@@ -7,8 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class Securbank1ApplicationTests {
-
+public class SecurbankApplicationTests {
 	@Test
 	public void contextLoads() {
 	}
