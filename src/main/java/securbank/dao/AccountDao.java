@@ -12,7 +12,7 @@ import java.util.*;
 
 public interface AccountDao extends BaseDao<Account, UUID> {
 	
-	public Account findByAccountNum(UUID accountNumber);
+	public Account findByAccountNumber(UUID accountNumber);
 	public List<Account> findAll();
 	
 	
