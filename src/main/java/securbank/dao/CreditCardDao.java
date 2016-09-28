@@ -6,9 +6,6 @@ import java.util.UUID;
 import securbank.models.CreditCard;
 
 public interface CreditCardDao extends BaseDao<CreditCard, UUID> {
-
 	public List<CreditCard> findAll();
-	public CreditCard findByCcId(UUID id);
-	public CreditCard findByAccountNo(UUID accountID);
-	
+	public CreditCard findByAccountNumber(UUID accountID);
 }
