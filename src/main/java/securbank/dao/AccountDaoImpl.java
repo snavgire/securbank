@@ -11,6 +11,11 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
+/**
+ * @author Madhu Illuri
+ *
+ */
+
 @Repository("accountDao")
 public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements AccountDao {
 	
@@ -22,6 +27,11 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 		super(Account.class);
 	}
 	
+	/**
+	* returns account for a given account number
+	* @param accountNumber
+	* @return account
+	*/
 	
 	@Override
 	public Account findByAccountNum(UUID accountNumber){
@@ -38,7 +48,10 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 		}
 	}
 	
-	
+	/**
+	* returns list of all the accounts 
+	* @return accounts
+	*/
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Account> findAll(){
