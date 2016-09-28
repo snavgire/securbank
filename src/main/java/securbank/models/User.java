@@ -1,6 +1,9 @@
 package securbank.models;
 
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +12,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import javax.persistence.CascadeType; 
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Email;
@@ -21,6 +28,11 @@ import org.joda.time.LocalDateTime;
 @Entity
 @Table(name = "User")
 public class User {
+	
+	/** One to many relation ship  */
+	
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private Set<Account> accounts = new HashSet<Account>(0);
 	
 	/**
 	 * @param userId
