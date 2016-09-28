@@ -38,8 +38,8 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 	
 		
 		try{
-			String qu = "SELECT acc from Account acc where acc.accountNumber LIKE :accountNum";
-			return (Account) this.entityManager.createQuery(qu)
+			String query = "SELECT acc from Account acc where acc.accountNumber = :accountNum";
+			return (Account) this.entityManager.createQuery(query)
 					.setParameter("accountNum", accountNumber)
 					.getSingleResult();
 		}
@@ -56,8 +56,8 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 	@Override
 	public List<Account> findAll(){
 		
-		String qu = "SELECT acc from Account acc";
-		return (List<Account>) this.entityManager.createQuery(qu).getResultList();
+		String query = "SELECT acc from Account acc";
+		return (List<Account>) this.entityManager.createQuery(query).getResultList();
 					
 	
 		
