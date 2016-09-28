@@ -1,11 +1,17 @@
 package securbank.models;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -49,20 +55,43 @@ public class Transfer {
 	@Column(name = "createdOn", nullable = false, updatable = false)
 	private LocalDateTime createdOn;
 	
+	@Column(name = "modifiedOn", nullable = true, updatable = true)
+	private LocalDateTime modifiedOn;
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@Column(name = "userId", nullable = true, updatable = true)
+	private Set<User> modifiedBy = new HashSet<User>(0);
+
+	@NotNull
+	@Column(name = "active", nullable = false, columnDefinition = "BIT")
+	private Boolean active;
+	
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "transfer")
+	private Set<Transaction> transactions = new HashSet<Transaction>(0);
+
 	/**
 	 * @param transferId
 	 * @param fromAccountNumber
 	 * @param toAccountNumber
 	 * @param status
+	 * @param transactions
 	 * @param createdOn
+	 * @param modifiedOn
+	 * @param modifiedBy
+	 * @param active 
 	 */
 	public Transfer(UUID transferId, String fromAccountNumber, String toAccountNumber,  
-			String status, LocalDateTime createdOn){
+			String status, Set<Transaction> transactions, LocalDateTime createdOn, LocalDateTime modifiedOn, 
+			Set<User> modifiedBy, Boolean active){
 		this.transferId = transferId;
 		this.fromAccountNumber = fromAccountNumber;
 		this.toAccountNumber = toAccountNumber;
 		this.status = status;
 		this.createdOn = createdOn;
+		this.modifiedOn = modifiedOn;
+		this.modifiedBy = modifiedBy;
+		this.transactions = transactions;
+		this.active = active;
 	}
 
 	/**

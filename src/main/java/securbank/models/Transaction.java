@@ -1,11 +1,17 @@
 package securbank.models;
 
+import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -56,13 +62,24 @@ public class Transaction {
 	@Column(name = "criticalStatus", unique = false, nullable = false, columnDefinition = "BIT")
 	private boolean criticalStatus;
 	
-	@NotNull
-	@Column(name = "transferId", unique = false, nullable = true, updatable = false)
-	private UUID transferId;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "transferId", nullable = false)
+	private Transfer transfer;
 	
 	@NotNull
 	@Column(name = "createdOn", nullable = false, updatable = false)
 	private LocalDateTime createdOn;
+	
+	@Column(name = "modifiedOn", nullable = true, updatable = true)
+	private LocalDateTime modifiedOn;
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@Column(name = "userId", nullable = true, updatable = true)
+	private Set<User> modifiedBy;
+
+	@NotNull
+	@Column(name = "active", nullable = false, columnDefinition = "BIT")
+	private Boolean active;
 	
 	/**
 	 * @param transactionId
@@ -74,10 +91,13 @@ public class Transaction {
 	 * @param criticalStatus
 	 * @param transferId
 	 * @param createdOn
+	 * @param modifiedOn
+	 * @param modifiedBy
+	 * @param active
 	 */
 	public Transaction(UUID transactionId, String accountNumber, double amount, 
 			String type, double oldBalance, double newBalance, Boolean criticalStatus, 
-			UUID transferId, LocalDateTime createdOn){
+			Transfer transfer, LocalDateTime createdOn, LocalDateTime modifiedOn, Set<User> modifiedBy, Boolean active){
 		super();
 		this.transactionId = transactionId;
 		this.accountNumber = accountNumber;
@@ -86,11 +106,78 @@ public class Transaction {
 		this.oldBalance = oldBalance;
 		this.newBalance = newBalance;
 		this.criticalStatus = criticalStatus;
-		this.transferId = transferId;
+		this.transfer = transfer;
 		this.createdOn = createdOn;
+		this.modifiedOn = modifiedOn;
+		this.modifiedBy = modifiedBy;
+		this.active = active;
+		
 	}
 
 	
+	/**
+	 * @return the transfer
+	 */
+	public Transfer getTransfer() {
+		return transfer;
+	}
+
+
+	/**
+	 * @return the modifiedOn
+	 */
+	public LocalDateTime getModifiedOn() {
+		return modifiedOn;
+	}
+
+
+	/**
+	 * @return the active
+	 */
+	public Boolean getActive() {
+		return active;
+	}
+
+
+	/**
+	 * @param transfer the transfer to set
+	 */
+	public void setTransfer(Transfer transfer) {
+		this.transfer = transfer;
+	}
+
+
+	/**
+	 * @param modifiedOn the modifiedOn to set
+	 */
+	public void setModifiedOn(LocalDateTime modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
+
+
+	/**
+	 * @return the modifiedBy
+	 */
+	public Set<User> getModifiedBy() {
+		return modifiedBy;
+	}
+
+	/**
+	 * @param modifiedBy the modifiedBy to set
+	 */
+	public void setModifiedBy(Set<User> modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
+
+
 	/**
 	 * @return the transactionId
 	 */
@@ -144,14 +231,6 @@ public class Transaction {
 	 */
 	public boolean isCriticalStatus() {
 		return criticalStatus;
-	}
-
-
-	/**
-	 * @return the transferId
-	 */
-	public UUID getTransferId() {
-		return transferId;
 	}
 
 
@@ -219,12 +298,12 @@ public class Transaction {
 	}
 
 
-	/**
-	 * @param transferId the transferId to set
-	 */
-	public void setTransferId(UUID transferId) {
-		this.transferId = transferId;
-	}
+//	/**
+//	 * @param transferId the transferId to set
+//	 */
+//	public void setTransferId(UUID transferId) {
+//		this.transferId = transferId;
+//	}
 
 
 	/**
@@ -242,7 +321,7 @@ public class Transaction {
 	public String toString() {
 		return "Transaction [transactionId=" + transactionId + ", accountNumber=" + accountNumber + ", amount=" + amount
 				+ ", type=" + type + ", oldBalance=" + oldBalance + ", newBalance=" + newBalance + ", criticalStatus="
-				+ criticalStatus + ", transferId=" + transferId + ", createdOn=" + createdOn + "]";
+				+ criticalStatus + ", transfer=" + transfer + ", createdOn=" + createdOn + "]";
 	}
 
 
