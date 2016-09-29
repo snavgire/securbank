@@ -1,64 +1,46 @@
 package securbank.models;
 
-import java.util.UUID;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import javax.persistence.CascadeType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.GenericGenerator;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.joda.time.LocalDateTime;
 
 /**
  * 
- * 
  * @author Madhu Illuri
- *
  */
-
 
 @Entity 
 @Table(name = "Account")
 public class Account {
 	
-	
-	/** map ManyToOne to many side of the relationship */
-	
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "userId", nullable = false)
-	private User user;
-	
 	/** Account number is unique. */
 	@Id
 	@NotNull
-	@GeneratedValue(generator = "uuid2")
-	@GenericGenerator(name = "uuid2", strategy = "uuid2")
-	@Size(min = 5, max = 15)
-	@Column(name = "accountNumber", nullable = false, length = 10, unique = true, columnDefinition = "BINARY(16)")
-	private UUID accountNumber;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "accountNumber", nullable = false, unique = true, columnDefinition = "BINARY(16)")
+	private Long accountNumber;
 	
-	/** UserID is unique	 */
+	/** multiple account can be associated with an user	 */
+	@ManyToOne(cascade = CascadeType.ALL)
 	@NotNull
-	@Column(name = "userId", unique = true, nullable = false, columnDefinition = "BINARY(16)")
-	private UUID userId;
-	
+	@JoinColumn(name = "user", unique = true, nullable = false)
+	private User user;
 	
 	/** balance on the account */
 	@NotNull
 	@Column(name = "balance", unique = false, nullable = false)
 	private Double balance;
 	
-	
-	/** account type. Default an account will be checkings(0), (1) for savings account	*/
+	/** account type. Default an account will be checking(0), (1) for savings account	*/
 	@NotNull
 	@Column(name = "accountType", unique = false, nullable = false, columnDefinition = "int(1) DEFAULT '0' ")
 	private Integer accountType;
@@ -71,10 +53,6 @@ public class Account {
 	@Column(name = "active", nullable = false, columnDefinition = "BIT")
 	private Boolean active;
 	
-	
-	
-	
-	
 	/**
 	 * 
 	 * @param accountNumber
@@ -84,17 +62,16 @@ public class Account {
 	 * @param createdOn
 	 * @param active
 	 */
-	public Account(UUID accountNumber, UUID userId, double balance, int accountType, LocalDateTime createdOn
+	public Account(Long accountNumber, User user, double balance, int accountType, LocalDateTime createdOn
 			,Boolean active){
 		
 		super();
 		this.accountNumber = accountNumber;
-		this.userId = userId;
+		this.user = user;
 		this.balance = balance;
 		this.accountType = accountType;
 		this.createdOn = createdOn;
-		this.active = active;
-		
+		this.active = active;	
 		
 	}
 	
@@ -102,7 +79,7 @@ public class Account {
 	 * 
 	 * @return accountNumber
 	 */
-	public UUID getAccountNumber() {
+	public Long getAccountNumber() {
 		return accountNumber;
 	}
 	
@@ -110,7 +87,7 @@ public class Account {
 	 * 
 	 * @param accountNumber sets accountNumber
 	 */
-	public void setAccountNumber(UUID accountNumber) {
+	public void setAccountNumber(Long accountNumber) {
 		this.accountNumber = accountNumber;
 	}
 	
@@ -118,16 +95,16 @@ public class Account {
 	 * 
 	 * @return userId
 	 */
-	public UUID getUserId() {
-		return userId;
+	public User getUserId() {
+		return user;
 	}
 	
 	/**
 	 * 
 	 * @param userId sets userId
 	 */
-	public void setUserId(UUID userId) {
-		this.userId = userId;
+	public void setUserId(User user) {
+		this.user = user;
 	}
 
 	/**
@@ -161,8 +138,7 @@ public class Account {
 	public void setAccountType(Integer accountType) {
 		this.accountType = accountType;
 	}
-	
-	
+		
 	/**
 	 * 
 	 * @return createdOn time created on
@@ -178,8 +154,7 @@ public class Account {
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
 	}
-	
-	
+		
 	/**
 	 * 
 	 * @return active if the account is active
@@ -195,11 +170,15 @@ public class Account {
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
-
-
-
 	
-	
-	
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString(){
+		return "Account [accountNumber=" + accountNumber + ", user=" + user + ", balance="
+				+ balance + ", accountType=" + accountType + ", active=" + active + ", balance=" +
+				", createdOn=" + createdOn + "]";
+	}
 
 }

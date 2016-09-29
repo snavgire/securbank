@@ -9,12 +9,8 @@ import java.util.*;
  * @author Madhu Illuri
  *
  */
-
 public interface AccountDao extends BaseDao<Account, UUID> {
 	
-	public Account findByAccountNumber(UUID accountNumber);
 	public List<Account> findAll();
-	
-	
 
 }

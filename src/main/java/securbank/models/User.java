@@ -28,11 +28,7 @@ import org.joda.time.LocalDateTime;
 @Entity
 @Table(name = "User")
 public class User {
-	
-	/** One to many relation ship  */
-	
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
-	private Set<Account> accounts = new HashSet<Account>(0);
+
 	
 	/**
 	 * @param userId
@@ -146,6 +142,10 @@ public class User {
 	@NotNull
 	@Column(name = "active", nullable = false, columnDefinition = "BIT")
 	private Boolean active;
+	
+	/** One to many relation ship  */
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private Set<Account> accounts = new HashSet<Account>(0);
 
 	public User() {
 		
