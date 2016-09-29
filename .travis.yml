@@ -5,4 +5,4 @@ services:
   - mysql
 before_script:
   - mysql -u root -e 'CREATE DATABASE securbank;'
-script: gradle check --stacktrace
+script: gradle check
