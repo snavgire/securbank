@@ -16,7 +16,6 @@ import javax.persistence.EntityManager;
  */
 @Repository("accountDao")
 public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements AccountDao {
-	
 	@Autowired
 	EntityManager entityManager;
 	
@@ -31,14 +30,8 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Account> findAll(){
-		
 		String query = "SELECT acc from Account acc";
 		return (List<Account>) this.entityManager.createQuery(query).getResultList();
 					
 	}
-	
-	
-	
-	
-
 }

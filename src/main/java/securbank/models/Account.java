@@ -3,6 +3,7 @@ package securbank.models;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,37 +27,34 @@ public class Account {
 	@Id
 	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "accountNumber", nullable = false, unique = true, columnDefinition = "BINARY(16)")
 	private Long accountNumber;
 	
 	/** multiple account can be associated with an user	 */
-	@ManyToOne(cascade = CascadeType.ALL)
-	@NotNull
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "user", unique = true, nullable = false)
 	private User user;
 	
 	/** balance on the account */
 	@NotNull
-	@Column(name = "balance", unique = false, nullable = false)
 	private Double balance;
 	
 	/** account type. Default an account will be checking(0), (1) for savings account	*/
 	@NotNull
-	@Column(name = "accountType", unique = false, nullable = false, columnDefinition = "int(1) DEFAULT '0' ")
+	@Column(name = "accountType", columnDefinition = "int(1) DEFAULT '0' ")
 	private Integer accountType;
 	
 	@NotNull
-	@Column(name = "createdOn", nullable = false, updatable = false)
+	@Column(name = "createdOn", updatable = false)
 	private LocalDateTime createdOn;
 	
 	@NotNull
-	@Column(name = "active", nullable = false, columnDefinition = "BIT")
+	@Column(name = "active", columnDefinition = "BIT")
 	private Boolean active;
 	
 	/**
 	 * 
 	 * @param accountNumber
-	 * @param userId
+	 * @param user
 	 * @param balance
 	 * @param accountType
 	 * @param createdOn
@@ -72,6 +70,10 @@ public class Account {
 		this.accountType = accountType;
 		this.createdOn = createdOn;
 		this.active = active;	
+		
+	}
+	
+	public Account() {
 		
 	}
 	
@@ -93,17 +95,17 @@ public class Account {
 	
 	/**
 	 * 
-	 * @return userId
+	 * @return user
 	 */
-	public User getUserId() {
+	public User getUser() {
 		return user;
 	}
 	
 	/**
 	 * 
-	 * @param userId sets userId
+	 * @param user sets user
 	 */
-	public void setUserId(User user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 

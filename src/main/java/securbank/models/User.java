@@ -28,49 +28,7 @@ import org.joda.time.LocalDateTime;
 @Entity
 @Table(name = "User")
 public class User {
-
 	
-	/**
-	 * @param userId
-	 * @param username
-	 * @param password
-	 * @param firstName
-	 * @param middleName
-	 * @param lastName
-	 * @param email
-	 * @param phone
-	 * @param addressLine1
-	 * @param addressLine2
-	 * @param city
-	 * @param state
-	 * @param zip
-	 * @param createdOn
-	 * @param modifiedOn
-	 * @param lastLogin
-	 * @param active
-	 */
-	public User(UUID userId, String username, String password, String firstName, String middleName, String lastName,
-			String email, String phone, String addressLine1, String addressLine2, String city, String state, String zip,
-			LocalDateTime createdOn, LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active) {
-		super();
-		this.userId = userId;
-		this.username = username;
-		this.password = password;
-		this.firstName = firstName;
-		this.middleName = middleName;
-		this.lastName = lastName;
-		this.email = email;
-		this.phone = phone;
-		this.addressLine1 = addressLine1;
-		this.addressLine2 = addressLine2;
-		this.city = city;
-		this.state = state;
-		this.zip = zip;
-		this.createdOn = createdOn;
-		this.modifiedOn = modifiedOn;
-		this.lastLogin = lastLogin;
-		this.active = active;
-	}
 	
 	@Id
 	@GeneratedValue(generator = "uuid2")
@@ -149,6 +107,51 @@ public class User {
 
 	public User() {
 		
+	}
+	
+	/**
+	 * @param userId
+	 * @param username
+	 * @param password
+	 * @param firstName
+	 * @param middleName
+	 * @param lastName
+	 * @param email
+	 * @param phone
+	 * @param addressLine1
+	 * @param addressLine2
+	 * @param city
+	 * @param state
+	 * @param zip
+	 * @param createdOn
+	 * @param modifiedOn
+	 * @param lastLogin
+	 * @param active
+	 * @param accounts
+	 */
+	public User(UUID userId, String username, String password, String firstName, String middleName, String lastName,
+			String email, String phone, String addressLine1, String addressLine2, String city, String state, String zip,
+			LocalDateTime createdOn, LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active,
+			Set<Account> accounts) {
+		super();
+		this.userId = userId;
+		this.username = username;
+		this.password = password;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phone = phone;
+		this.addressLine1 = addressLine1;
+		this.addressLine2 = addressLine2;
+		this.city = city;
+		this.state = state;
+		this.zip = zip;
+		this.createdOn = createdOn;
+		this.modifiedOn = modifiedOn;
+		this.lastLogin = lastLogin;
+		this.active = active;
+		this.accounts = accounts;
 	}
 	
 	/**
@@ -387,6 +390,20 @@ public class User {
 	 */
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+
+	/**
+	 * @return the accounts
+	 */
+	public Set<Account> getAccounts() {
+		return accounts;
+	}
+
+	/**
+	 * @param accounts the accounts to set
+	 */
+	public void setAccounts(Set<Account> accounts) {
+		this.accounts = accounts;
 	}
 
 	/* (non-Javadoc)
