@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
      * @return user
      */
 	@Override
-	public User createInternalUser(User user) {
+	public User createExternalUser(User user) {
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
