@@ -3,6 +3,8 @@
  */
 package securbank.services;
 
+import javax.transaction.Transactional;
+
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import securbank.models.Account;
  *
  */
 @Service("accountService")
+@Transactional
 public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
@@ -32,6 +35,4 @@ public class AccountServiceImpl implements AccountService {
 		
 		return accountDao.save(account);
 	}
-	
-	
 }
