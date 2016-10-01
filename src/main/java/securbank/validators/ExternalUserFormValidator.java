@@ -1,5 +1,6 @@
 package securbank.validators;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -7,6 +8,7 @@ import org.springframework.validation.ValidationUtils;
 
 import securbank.models.User;
 import securbank.Utils;
+import securbank.dao.UserDao;
 /**
  * @author Ayush Gupta
  *
@@ -16,6 +18,9 @@ public class ExternalUserFormValidator implements Validator{
 
 	Utils utils = new Utils();
 	
+	@Autowired
+	UserDao userDao;
+	
 	/**
      * If supports class
      * 
@@ -23,7 +28,8 @@ public class ExternalUserFormValidator implements Validator{
      *            The class to check
      *            
      * @return boolean
-     */	@Override
+     */	
+	@Override
 	public boolean supports(Class<?> clazz) {
 		return User.class.equals(clazz);
 	}
@@ -49,20 +55,35 @@ public class ExternalUserFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "zip", "user.zip.required", "Zip is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "state", "user.phone.required", "State is required");
 		
-		if (!errors.hasFieldErrors("email") && !utils.validateEmail(user.getEmail())) {
-					errors.rejectValue("email", "user.email.contraint", "Invalid Email");
+		if (!errors.hasFieldErrors("email")) {
+			if (!utils.validateEmail(user.getEmail())) {
+				errors.rejectValue("email", "user.email.contraint", "Invalid Email");
+			}
+			else if (userDao.emailExists(user.getEmail())) {
+				errors.rejectValue("email", "user.email.exists", "Email exists");
+			}
 		}
 		
-		if (!errors.hasFieldErrors("username") && !utils.validateUsername(user.getUsername())) {
-			errors.rejectValue("username", "user.username.contraint", "Username can contain lowercase alphanumeric with (-,_) and length should be between 3 and 15");
+		if (!errors.hasFieldErrors("username")) {
+			if (!utils.validateUsername(user.getUsername())) {
+				errors.rejectValue("username", "user.username.contraint", "Username can contain lowercase alphanumeric with (-,_) and length should be between 3 and 15");
+			}
+			else if (userDao.usernameExists(user.getUsername())) {
+				errors.rejectValue("username", "user.username.exists", "Username exists");
+			}
 		}
 		
 		if (!errors.hasFieldErrors("password") && !utils.validatePassword(user.getPassword())) {
 			errors.rejectValue("password", "user.password.contraint", "Password should contain one letter, number and special character. Length of password should be between 6 and 20");
 		}
 		
-		if (!errors.hasFieldErrors("phone") && !utils.validatePhone(user.getPhone())) {
-			errors.rejectValue("Phone", "user.phone.contraint", "Invalid Phone");
+		if (!errors.hasFieldErrors("phone")) {
+			if (!utils.validatePhone(user.getPhone())) {
+				errors.rejectValue("phone", "user.phone.contraint", "Invalid Phone");
+			}
+			else if (userDao.phoneExists(user.getPhone())) {
+				errors.rejectValue("phone", "user.phone.exists", "Phone number exists");
+			}
 		}
 		
 		if (!errors.hasFieldErrors("zip") && !utils.validateZip(user.getZip())) {

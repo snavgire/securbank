@@ -20,6 +20,10 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
 	@Autowired
 	EntityManager entityManager; 
 	
+	public UserDaoImpl() {
+		super(User.class);
+	}
+	
 	/**
      * Returns user for the given Id.
      * 
@@ -27,14 +31,11 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
      *            The username or email to query db
      * @return User
      */
-	public UserDaoImpl() {
-		super(User.class);
-	}
 	
 	@Override
 	public User findByUsernameOrEmail(String user) {
 		try {
-			return (User) this.entityManager.createQuery("SELECT user from User user where (user.username = :username OR user.email = :email) AND user.active = 1")
+			return (User) this.entityManager.createQuery("SELECT user from User user where (user.username = :username OR user.email = :email) AND user.active = true")
 					.setParameter("username", user)
 					.setParameter("email", user)
 					.getSingleResult();
@@ -50,10 +51,51 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
      * 
      * @return users
      */
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> findAll() {
-		return (List<User>) this.entityManager.createQuery("SELECT user from User user")
+		return this.entityManager.createQuery("SELECT user from User user", User.class)
 											.getResultList();
+	}
+
+	/**
+     * Returns if username exists in table
+     * 
+     * @param username
+     * 			The username to check
+     * @return boolean
+     */
+	@Override
+	public boolean usernameExists(String username) {
+		return this.entityManager.createQuery("SELECT COUNT(user) from User user where (user.username = :username AND user.active = true)", Long.class)
+					.setParameter("username", username)
+					.getSingleResult() != 0;
+	}
+	
+	/**
+     * Returns if email exists in table
+     * 
+     * @param email
+     * 			The email to check
+     * @return boolean
+     */
+	@Override
+	public boolean emailExists(String email) {
+		return this.entityManager.createQuery("SELECT COUNT(user) from User user where (user.email = :email AND user.active = true)", Long.class)
+					.setParameter("email", email)
+					.getSingleResult() != 0;
+	}
+	
+	/**
+     * Returns if phone exists in table
+     * 
+     * @param phone
+     * 			The phone to check
+     * @return boolean
+     */
+	@Override
+	public boolean phoneExists(String phone) {
+		return this.entityManager.createQuery("SELECT COUNT(user) from User user where (user.phone = :phone AND user.active = true)", Long.class)
+					.setParameter("phone", phone)
+					.getSingleResult() != 0;
 	}
 }
