@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User createExternalUser(User user) {
 		user.setPassword(encoder.encode(user.getPassword()));
+		user.setRole("individual");
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
 		

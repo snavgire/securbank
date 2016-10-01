@@ -36,6 +36,9 @@ public class User {
 	private UUID userId;
 	
 	@NotNull
+	private String role;
+	
+	@NotNull
 	@Size(min = 3, max = 15)
 	@Column(name = "username", unique = true)
 	private String username;
@@ -108,6 +111,7 @@ public class User {
 	
 	/**
 	 * @param userId
+	 * @param role
 	 * @param username
 	 * @param password
 	 * @param firstName
@@ -126,12 +130,13 @@ public class User {
 	 * @param active
 	 * @param accounts
 	 */
-	public User(UUID userId, String username, String password, String firstName, String middleName, String lastName,
-			String email, String phone, String addressLine1, String addressLine2, String city, String state, String zip,
-			LocalDateTime createdOn, LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active,
-			Set<Account> accounts) {
+	public User(UUID userId, String role, String username, String password, String firstName, String middleName,
+			String lastName, String email, String phone, String addressLine1, String addressLine2, String city,
+			String state, String zip, LocalDateTime createdOn, LocalDateTime modifiedOn, LocalDateTime lastLogin,
+			Boolean active, Set<Account> accounts) {
 		super();
 		this.userId = userId;
+		this.role = role;
 		this.username = username;
 		this.password = password;
 		this.firstName = firstName;
@@ -163,6 +168,20 @@ public class User {
 	 */
 	public void setUserId(UUID userId) {
 		this.userId = userId;
+	}
+
+	/**
+	 * @return the role
+	 */
+	public String getRole() {
+		return role;
+	}
+
+	/**
+	 * @param role the role to set
+	 */
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	/**
@@ -408,12 +427,10 @@ public class User {
 	 */
 	@Override
 	public String toString() {
-		return "User [userId=" + userId + ", username=" + username + ", password=" + password + ", firstName="
-				+ firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", email=" + email + ", phone="
-				+ phone + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city
-				+ ", state=" + state + ", zip=" + zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn
-				+ ", lastLogin=" + lastLogin + ", active=" + active + "]";
-	}
-
-	
+		return "User [userId=" + userId + ", role=" + role + ", username=" + username + ", password=" + password
+				+ ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", email="
+				+ email + ", phone=" + phone + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2
+				+ ", city=" + city + ", state=" + state + ", zip=" + zip + ", createdOn=" + createdOn + ", modifiedOn="
+				+ modifiedOn + ", lastLogin=" + lastLogin + ", active=" + active + ", accounts=" + accounts + "]";
+	}	
 }
