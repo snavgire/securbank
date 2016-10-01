@@ -29,17 +29,15 @@ import org.joda.time.LocalDateTime;
 @Table(name = "User")
 public class User {
 	
-	
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "uuid2")
-	@NotNull
-	@Column(name = "userId", unique = true, nullable = false, columnDefinition = "BINARY(16)")
+	@Column(name = "userId", unique = true, columnDefinition = "BINARY(16)")
 	private UUID userId;
 	
 	@NotNull
-	@Size(min = 2, max = 35)
-	@Column(name = "username", unique = true, nullable = false)
+	@Size(min = 3, max = 15)
+	@Column(name = "username", unique = true)
 	private String username;
 	
 	@NotNull
@@ -47,25 +45,24 @@ public class User {
 	private String password;
 	
 	@NotNull
-	@Size(min = 2, max = 50)
+	@Size(min = 2)
 	private String firstName;
 	
-	@Size(min = 2, max = 50)
+	@Size(min = 0)
 	private String middleName;
 	
 	@NotNull
-	@Size(min = 2, max = 50)
+	@Size(min = 2)
 	private String lastName;
 	
 	@NotNull
 	@Email
-	@Size(min = 2, max = 35)
-	@Column(name = "email", unique = true, nullable = false)
+	@Column(name = "email", unique = true)
 	private String email;
 
 	@NotNull
 	@Size(min = 10, max = 10)
-	@Column(name = "phone", unique = true, nullable = false)
+	@Column(name = "phone", unique = true)
 	private String phone;
 
 	@NotNull
@@ -88,17 +85,17 @@ public class User {
 	private String zip;
 
 	@NotNull
-	@Column(name = "createdOn", nullable = false, updatable = false)
+	@Column(name = "createdOn", updatable = false)
 	private LocalDateTime createdOn;
 
-	@Column(name = "modifiedOn", nullable = true, updatable = true)
+	@Column(name = "modifiedOn", updatable = true)
 	private LocalDateTime modifiedOn;
 
-	@Column(name = "lastLogin", nullable = true, updatable = true)
+	@Column(name = "lastLogin", updatable = true)
 	private LocalDateTime lastLogin;
 
 	@NotNull
-	@Column(name = "active", nullable = false, columnDefinition = "BIT")
+	@Column(name = "active", columnDefinition = "BIT")
 	private Boolean active;
 	
 	/** One to many relation ship  */

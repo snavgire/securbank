@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.joda.time.LocalDateTime;
 
 /**
@@ -25,23 +26,20 @@ public class Account {
 	
 	/** Account number is unique. */
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long accountNumber;
 	
 	/** multiple account can be associated with an user	 */
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "user", unique = true, nullable = false)
+	@JoinColumn(name = "userId", nullable = false)
 	private User user;
 	
 	/** balance on the account */
 	@NotNull
 	private Double balance;
 	
-	/** account type. Default an account will be checking(0), (1) for savings account	*/
 	@NotNull
-	@Column(name = "accountType", columnDefinition = "int(1) DEFAULT '0' ")
-	private Integer accountType;
+	private String type;
 	
 	@NotNull
 	@Column(name = "createdOn", updatable = false)
@@ -60,14 +58,12 @@ public class Account {
 	 * @param createdOn
 	 * @param active
 	 */
-	public Account(Long accountNumber, User user, double balance, int accountType, LocalDateTime createdOn
-			,Boolean active){
-		
+	public Account(Long accountNumber, User user, double balance, String type, LocalDateTime createdOn, Boolean active){
 		super();
 		this.accountNumber = accountNumber;
 		this.user = user;
 		this.balance = balance;
-		this.accountType = accountType;
+		this.type = type;
 		this.createdOn = createdOn;
 		this.active = active;	
 		
@@ -127,18 +123,18 @@ public class Account {
 
 	/**
 	 * 
-	 * @return accountType
+	 * @return type
 	 */
-	public Integer getAccountType() {
-		return accountType;
+	public String getType() {
+		return type;
 	}
 	
 	/**
 	 * 
-	 * @param accountType sets accountType
+	 * @param type sets type
 	 */
-	public void setAccountType(Integer accountType) {
-		this.accountType = accountType;
+	public void setType(String type) {
+		this.type = type;
 	}
 		
 	/**
@@ -179,7 +175,7 @@ public class Account {
 	@Override
 	public String toString(){
 		return "Account [accountNumber=" + accountNumber + ", user=" + user + ", balance="
-				+ balance + ", accountType=" + accountType + ", active=" + active + ", balance=" +
+				+ balance + ", type=" + type + ", active=" + active + ", balance=" +
 				", createdOn=" + createdOn + "]";
 	}
 
