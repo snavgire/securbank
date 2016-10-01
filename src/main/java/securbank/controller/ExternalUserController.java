@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import securbank.models.User;
 import securbank.services.UserService;
-import securbank.validators.ExternalUserFormValidator;
+import securbank.validators.NewUserFormValidator;
 /**
  * @author Ayush Gupta
  *
@@ -24,7 +24,7 @@ public class ExternalUserController {
 	UserService userService;
 	
 	@Autowired 
-	ExternalUserFormValidator userFormValidator;
+	NewUserFormValidator userFormValidator;
 	
 	@GetMapping("/signup")
     public String signupForm(Model model) {

@@ -13,8 +13,8 @@ import securbank.dao.UserDao;
  * @author Ayush Gupta
  *
  */
-@Component("externameFserFormValidator")
-public class ExternalUserFormValidator implements Validator{
+@Component("newUserFormValidator")
+public class NewUserFormValidator implements Validator{
 
 	Utils utils = new Utils();
 	
@@ -54,6 +54,7 @@ public class ExternalUserFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "city", "user.city.required", "City is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "zip", "user.zip.required", "Zip is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "state", "user.phone.required", "State is required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "role", "user.role.required", "Role is required");
 		
 		if (!errors.hasFieldErrors("email")) {
 			if (!utils.validateEmail(user.getEmail())) {
