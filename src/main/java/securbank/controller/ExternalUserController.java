@@ -39,7 +39,15 @@ public class ExternalUserController {
 			return "signup";
         }
 		
-    	userService.createInternalUser(user);
+    	userService.createExternalUser(user);
+    	
         return "redirect:/";
+    }
+	
+	@GetMapping("/user/details")
+    public String currentUserDetails(Model model) {
+		model.addAttribute(userService.getCurrentUser());
+		
+        return "details";
     }
 }
