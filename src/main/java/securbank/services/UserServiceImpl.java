@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -53,4 +54,17 @@ public class UserServiceImpl implements UserService {
 		
 		return account.getUser();
 	}
+	
+	/**
+     * Get current logged in user
+     * 
+     * @return user
+     */
+	@Override
+	public User getCurrentUser() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	      
+		return userDao.findById(user.getUserId());
+	}
+	
 }

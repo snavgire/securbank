@@ -11,4 +11,5 @@ import securbank.models.User;
  */
 public interface UserService {
 	public User createInternalUser(User user);
+	public User getCurrentUser();
 }
