@@ -3,6 +3,8 @@
  */
 package securbank.controller;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,7 +60,7 @@ public class ExternalUserController {
         return "edit";
     }
 	
-	@PostMapping("/edit")
+	@PostMapping("/user/edit/")
     public String editSubmit(@ModelAttribute ModificationRequest request, BindingResult bindingResult) {
 		editUserFormValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
@@ -76,6 +78,5 @@ public class ExternalUserController {
 		model.addAttribute(userService.getCurrentUser());
 		
         return "details";
-    }
-	
+    }	
 }
