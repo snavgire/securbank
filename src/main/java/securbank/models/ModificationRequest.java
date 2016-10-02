@@ -88,8 +88,8 @@ public class ModificationRequest {
 	@Column(name = "createdOn", updatable = false)
 	private LocalDateTime createdOn;
 
-	@Column(name = "approvedOn", updatable = true)
-	private LocalDateTime approvedOn;
+	@Column(name = "modifiedOn", updatable = true)
+	private LocalDateTime modifiedOn;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId")
@@ -127,7 +127,7 @@ public class ModificationRequest {
 	 * @param State
 	 * @param zip
 	 * @param createdOn
-	 * @param approvedOn
+	 * @param modifiedOn
 	 * @param approvedBy
 	 * @param user
 	 * @param status
@@ -136,7 +136,7 @@ public class ModificationRequest {
 	public ModificationRequest(UUID modificationRequestId, String role, String username, String password,
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String State, String zip, LocalDateTime createdOn,
-			LocalDateTime approvedOn, User approvedBy, User user, String status, Boolean active) {
+			LocalDateTime modifiedOn, User approvedBy, User user, String status, Boolean active) {
 		super();
 		this.modificationRequestId = modificationRequestId;
 		this.role = role;
@@ -153,7 +153,7 @@ public class ModificationRequest {
 		this.State = State;
 		this.zip = zip;
 		this.createdOn = createdOn;
-		this.approvedOn = approvedOn;
+		this.modifiedOn = modifiedOn;
 		this.approvedBy = approvedBy;
 		this.user = user;
 		this.status = status;
@@ -371,17 +371,17 @@ public class ModificationRequest {
 	}
 
 	/**
-	 * @return the approvedOn
+	 * @return the modifiedOn
 	 */
-	public LocalDateTime getApprovedOn() {
-		return approvedOn;
+	public LocalDateTime getModifiedOn() {
+		return modifiedOn;
 	}
 
 	/**
-	 * @param approvedOn the approvedOn to set
+	 * @param modifiedOn the modifiedOn to set
 	 */
-	public void setApprovedOn(LocalDateTime approvedOn) {
-		this.approvedOn = approvedOn;
+	public void setModifiedOn(LocalDateTime modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 
 	/**
@@ -449,7 +449,7 @@ public class ModificationRequest {
 				+ username + ", password=" + password + ", firstName=" + firstName + ", middleName=" + middleName
 				+ ", lastName=" + lastName + ", email=" + email + ", phone=" + phone + ", addressLine1=" + addressLine1
 				+ ", addressLine2=" + addressLine2 + ", city=" + city + ", State=" + State + ", zip=" + zip
-				+ ", createdOn=" + createdOn + ", approvedOn=" + approvedOn + ", approvedBy=" + approvedBy + ", user="
+				+ ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", approvedBy=" + approvedBy + ", user="
 				+ user + ", status=" + status + ", active=" + active + "]";
 	}
 	
