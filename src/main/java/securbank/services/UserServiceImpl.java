@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,6 +59,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Value("${user.verification.subject}")
 	private String verificationSubject;
+	
+	@Autowired
+	private Environment env;
 	
 	private SimpleMailMessage message;
 	
@@ -201,16 +205,37 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-     * Creates new user request
+     * Approves user request
      * 
-     * @param user
-     *            The modified user to be create 
+     * @param requestId
+     *            The id of the request to be approved 
      * @return modificationRequest
      */
 	@Override
 	public ModificationRequest approveModificationRequest(UUID requestId) {
 		ModificationRequest request = modificationRequestDao.findById(requestId);
 		User user = request.getUser();
+		
+		// If email has been taken
+		if (userDao.emailExists(request.getEmail()) || newUserRequestDao.emailExists(request.getEmail())) {
+			
+			// Sends an email if requested change is not acceptable
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setText(env.getProperty("modification.request.failure.body"));
+			message.setSubject(env.getProperty("modification.request.failure.subject"));
+			message.setTo(user.getEmail());
+			emailService.sendEmail(message);
+			
+			// update request
+			request.setActive(false);
+			request.setStatus("rejected");
+			request.setModifiedOn(LocalDateTime.now());
+			modificationRequestDao.update(request);
+			
+			return null;
+		}
+		
+		// Update User
 		user.setUsername(request.getUsername());
 		user.setFirstName(request.getFirstName());
 		user.setMiddleName(request.getMiddleName());
@@ -223,13 +248,14 @@ public class UserServiceImpl implements UserService {
 		user.setState(request.getState());
 		user.setZip(request.getZip());
 		user.setPassword(request.getPassword());
+		user.setModifiedOn(LocalDateTime.now());
 		userDao.update(user);
 		
-		user.setModifiedOn(LocalDateTime.now());
+		// Update request
 		request.setActive(false);
-		request.setCreatedOn(LocalDateTime.now());
-		request.setStatus("pending");
-		modificationRequestDao.save(request);
+		request.setModifiedOn(LocalDateTime.now());
+		request.setStatus("approved");
+		modificationRequestDao.update(request);
 		
 		return request;
 	}
