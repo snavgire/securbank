@@ -74,8 +74,8 @@ public class InternalUserController {
 		user.setEmail(newUserRequest.getEmail());
 		user.setRole(newUserRequest.getRole());
 		model.addAttribute("user", user);
-		
-        return "internal_signup";
+		  
+		return "internal_signup";
     }
 	
 	@PostMapping("/internal/signup")
