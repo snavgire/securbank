@@ -3,6 +3,7 @@
  */
 package securbank.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -15,9 +16,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import securbank.dao.ModificationRequestDao;
 import securbank.dao.NewUserRequestDao;
 import securbank.dao.UserDao;
 import securbank.models.Account;
+import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 
@@ -34,6 +37,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private NewUserRequestDao newUserRequestDao;
+	
+	@Autowired
+	private ModificationRequestDao modificationRequestDao;
 	
 	@Autowired 
 	private AccountService accountService;
@@ -165,6 +171,67 @@ public class UserServiceImpl implements UserService {
 		}
 	
 		return newUserRequest;
+	}
+
+	/**
+     * Creates new user request
+     * 
+     * @param user
+     *            The modified user to be create 
+     * @return modificationRequest
+     */
+	@Override
+	public ModificationRequest createModificationRequest(ModificationRequest request) {
+		User user = getCurrentUser();
+		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(user);
+		
+		// Deactivate all active request 
+		for (ModificationRequest activeRequest : requests) {
+			activeRequest.setActive(false);
+			modificationRequestDao.update(activeRequest);
+		}
+		request.setUser(user);
+		request.setPassword(user.getPassword());
+		request.setActive(true);
+		request.setCreatedOn(LocalDateTime.now());
+		request.setStatus("pending");
+		modificationRequestDao.save(request);
+		
+		return request;
+	}
+
+	/**
+     * Creates new user request
+     * 
+     * @param user
+     *            The modified user to be create 
+     * @return modificationRequest
+     */
+	@Override
+	public ModificationRequest approveModificationRequest(UUID requestId) {
+		ModificationRequest request = modificationRequestDao.findById(requestId);
+		User user = request.getUser();
+		user.setUsername(request.getUsername());
+		user.setFirstName(request.getFirstName());
+		user.setMiddleName(request.getMiddleName());
+		user.setLastName(request.getLastName());
+		user.setEmail(request.getEmail());
+		user.setPhone(request.getPhone());
+		user.setAddressLine1(request.getAddressLine1());
+		user.setAddressLine2(request.getAddressLine2());
+		user.setCity(request.getCity());
+		user.setState(request.getState());
+		user.setZip(request.getZip());
+		user.setPassword(request.getPassword());
+		userDao.update(user);
+		
+		user.setModifiedOn(LocalDateTime.now());
+		request.setActive(false);
+		request.setCreatedOn(LocalDateTime.now());
+		request.setStatus("pending");
+		modificationRequestDao.save(request);
+		
+		return request;
 	}
 
 }

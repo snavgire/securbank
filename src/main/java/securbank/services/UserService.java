@@ -5,6 +5,7 @@ package securbank.services;
 
 import java.util.UUID;
 
+import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 
@@ -18,4 +19,6 @@ public interface UserService {
 	public NewUserRequest createUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
+	public ModificationRequest createModificationRequest(ModificationRequest request);
+	public ModificationRequest approveModificationRequest(UUID requestId);
 }
