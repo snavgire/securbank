@@ -7,7 +7,7 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.ValidationUtils;
 
 import securbank.models.User;
-import securbank.Utils;
+import securbank.utils.ContraintUtils;
 import securbank.dao.UserDao;
 /**
  * @author Ayush Gupta
@@ -16,10 +16,8 @@ import securbank.dao.UserDao;
 @Component("newUserFormValidator")
 public class NewUserFormValidator implements Validator{
 
-	Utils utils = new Utils();
-	
 	@Autowired
-	UserDao userDao;
+	private UserDao userDao;
 	
 	/**
      * If supports class
@@ -45,6 +43,7 @@ public class NewUserFormValidator implements Validator{
 	@Override
 	public void validate(Object target, Errors errors) {
 		User user = (User) target;
+		
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "user.username.required", "Username is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "user.firstName.required", "First Name is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lastName", "user.lastName.required", "Last Name is required");
@@ -57,7 +56,7 @@ public class NewUserFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "role", "user.role.required", "Role is required");
 		
 		if (!errors.hasFieldErrors("email")) {
-			if (!utils.validateEmail(user.getEmail())) {
+			if (!ContraintUtils.validateEmail(user.getEmail())) {
 				errors.rejectValue("email", "user.email.contraint", "Invalid Email");
 			}
 			else if (userDao.emailExists(user.getEmail())) {
@@ -66,7 +65,7 @@ public class NewUserFormValidator implements Validator{
 		}
 		
 		if (!errors.hasFieldErrors("username")) {
-			if (!utils.validateUsername(user.getUsername())) {
+			if (!ContraintUtils.validateUsername(user.getUsername())) {
 				errors.rejectValue("username", "user.username.contraint", "Username can contain lowercase alphanumeric with (-,_) and length should be between 3 and 15");
 			}
 			else if (userDao.usernameExists(user.getUsername())) {
@@ -74,12 +73,12 @@ public class NewUserFormValidator implements Validator{
 			}
 		}
 		
-		if (!errors.hasFieldErrors("password") && !utils.validatePassword(user.getPassword())) {
+		if (!errors.hasFieldErrors("password") && !ContraintUtils.validatePassword(user.getPassword())) {
 			errors.rejectValue("password", "user.password.contraint", "Password should contain one letter, number and special character. Length of password should be between 6 and 20");
 		}
 		
 		if (!errors.hasFieldErrors("phone")) {
-			if (!utils.validatePhone(user.getPhone())) {
+			if (!ContraintUtils.validatePhone(user.getPhone())) {
 				errors.rejectValue("phone", "user.phone.contraint", "Invalid Phone");
 			}
 			else if (userDao.phoneExists(user.getPhone())) {
@@ -87,7 +86,7 @@ public class NewUserFormValidator implements Validator{
 			}
 		}
 		
-		if (!errors.hasFieldErrors("zip") && !utils.validateZip(user.getZip())) {
+		if (!errors.hasFieldErrors("zip") && !ContraintUtils.validateZip(user.getZip())) {
 			errors.rejectValue("zip", "user.zip.invalid", "Invalid Zip");
 		}
 	} 

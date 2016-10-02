@@ -29,7 +29,8 @@ public class ExternalUserController {
 	@GetMapping("/signup")
     public String signupForm(Model model) {
 		model.addAttribute("user", new User());
-        return "signup";
+
+		return "signup";
     }
 		
 	@PostMapping("/signup")

@@ -3,16 +3,22 @@
  */
 package securbank.services;
 
+import java.util.UUID;
+
 import javax.transaction.Transactional;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import securbank.dao.NewUserRequestDao;
 import securbank.dao.UserDao;
 import securbank.models.Account;
+import securbank.models.NewUserRequest;
 import securbank.models.User;
 
 /**
@@ -24,13 +30,30 @@ import securbank.models.User;
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	UserDao userDao;
+	private UserDao userDao;
+	
+	@Autowired
+	private NewUserRequestDao newUserRequestDao;
 	
 	@Autowired 
 	private AccountService accountService;
 	
 	@Autowired
+	private EmailService emailService;
+	
+	@Autowired
 	private PasswordEncoder encoder;
+	
+	@Value("${application.url}")
+	private String url;
+	
+	@Value("${user.verification.body}")
+	private String verificationBody;
+	
+	@Value("${user.verification.subject}")
+	private String verificationSubject;
+	
+	private SimpleMailMessage message;
 	
 	/**
      * Creates new user
@@ -64,6 +87,19 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User createInternalUser(User user) {
+		NewUserRequest newUserRequest = new NewUserRequest();
+		
+		// verify if request exists
+		newUserRequest = newUserRequestDao.findByEmailAndRole(user.getEmail(), user.getRole()); 
+		if (newUserRequest == null) {
+			return null;
+		}
+		
+		// Deactivates request
+		newUserRequest.setActive(false);
+		newUserRequestDao.update(newUserRequest);
+		
+		// creates new user
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
@@ -82,5 +118,53 @@ public class UserServiceImpl implements UserService {
 	      
 		return userDao.findById(user.getUserId());
 	}
+
+	/**
+     * Creates new user request
+     * 
+     * @param newUserRequest
+     *            The user request to be created
+     * @return newUserRequest
+     */
+	@Override
+	public NewUserRequest createUserRequest(NewUserRequest newUserRequest) {
+		newUserRequest.setCreatedOn(LocalDateTime.now());
+		newUserRequest.setExpireOn(LocalDateTime.now().plusDays(1));
+		newUserRequest.setActive(true);
+		newUserRequest = newUserRequestDao.save(newUserRequest);
+		
+		//setup up email message
+		message = new SimpleMailMessage();
+		message.setText(verificationBody.replace(":id:",newUserRequest.getNewUserRequestId().toString()));
+		message.setSubject(verificationSubject);
+		message.setTo(newUserRequest.getEmail());
+		
+		// send email
+		if (emailService.sendEmail(message) == false) {
+			// Deactivate request if email fails
+			newUserRequest.setActive(false);
+			newUserRequestDao.update(newUserRequest);
+			
+			return null;
+		};
+		
+		return newUserRequest;
+	}
 	
+	/**
+     * Get new user request and deactivates it
+     * @param newUserRequestId
+     *            The user request id to be retrieved
+     * @return newUserRequest
+     */
+	@Override
+	public NewUserRequest getNewUserRequest(UUID newUserRequestId) {
+		NewUserRequest newUserRequest = newUserRequestDao.findById(newUserRequestId);
+		if (newUserRequest == null) {
+			return null;
+		}
+	
+		return newUserRequest;
+	}
+
 }

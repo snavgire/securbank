@@ -3,6 +3,9 @@
  */
 package securbank.services;
 
+import java.util.UUID;
+
+import securbank.models.NewUserRequest;
 import securbank.models.User;
 
 /**
@@ -12,5 +15,7 @@ import securbank.models.User;
 public interface UserService {
 	public User createExternalUser(User user);
 	public User createInternalUser(User user);
+	public NewUserRequest createUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
+	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
 }
