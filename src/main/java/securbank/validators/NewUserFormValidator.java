@@ -74,8 +74,13 @@ public class NewUserFormValidator implements Validator{
 			}
 		}
 		
-		if (!errors.hasFieldErrors("password") && !ContraintUtils.validatePassword(user.getPassword())) {
-			errors.rejectValue("password", "user.password.contraint", "Password should contain one letter, number and special character. Length of password should be between 6 and 20");
+		if (!errors.hasFieldErrors("password")) {
+			if (!ContraintUtils.validatePassword(user.getPassword())) {
+				errors.rejectValue("password", "user.password.contraint", "Password should contain one letter, number and special character. Length of password should be between 6 and 20");
+			}
+			else if (!user.getPassword().equals(user.getConfirmPassword())) {
+				errors.rejectValue("password", "user.password.match", "Password doesn't match");
+			}
 		}
 		
 		if (!errors.hasFieldErrors("phone")) {
