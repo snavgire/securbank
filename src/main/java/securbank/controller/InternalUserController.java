@@ -92,4 +92,33 @@ public class InternalUserController {
     	
         return "redirect:/";
     }
+
+	@PostMapping("/internal/edit/approve")
+    public String rejectEdit(@ModelAttribute UUID requestId, BindingResult bindingResult) {
+		if (requestId == null) {
+			return "redirect:/error";
+		}
+		
+		// approves request
+		if (userService.approveModificationRequest(requestId) == null) {
+    		return "redirect:/error";
+    	}
+    	
+        return "redirect:/";
+    }
+	
+	@PostMapping("/internal/edit/reject")
+    public String approveEdit(@ModelAttribute UUID requestId, BindingResult bindingResult) {
+		if (requestId == null) {
+			return "redirect:/error";
+		}
+		
+		// rejects request
+		if (userService.rejectModificationRequest(requestId) == null) {
+    		return "redirect:/error";
+    	}
+    	
+        return "redirect:/";
+    }
+
 }
