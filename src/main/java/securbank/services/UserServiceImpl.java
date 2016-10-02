@@ -214,6 +214,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public ModificationRequest approveModificationRequest(UUID requestId) {
 		ModificationRequest request = modificationRequestDao.findById(requestId);
+		if (request == null) {
+			return null;
+		}
+		
 		User user = request.getUser();
 		
 		// If email has been taken
@@ -255,9 +259,36 @@ public class UserServiceImpl implements UserService {
 		request.setActive(false);
 		request.setModifiedOn(LocalDateTime.now());
 		request.setStatus("approved");
-		modificationRequestDao.update(request);
+		request = modificationRequestDao.update(request);
 		
 		return request;
 	}
-
+	/**
+     * Rejects user request
+     * 
+     * @param requestId
+     *            The id of the request to be approved 
+     * @return modificationRequest
+     */
+	@Override
+	public ModificationRequest rejectModificationRequest(UUID requestId) {
+		ModificationRequest request = modificationRequestDao.findById(requestId);
+		User user = request.getUser();
+			
+		// Sends an email if request is rejected
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setText(env.getProperty("modification.request.reject.body"));
+		message.setSubject(env.getProperty("modification.request.reject.subject"));
+		message.setTo(user.getEmail());
+		emailService.sendEmail(message);
+	
+		// update request
+		request.setActive(false);
+		request.setStatus("rejected");
+		request.setModifiedOn(LocalDateTime.now());
+		request.setApprovedBy(getCurrentUser());
+		request = modificationRequestDao.update(request);
+		
+		return request;
+	}
 }

@@ -21,4 +21,5 @@ public interface UserService {
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
 	public ModificationRequest createModificationRequest(ModificationRequest request);
 	public ModificationRequest approveModificationRequest(UUID requestId);
+	public ModificationRequest rejectModificationRequest(UUID requestId);
 }
