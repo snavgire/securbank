@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,15 +49,6 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private PasswordEncoder encoder;
-	
-	@Value("${application.url}")
-	private String url;
-	
-	@Value("${user.verification.body}")
-	private String verificationBody;
-	
-	@Value("${user.verification.subject}")
-	private String verificationSubject;
 	
 	@Autowired
 	private Environment env;
@@ -125,8 +115,17 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getCurrentUser() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	      
-		return userDao.findById(user.getUserId());
+		if (user == null) {
+			return null;
+		}
+		
+		// gets latest object from db
+		user = userDao.findById(user.getUserId());
+		if (user == null) {
+			return null;
+		}
+		
+		return user;
 	}
 
 	/**
@@ -145,8 +144,8 @@ public class UserServiceImpl implements UserService {
 		
 		//setup up email message
 		message = new SimpleMailMessage();
-		message.setText(verificationBody.replace(":id:",newUserRequest.getNewUserRequestId().toString()));
-		message.setSubject(verificationSubject);
+		message.setText(env.getProperty("user.verification.body").replace(":id:",newUserRequest.getNewUserRequestId().toString()));
+		message.setSubject(env.getProperty("user.verification.subject"));
 		message.setTo(newUserRequest.getEmail());
 		
 		// send email
@@ -263,6 +262,7 @@ public class UserServiceImpl implements UserService {
 		
 		return request;
 	}
+	
 	/**
      * Rejects user request
      * 
@@ -290,5 +290,25 @@ public class UserServiceImpl implements UserService {
 		request = modificationRequestDao.update(request);
 		
 		return request;
+	}
+	
+	/**
+     * Get all pending user request
+     * 
+     * @return List<modificationRequest>
+     */
+	public List<ModificationRequest> getAllPendingUserModificationRequest() {
+		return modificationRequestDao.findAllbyStatus("pending");
+	}
+	
+	/**
+     * Get request by Id
+     * 
+     * @param requestId
+     *            The id of the request to be retrieved 
+     * @return modificationRequest
+     */
+	public ModificationRequest getModificationRequest(UUID requestId) {
+		return modificationRequestDao.findById(requestId);
 	}
 }

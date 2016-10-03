@@ -14,7 +14,7 @@ import securbank.dao.UserDao;
  * @author Ayush Gupta
  *
  */
-@Component("newUserFormValidator")
+@Component("editUserFormValidator")
 public class EditUserFormValidator implements Validator{
 
 	@Autowired
@@ -54,23 +54,19 @@ public class EditUserFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "city", "user.city.required", "City is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "zip", "user.zip.required", "Zip is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "state", "user.phone.required", "State is required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "role", "user.role.required", "Role is required");
+		// ValidationUtils.rejectIfEmptyOrWhitespace(errors, "role", "user.role.required", "Role is required");
+		
+		User user = userDao.findByUsername(request.getUsername());
+		if (user == null) {
+			errors.rejectValue("username", "user.username.invalid", "Invalid Username");
+		}
 		
 		if (!errors.hasFieldErrors("email")) {
 			if (!ContraintUtils.validateEmail(request.getEmail())) {
 				errors.rejectValue("email", "user.email.contraint", "Invalid Email");
 			}
-			else if (userDao.emailExists(request.getEmail())) {
+			else if (!request.getEmail().equals(user.getEmail()) && userDao.emailExists(request.getEmail())) {
 				errors.rejectValue("email", "user.email.exists", "Email exists");
-			}
-		}
-		
-		if (!errors.hasFieldErrors("username")) {
-			if (!ContraintUtils.validateUsername(request.getUsername())) {
-				errors.rejectValue("username", "user.username.contraint", "Username can contain lowercase alphanumeric with (-,_) and length should be between 3 and 15");
-			}
-			else if (userDao.usernameExists(request.getUsername())) {
-				errors.rejectValue("username", "user.username.exists", "Username exists");
 			}
 		}
 		
@@ -78,7 +74,7 @@ public class EditUserFormValidator implements Validator{
 			if (!ContraintUtils.validatePhone(request.getPhone())) {
 				errors.rejectValue("phone", "user.phone.contraint", "Invalid Phone");
 			}
-			else if (userDao.phoneExists(request.getPhone())) {
+			else if (!request.getPhone().equals(user.getPhone()) && userDao.phoneExists(request.getPhone())) {
 				errors.rejectValue("phone", "user.phone.exists", "Phone number exists");
 			}
 		}

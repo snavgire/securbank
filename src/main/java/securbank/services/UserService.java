@@ -3,6 +3,7 @@
  */
 package securbank.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import securbank.models.ModificationRequest;
@@ -22,4 +23,6 @@ public interface UserService {
 	public ModificationRequest createModificationRequest(ModificationRequest request);
 	public ModificationRequest approveModificationRequest(UUID requestId);
 	public ModificationRequest rejectModificationRequest(UUID requestId);
+	public List<ModificationRequest> getAllPendingUserModificationRequest();
+	public ModificationRequest getModificationRequest(UUID requestId);
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
@@ -93,25 +94,17 @@ public class InternalUserController {
         return "redirect:/";
     }
 
-	@PostMapping("/internal/edit/approve")
-    public String rejectEdit(@ModelAttribute UUID requestId, BindingResult bindingResult) {
-		if (requestId == null) {
-			return "redirect:/error";
+	@PostMapping("/internal/user/request/action")
+    public String approveEdit(@RequestParam UUID requestId, @RequestParam String action, BindingResult bindingResult) {
+		if (action == null || !(action.equals("approve") || action.equals("reject"))) {
+			bindingResult.reject("action.invalid", "Invalid Action");
 		}
-		
-		// approves request
-		if (userService.approveModificationRequest(requestId) == null) {
-    		return "redirect:/error";
-    	}
-    	
-        return "redirect:/";
-    }
-	
-	@PostMapping("/internal/edit/reject")
-    public String approveEdit(@ModelAttribute UUID requestId, BindingResult bindingResult) {
 		if (requestId == null) {
-			return "redirect:/error";
+			bindingResult.reject("request.request", "Request should be selected");
 		}
+		if (bindingResult.hasErrors()) {
+			return "redirect:/error";
+        }
 		
 		// rejects request
 		if (userService.rejectModificationRequest(requestId) == null) {
@@ -120,5 +113,27 @@ public class InternalUserController {
     	
         return "redirect:/";
     }
-
+	
+	@GetMapping("/internal/user/request/all")
+    public String getAllUserRequest(Model model) {
+		model.addAttribute("modificationrequests", userService.getAllPendingUserModificationRequest());
+    	
+        return "userrequests";
+    }
+	
+	@GetMapping("/internal/user/request/view")
+    public String getUserRequest(Model model, @RequestParam UUID id) {
+		if (id == null) {
+			return "redirect:/error";
+		}
+		ModificationRequest modificationRequest = userService.getModificationRequest(id);
+		
+		if (modificationRequest == null) {
+			return "redirect:/error";
+		}
+		
+		model.addAttribute("modificationrequest", modificationRequest);
+    	
+        return "userrequest";
+    }
 }

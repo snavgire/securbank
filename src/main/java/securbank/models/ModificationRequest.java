@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -29,15 +30,14 @@ public class ModificationRequest {
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "uuid2")
-	@Column(name = "userId", unique = true, columnDefinition = "BINARY(16)")
+	@Column(name = "modificationRequestId", unique = true, columnDefinition = "BINARY(16)")
 	private UUID modificationRequestId;
 	
 	@NotNull
 	private String role;
 	
 	@NotNull
-	@Size(min = 3, max = 15)
-	@Column(name = "username")
+	@Transient
 	private String username;
 	
 	@NotNull
@@ -92,13 +92,13 @@ public class ModificationRequest {
 	private LocalDateTime modifiedOn;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "userId")
+	@JoinColumn(name = "approvedByUserId", referencedColumnName = "userId")
 	private User approvedBy;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "userId")
-	private User user;
-
+	@JoinColumn(name = "userId", referencedColumnName = "userId")
+	private User user;	
+	
 	@NotNull
 	@Column(name = "status")
 	private String status;

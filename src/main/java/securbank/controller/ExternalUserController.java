@@ -3,8 +3,6 @@
  */
 package securbank.controller;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,13 +52,17 @@ public class ExternalUserController {
     }
 	
 	@GetMapping("/user/edit")
-    public String currentUserEdit(Model model) {
-		model.addAttribute(userService.getCurrentUser());
+    public String editUser(Model model) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error";
+		}
+		model.addAttribute("user", user);
 		
-        return "edit";
+        return "signup";
     }
 	
-	@PostMapping("/user/edit/")
+	@PostMapping("/user/edit")
     public String editSubmit(@ModelAttribute ModificationRequest request, BindingResult bindingResult) {
 		editUserFormValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
@@ -69,14 +71,19 @@ public class ExternalUserController {
 		
 		// create request
     	userService.createModificationRequest(request);
-    	
+	
         return "redirect:/";
     }
 	
 	@GetMapping("/user/details")
     public String currentUserDetails(Model model) {
-		model.addAttribute(userService.getCurrentUser());
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error";
+		}
 		
-        return "details";
+		model.addAttribute("user", userService.getCurrentUser());
+		
+		return "details";
     }	
 }
