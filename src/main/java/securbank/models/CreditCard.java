@@ -3,10 +3,14 @@ package securbank.models;
 import java.awt.geom.Arc2D.Double;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -23,18 +27,18 @@ public class CreditCard {
 	
 	/**
 	 * @param ccID
-	 * @param accountID
+	 * @param account
 	 * @param limit
 	 * @param used
 	 * @param activeBalance
 	 * @param active
 	 * @param createdOn
 	 */
-	public CreditCard(UUID ccID, UUID accountID, Double maxLimit, Double used, Double activeBalance, Boolean active,
+	public CreditCard(UUID ccID, Account account, Double maxLimit, Double used, Double activeBalance, Boolean active,
 			LocalDateTime createdOn) {
 		super();
 		this.ccID = ccID;
-		this.accountID = accountID;
+		this.account = account;
 		this.maxLimit = maxLimit;
 		this.used = used;
 		this.activeBalance = activeBalance;
@@ -48,10 +52,6 @@ public class CreditCard {
 	@NotNull
 	@Column(name = "ccID", unique = true, nullable = false, columnDefinition = "BINARY(16)")
 	private UUID ccID;
-
-	@NotNull
-	@Column(name = "accountID", unique = true, nullable = false, columnDefinition = "BINARY(16)")
-	private UUID accountID;
 
 	@NotNull
 	@Column(name = "maxLimit", nullable = false)
@@ -73,6 +73,10 @@ public class CreditCard {
 	@Column(name = "createdOn", nullable = false, updatable = false)
 	private LocalDateTime createdOn;
 
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "accountNumber", nullable = false)
+	private Account account;
+
 	/**
 	 * @return the ccID
 	 */
@@ -90,15 +94,15 @@ public class CreditCard {
 	/**
 	 * @return the accountID
 	 */
-	public UUID getAccountID() {
-		return accountID;
+	public Account getAccount() {
+		return account;
 	}
 
 	/**
 	 * @param accountID the accountID to set
 	 */
-	public void setAccountID(UUID accountID) {
-		this.accountID = accountID;
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 
 	/**
@@ -173,7 +177,7 @@ public class CreditCard {
 
 	@Override
 	public String toString() {
-		return "CreditCard [ccID=" + ccID + ", accountID=" + accountID + ", maxLimit=" + maxLimit + ", used=" + used
+		return "CreditCard [ccID=" + ccID + ", account=" + account + ", maxLimit=" + maxLimit + ", used=" + used
 				+ ", activeBalance=" + activeBalance + ", active=" + active + ", createdOn=" + createdOn + "]";
 	}
 

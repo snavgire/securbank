@@ -1,6 +1,5 @@
 package securbank.models;
 
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -11,10 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.joda.time.LocalDateTime;
@@ -38,11 +35,6 @@ public class Transaction {
 	private UUID transactionId;
 	
 	@NotNull
-	@Size(min = 8, max = 8)
-	@Column(name = "accountNumber", unique = false, nullable = false, updatable = false)
-	private String accountNumber;
-	
-	@NotNull
 	@Column(name = "amount", unique = false, nullable = false, updatable = false)
 	private double amount;
 	
@@ -62,10 +54,6 @@ public class Transaction {
 	@Column(name = "criticalStatus", unique = false, nullable = false, columnDefinition = "BIT")
 	private boolean criticalStatus;
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "transferId", nullable = false)
-	private Transfer transfer;
-	
 	@NotNull
 	@Column(name = "createdOn", nullable = false, updatable = false)
 	private LocalDateTime createdOn;
@@ -73,110 +61,58 @@ public class Transaction {
 	@Column(name = "modifiedOn", nullable = true, updatable = true)
 	private LocalDateTime modifiedOn;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@Column(name = "userId", nullable = true, updatable = true)
-	private Set<User> modifiedBy;
+	@NotNull
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "accountNumber", nullable = false)
+	private Account account;
+	
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "transferId", nullable = true)
+	private Transfer transfer;
+
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "userId", nullable = true)
+	private User modifiedBy;
 
 	@NotNull
 	@Column(name = "active", nullable = false, columnDefinition = "BIT")
 	private Boolean active;
-	
+
 	/**
 	 * @param transactionId
-	 * @param accountNumber
 	 * @param amount
 	 * @param type
 	 * @param oldBalance
 	 * @param newBalance
 	 * @param criticalStatus
-	 * @param transferId
 	 * @param createdOn
 	 * @param modifiedOn
+	 * @param account
+	 * @param transfer
 	 * @param modifiedBy
 	 * @param active
 	 */
-	public Transaction(UUID transactionId, String accountNumber, double amount, 
-			String type, double oldBalance, double newBalance, Boolean criticalStatus, 
-			Transfer transfer, LocalDateTime createdOn, LocalDateTime modifiedOn, Set<User> modifiedBy, Boolean active){
+	public Transaction(UUID transactionId, double amount, String type, double oldBalance, double newBalance,
+			boolean criticalStatus, LocalDateTime createdOn, LocalDateTime modifiedOn, Account account,
+			Transfer transfer, User modifiedBy, Boolean active) {
 		super();
 		this.transactionId = transactionId;
-		this.accountNumber = accountNumber;
 		this.amount = amount;
 		this.type = type;
 		this.oldBalance = oldBalance;
 		this.newBalance = newBalance;
 		this.criticalStatus = criticalStatus;
-		this.transfer = transfer;
 		this.createdOn = createdOn;
 		this.modifiedOn = modifiedOn;
+		this.account = account;
+		this.transfer = transfer;
 		this.modifiedBy = modifiedBy;
 		this.active = active;
+	}
+	
+	public Transaction() {
 		
 	}
-
-	
-	/**
-	 * @return the transfer
-	 */
-	public Transfer getTransfer() {
-		return transfer;
-	}
-
-
-	/**
-	 * @return the modifiedOn
-	 */
-	public LocalDateTime getModifiedOn() {
-		return modifiedOn;
-	}
-
-
-	/**
-	 * @return the active
-	 */
-	public Boolean getActive() {
-		return active;
-	}
-
-
-	/**
-	 * @param transfer the transfer to set
-	 */
-	public void setTransfer(Transfer transfer) {
-		this.transfer = transfer;
-	}
-
-
-	/**
-	 * @param modifiedOn the modifiedOn to set
-	 */
-	public void setModifiedOn(LocalDateTime modifiedOn) {
-		this.modifiedOn = modifiedOn;
-	}
-
-
-	/**
-	 * @return the modifiedBy
-	 */
-	public Set<User> getModifiedBy() {
-		return modifiedBy;
-	}
-
-	/**
-	 * @param modifiedBy the modifiedBy to set
-	 */
-	public void setModifiedBy(Set<User> modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
-
-
-	/**
-	 * @param active the active to set
-	 */
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
 
 	/**
 	 * @return the transactionId
@@ -185,14 +121,12 @@ public class Transaction {
 		return transactionId;
 	}
 
-
 	/**
-	 * @return the accountNumber
+	 * @param transactionId the transactionId to set
 	 */
-	public String getAccountNumber() {
-		return accountNumber;
+	public void setTransactionId(UUID transactionId) {
+		this.transactionId = transactionId;
 	}
-
 
 	/**
 	 * @return the amount
@@ -201,6 +135,12 @@ public class Transaction {
 		return amount;
 	}
 
+	/**
+	 * @param amount the amount to set
+	 */
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
 
 	/**
 	 * @return the type
@@ -209,6 +149,12 @@ public class Transaction {
 		return type;
 	}
 
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	/**
 	 * @return the oldBalance
@@ -217,63 +163,6 @@ public class Transaction {
 		return oldBalance;
 	}
 
-	
-	/**
-	 * @return the newBalance
-	 */
-	public double getNewBalance() {
-		return newBalance;
-	}
-
-
-	/**
-	 * @return the criticalStatus
-	 */
-	public boolean isCriticalStatus() {
-		return criticalStatus;
-	}
-
-
-	/**
-	 * @return the createdOn
-	 */
-	public LocalDateTime getCreatedOn() {
-		return createdOn;
-	}
-
-
-	/**
-	 * @param transactionId the transactionId to set
-	 */
-	public void setTransactionId(UUID transactionId) {
-		this.transactionId = transactionId;
-	}
-
-
-	/**
-	 * @param accountNumber the accountNumber to set
-	 */
-	public void setAccountNumber(String accountNumber) {
-		this.accountNumber = accountNumber;
-	}
-
-
-	/**
-	 * @param amount the amount to set
-	 */
-	public void setAmount(double amount) {
-		this.amount = amount;
-	}
-
-
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
-
-
 	/**
 	 * @param oldBalance the oldBalance to set
 	 */
@@ -281,6 +170,12 @@ public class Transaction {
 		this.oldBalance = oldBalance;
 	}
 
+	/**
+	 * @return the newBalance
+	 */
+	public double getNewBalance() {
+		return newBalance;
+	}
 
 	/**
 	 * @param newBalance the newBalance to set
@@ -289,6 +184,12 @@ public class Transaction {
 		this.newBalance = newBalance;
 	}
 
+	/**
+	 * @return the criticalStatus
+	 */
+	public boolean isCriticalStatus() {
+		return criticalStatus;
+	}
 
 	/**
 	 * @param criticalStatus the criticalStatus to set
@@ -297,14 +198,12 @@ public class Transaction {
 		this.criticalStatus = criticalStatus;
 	}
 
-
-//	/**
-//	 * @param transferId the transferId to set
-//	 */
-//	public void setTransferId(UUID transferId) {
-//		this.transferId = transferId;
-//	}
-
+	/**
+	 * @return the createdOn
+	 */
+	public LocalDateTime getCreatedOn() {
+		return createdOn;
+	}
 
 	/**
 	 * @param createdOn the createdOn to set
@@ -313,16 +212,84 @@ public class Transaction {
 		this.createdOn = createdOn;
 	}
 
+	/**
+	 * @return the modifiedOn
+	 */
+	public LocalDateTime getModifiedOn() {
+		return modifiedOn;
+	}
+
+	/**
+	 * @param modifiedOn the modifiedOn to set
+	 */
+	public void setModifiedOn(LocalDateTime modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
+
+	/**
+	 * @return the account
+	 */
+	public Account getAccount() {
+		return account;
+	}
+
+	/**
+	 * @param account the account to set
+	 */
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+
+	/**
+	 * @return the transfer
+	 */
+	public Transfer getTransfer() {
+		return transfer;
+	}
+
+	/**
+	 * @param transfer the transfer to set
+	 */
+	public void setTransfer(Transfer transfer) {
+		this.transfer = transfer;
+	}
+
+	/**
+	 * @return the modifiedBy
+	 */
+	public User getModifiedBy() {
+		return modifiedBy;
+	}
+
+	/**
+	 * @param modifiedBy the modifiedBy to set
+	 */
+	public void setModifiedBy(User modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	/**
+	 * @return the active
+	 */
+	public Boolean getActive() {
+		return active;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Transaction [transactionId=" + transactionId + ", accountNumber=" + accountNumber + ", amount=" + amount
-				+ ", type=" + type + ", oldBalance=" + oldBalance + ", newBalance=" + newBalance + ", criticalStatus="
-				+ criticalStatus + ", transfer=" + transfer + ", createdOn=" + createdOn + "]";
+		return "Transaction [transactionId=" + transactionId + ", amount=" + amount + ", type=" + type + ", oldBalance="
+				+ oldBalance + ", newBalance=" + newBalance + ", criticalStatus=" + criticalStatus + ", createdOn="
+				+ createdOn + ", modifiedOn=" + modifiedOn + ", account=" + account + ", transfer=" + transfer
+				+ ", modifiedBy=" + modifiedBy + ", active=" + active + "]";
 	}
-
-
 }
