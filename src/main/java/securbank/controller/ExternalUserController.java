@@ -6,16 +6,16 @@ package securbank.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import securbank.models.ModificationRequest;
 import securbank.models.User;
 import securbank.services.UserService;
+<<<<<<< HEAD
 import securbank.validators.EditUserFormValidator;
 import securbank.validators.NewUserFormValidator;
+=======
+>>>>>>> f717bbd5088f1c8fde7984a13c4a0a83ffd14fea
 
 /**
  * @author Ayush Gupta
@@ -26,6 +26,7 @@ public class ExternalUserController {
 	@Autowired
 	UserService userService;
 	
+<<<<<<< HEAD
 	@Autowired 
 	NewUserFormValidator userFormValidator;
 	
@@ -75,10 +76,13 @@ public class ExternalUserController {
         return "redirect:/";
     }
 	
+=======
+>>>>>>> f717bbd5088f1c8fde7984a13c4a0a83ffd14fea
 	@GetMapping("/user/details")
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
+<<<<<<< HEAD
 			return "redirect:/error";
 		}
 		
@@ -86,4 +90,13 @@ public class ExternalUserController {
 		
 		return "details";
     }	
+=======
+			return "redirect:/error?code=user-notfound";
+		}
+		
+		model.addAttribute("user", user);
+		
+        return "internal/detail";
+    }
+>>>>>>> f717bbd5088f1c8fde7984a13c4a0a83ffd14fea
 }
