@@ -20,9 +20,10 @@ public interface UserService {
 	public NewUserRequest createUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
-	public ModificationRequest createModificationRequest(ModificationRequest request);
-	public ModificationRequest approveModificationRequest(UUID requestId);
-	public ModificationRequest rejectModificationRequest(UUID requestId);
-	public List<ModificationRequest> getAllPendingUserModificationRequest();
+	public ModificationRequest createInternalModificationRequest(ModificationRequest request);
+	public ModificationRequest createExternalModificationRequest(ModificationRequest request);
+	public ModificationRequest approveModificationRequest(ModificationRequest request);
+	public ModificationRequest rejectModificationRequest(ModificationRequest requestId);
+	public List<ModificationRequest> getAllPendingModificationRequest(String type);
 	public ModificationRequest getModificationRequest(UUID requestId);
 }

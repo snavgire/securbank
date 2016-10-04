@@ -81,47 +81,4 @@ public class InternalUserController {
     	
         return "redirect:/login";
     }
-
-	@PostMapping("/internal/user/request/action")
-    public String approveEdit(@RequestParam UUID requestId, @RequestParam String action, BindingResult bindingResult) {
-		if (action == null || !(action.equals("approve") || action.equals("reject"))) {
-			bindingResult.reject("action.invalid", "Invalid Action");
-		}
-		if (requestId == null) {
-			bindingResult.reject("request.request", "Request should be selected");
-		}
-		if (bindingResult.hasErrors()) {
-			return "redirect:/error";
-        }
-		
-		// rejects request
-		if (userService.rejectModificationRequest(requestId) == null) {
-    		return "redirect:/error";
-    	}
-    	
-        return "redirect:/";
-    }
-	
-	@GetMapping("/internal/user/request/all")
-    public String getAllUserRequest(Model model) {
-		model.addAttribute("modificationrequests", userService.getAllPendingUserModificationRequest());
-    	
-        return "userrequests";
-    }
-	
-	@GetMapping("/internal/user/request/view")
-    public String getUserRequest(Model model, @RequestParam UUID id) {
-		if (id == null) {
-			return "redirect:/error";
-		}
-		ModificationRequest modificationRequest = userService.getModificationRequest(id);
-		
-		if (modificationRequest == null) {
-			return "redirect:/error";
-		}
-		
-		model.addAttribute("modificationrequest", modificationRequest);
-    	
-        return "userrequest";
-    }
 }

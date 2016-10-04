@@ -83,21 +83,15 @@ public class ModificationRequest {
 	@NotNull
 	@Size(min = 5, max = 5)
 	private String zip;
-
+	
+	@NotNull
+	private String userType;
 	@NotNull
 	@Column(name = "createdOn", updatable = false)
 	private LocalDateTime createdOn;
 
 	@Column(name = "modifiedOn", updatable = true)
 	private LocalDateTime modifiedOn;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "approvedByUserId", referencedColumnName = "userId")
-	private User approvedBy;
-	
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "userId", referencedColumnName = "userId")
-	private User user;	
 	
 	@NotNull
 	@Column(name = "status")
@@ -107,9 +101,13 @@ public class ModificationRequest {
 	@Column(name = "active", columnDefinition = "BIT")
 	private Boolean active;
 	
-	public ModificationRequest() {
-		
-	}
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "approvedByUserId", referencedColumnName = "userId")
+	private User approvedBy;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "userId", referencedColumnName = "userId")
+	private User user;
 
 	/**
 	 * @param modificationRequestId
@@ -124,19 +122,20 @@ public class ModificationRequest {
 	 * @param addressLine1
 	 * @param addressLine2
 	 * @param city
-	 * @param State
+	 * @param state
 	 * @param zip
+	 * @param userType
 	 * @param createdOn
 	 * @param modifiedOn
-	 * @param approvedBy
-	 * @param user
 	 * @param status
 	 * @param active
+	 * @param approvedBy
+	 * @param user
 	 */
 	public ModificationRequest(UUID modificationRequestId, String role, String username, String password,
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
-			String addressLine2, String city, String State, String zip, LocalDateTime createdOn,
-			LocalDateTime modifiedOn, User approvedBy, User user, String status, Boolean active) {
+			String addressLine2, String city, String state, String zip, String userType, LocalDateTime createdOn,
+			LocalDateTime modifiedOn, String status, Boolean active, User approvedBy, User user) {
 		super();
 		this.modificationRequestId = modificationRequestId;
 		this.role = role;
@@ -150,25 +149,30 @@ public class ModificationRequest {
 		this.addressLine1 = addressLine1;
 		this.addressLine2 = addressLine2;
 		this.city = city;
-		this.State = State;
+		State = state;
 		this.zip = zip;
+		this.userType = userType;
 		this.createdOn = createdOn;
 		this.modifiedOn = modifiedOn;
-		this.approvedBy = approvedBy;
-		this.user = user;
 		this.status = status;
 		this.active = active;
+		this.approvedBy = approvedBy;
+		this.user = user;
+	}	
+	
+	public ModificationRequest() {
+		
 	}
 
 	/**
-	 * @return the modificationstatusId
+	 * @return the modificationRequestId
 	 */
 	public UUID getModificationRequestId() {
 		return modificationRequestId;
 	}
 
 	/**
-	 * @param modificationstatusId the modificationstatusId to set
+	 * @param modificationRequestId the modificationRequestId to set
 	 */
 	public void setModificationRequestId(UUID modificationRequestId) {
 		this.modificationRequestId = modificationRequestId;
@@ -329,17 +333,17 @@ public class ModificationRequest {
 	}
 
 	/**
-	 * @return the State
+	 * @return the state
 	 */
 	public String getState() {
 		return State;
 	}
 
 	/**
-	 * @param State the State to set
+	 * @param state the state to set
 	 */
-	public void setState(String State) {
-		this.State = State;
+	public void setState(String state) {
+		State = state;
 	}
 
 	/**
@@ -354,6 +358,20 @@ public class ModificationRequest {
 	 */
 	public void setZip(String zip) {
 		this.zip = zip;
+	}
+
+	/**
+	 * @return the userType
+	 */
+	public String getUserType() {
+		return userType;
+	}
+
+	/**
+	 * @param userType the userType to set
+	 */
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 
 	/**
@@ -385,34 +403,6 @@ public class ModificationRequest {
 	}
 
 	/**
-	 * @return the approvedBy
-	 */
-	public User getApprovedBy() {
-		return approvedBy;
-	}
-
-	/**
-	 * @param approvedBy the approvedBy to set
-	 */
-	public void setApprovedBy(User approvedBy) {
-		this.approvedBy = approvedBy;
-	}
-
-	/**
-	 * @return the user
-	 */
-	public User getUser() {
-		return user;
-	}
-
-	/**
-	 * @param user the user to set
-	 */
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	/**
 	 * @return the status
 	 */
 	public String getStatus() {
@@ -440,18 +430,44 @@ public class ModificationRequest {
 		this.active = active;
 	}
 
+	/**
+	 * @return the approvedBy
+	 */
+	public User getApprovedBy() {
+		return approvedBy;
+	}
+
+	/**
+	 * @param approvedBy the approvedBy to set
+	 */
+	public void setApprovedBy(User approvedBy) {
+		this.approvedBy = approvedBy;
+	}
+
+	/**
+	 * @return the user
+	 */
+	public User getUser() {
+		return user;
+	}
+
+	/**
+	 * @param user the user to set
+	 */
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Modificationstatus [modificationRequestId=" + modificationRequestId + ", role=" + role + ", username="
+		return "ModificationRequest [modificationRequestId=" + modificationRequestId + ", role=" + role + ", username="
 				+ username + ", password=" + password + ", firstName=" + firstName + ", middleName=" + middleName
 				+ ", lastName=" + lastName + ", email=" + email + ", phone=" + phone + ", addressLine1=" + addressLine1
 				+ ", addressLine2=" + addressLine2 + ", city=" + city + ", State=" + State + ", zip=" + zip
-				+ ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", approvedBy=" + approvedBy + ", user="
-				+ user + ", status=" + status + ", active=" + active + "]";
+				+ ", userType=" + userType + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", status="
+				+ status + ", active=" + active + ", approvedBy=" + approvedBy + ", user=" + user + "]";
 	}
-	
-	
 }

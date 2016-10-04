@@ -8,7 +8,6 @@
         <form action="#" th:action="@{/user/edit}" th:object="${user}" method="post">
     	<p>
     		Username: <input type="text" th:field="*{username}" readonly="true"/>
-    		<p th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
     	</p>
         <p>Email: <input type="text" th:field="*{email}" />
         		<p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>

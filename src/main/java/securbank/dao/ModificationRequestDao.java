@@ -12,6 +12,6 @@ import java.util.UUID;
  */
 public interface ModificationRequestDao extends BaseDao<ModificationRequest, UUID> {
 	public List<ModificationRequest> findAll();
-	public List<ModificationRequest> findAllbyStatus(String status);
+	public List<ModificationRequest> findAllbyStatusAndUserType(String status, String userType);
 	public List<ModificationRequest> findAllbyUser(User user);
 }

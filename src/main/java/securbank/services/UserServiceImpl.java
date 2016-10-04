@@ -184,8 +184,11 @@ public class UserServiceImpl implements UserService {
      * @return modificationRequest
      */
 	@Override
-	public ModificationRequest createModificationRequest(ModificationRequest request) {
+	public ModificationRequest createInternalModificationRequest(ModificationRequest request) {
 		User user = getCurrentUser();
+		if (user == null) {
+			return null;
+		}
 		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(user);
 		
 		// Deactivate all active request 
@@ -198,11 +201,38 @@ public class UserServiceImpl implements UserService {
 		request.setActive(true);
 		request.setCreatedOn(LocalDateTime.now());
 		request.setStatus("pending");
+		request.setUserType("internal");
 		modificationRequestDao.save(request);
 		
 		return request;
 	}
 
+	@Override
+	public ModificationRequest createExternalModificationRequest(ModificationRequest request) {
+		User user = getCurrentUser();
+		if (user == null) {
+			return null;
+		}
+		
+		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(user);
+		
+		// Deactivate all active request 
+		for (ModificationRequest activeRequest : requests) {
+			activeRequest.setActive(false);
+			modificationRequestDao.update(activeRequest);
+		}
+		request.setUser(user);
+		request.setPassword(user.getPassword());
+		request.setActive(true);
+		request.setCreatedOn(LocalDateTime.now());
+		request.setStatus("pending");
+		request.setUserType("external");
+		
+		modificationRequestDao.save(request);
+		
+		return request;
+	}
+	
 	/**
      * Approves user request
      * 
@@ -211,12 +241,7 @@ public class UserServiceImpl implements UserService {
      * @return modificationRequest
      */
 	@Override
-	public ModificationRequest approveModificationRequest(UUID requestId) {
-		ModificationRequest request = modificationRequestDao.findById(requestId);
-		if (request == null) {
-			return null;
-		}
-		
+	public ModificationRequest approveModificationRequest(ModificationRequest request) {
 		User user = request.getUser();
 		
 		// If email has been taken
@@ -271,8 +296,7 @@ public class UserServiceImpl implements UserService {
      * @return modificationRequest
      */
 	@Override
-	public ModificationRequest rejectModificationRequest(UUID requestId) {
-		ModificationRequest request = modificationRequestDao.findById(requestId);
+	public ModificationRequest rejectModificationRequest(ModificationRequest request) {
 		User user = request.getUser();
 			
 		// Sends an email if request is rejected
@@ -293,12 +317,14 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	/**
-     * Get all pending user request
+     * Get all pending internal user request
      * 
+     * @param type
+     *            The type of user 
      * @return List<modificationRequest>
      */
-	public List<ModificationRequest> getAllPendingUserModificationRequest() {
-		return modificationRequestDao.findAllbyStatus("pending");
+	public List<ModificationRequest> getAllPendingModificationRequest(String type) {
+		return modificationRequestDao.findAllbyStatusAndUserType("pending", type);
 	}
 	
 	/**

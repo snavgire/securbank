@@ -41,14 +41,17 @@ public class ModificationRequestDaoImpl extends BaseDaoImpl<ModificationRequest,
      * Returns list of all request in the tables
      * @param status
      * 			Status for which to query db
+     * @param userType
+     * 			type of user(internal or external) for which to query db
      * 
      * @return modificationRequests
      */
 	@Override
-	public List<ModificationRequest> findAllbyStatus(String status) {
-		return this.entityManager.createQuery("SELECT request from ModificationRequest request where request.status = :status AND request.active = TRUE", ModificationRequest.class)
-									.setParameter("status", status)							
-									.getResultList();
+	public List<ModificationRequest> findAllbyStatusAndUserType(String status, String userType) {
+		return this.entityManager.createQuery("SELECT request from ModificationRequest request where request.status = :status AND userType = type AND request.active = TRUE", ModificationRequest.class)
+				.setParameter("status", status)							
+				.setParameter("type", userType)							
+				.getResultList();
 	}	
 	
 	/**
