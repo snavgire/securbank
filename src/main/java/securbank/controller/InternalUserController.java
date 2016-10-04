@@ -5,6 +5,8 @@ package securbank.controller;
 
 import java.util.UUID;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +20,6 @@ import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
 import securbank.validators.NewUserFormValidator;
-import securbank.validators.NewUserRequestFormValidator;
 
 /**
  * @author Ayush Gupta
@@ -30,66 +31,53 @@ public class InternalUserController {
 	private UserService userService;
 	
 	@Autowired 
-	private NewUserRequestFormValidator newUserRequestFormValidator;
-	
-	@Autowired 
 	NewUserFormValidator userFormValidator;
 	
-	@GetMapping("/admin/register")
-    public String signupForm(Model model) {
-		model.addAttribute("newUserRequest", new NewUserRequest());
-
-		return "newuserrequest";
-    }
-
-	@GetMapping("/admin/register/success")
-    public String signupSuccess(Model model) {
-		return "home";
-    }
-
-	@PostMapping("/admin/register")
-    public String signupSubmit(@ModelAttribute NewUserRequest newUserRequest, BindingResult bindingResult) {
-		newUserRequestFormValidator.validate(newUserRequest, bindingResult);
-		if (bindingResult.hasErrors()) {
-			return "newuserrequest";
-        }
-		if (userService.createUserRequest(newUserRequest) == null) {
-			return "redirect:/error";
-		};
-    	
-        return "redirect:/admin/register";
-    }
+	@Autowired
+    public HttpSession session;
 	
-
-	@GetMapping("/internal/verify")
+	@GetMapping("/internal/user/verify")
     public String verifyNewUser(Model model, @RequestParam UUID id) {
 		if (id == null) {
 			return "redirect/error";
 		}
 		NewUserRequest newUserRequest = userService.getNewUserRequest(id);
 		if (newUserRequest == null) {
-			return "redirect/error";
+			return "redirect/error?code=400&path=no-request";
 		}
+		session.setAttribute("verification.token", newUserRequest.getNewUserRequestId());
 		User user = new User();
 		user.setEmail(newUserRequest.getEmail());
 		user.setRole(newUserRequest.getRole());
 		model.addAttribute("user", user);
-		  
-		return "internal_signup";
+		
+		return "internal/signup";
     }
 	
-	@PostMapping("/internal/signup")
+	// TODO: add check to verify if this request comes from verification link
+	@PostMapping("/internal/user/signup")
     public String internalSignupSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		UUID token = (UUID) session.getAttribute("verification.token");
+		if (token == null) {
+			return "redirect:/error?code=400&path=bad-request";
+		}
+		NewUserRequest newUserRequest = userService.getNewUserRequest(token);
+		if (newUserRequest == null) {
+			return "redirect:/error?code=400&path=token-invalid";
+		}
+		if(!newUserRequest.getEmail().equals(user.getEmail()) || !newUserRequest.getRole().equals(user.getRole())) {
+			return "redirect:/error?code=400";
+		}
 		userFormValidator.validate(user, bindingResult);
 		
 		if (bindingResult.hasErrors()) {
-			return "internal_signup";
+			return "internal/signup";
         }
 		
 		if (userService.createInternalUser(user) == null) {
-			return "redirect:/error";
+			return "redirect:/error?code=400&path=user-invalid";
 		};
     	
-        return "redirect:/";
+        return "redirect:/login";
     }
 }

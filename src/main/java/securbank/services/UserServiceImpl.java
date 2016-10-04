@@ -44,9 +44,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PasswordEncoder encoder;
 	
-	@Value("${application.url}")
-	private String url;
-	
 	@Value("${user.verification.body}")
 	private String verificationBody;
 	
@@ -115,7 +112,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getCurrentUser() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	      
+		if (user == null) {
+			return null;
+		}
+		
 		return userDao.findById(user.getUserId());
 	}
 

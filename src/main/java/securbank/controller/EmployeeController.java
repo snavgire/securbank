@@ -16,19 +16,19 @@ import securbank.services.UserService;
  *
  */
 @Controller
-public class ExternalUserController {
+public class EmployeeController {
 	@Autowired
-	UserService userService;
+	private UserService userService;
 	
-	@GetMapping("/user/details")
+	@GetMapping("/employee/details")
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
-			return "redirect:/error?code=user-notfound";
+			return "redirect:/error?code=user.notfound";
 		}
 		
 		model.addAttribute("user", user);
 		
-        return "internal/detail";
+        return "employee/detail";
     }
 }
