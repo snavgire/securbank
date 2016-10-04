@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <title>Admin Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="webjars/bootstrap/3.3.6/css/bootstrap.min.css"/>
+        <script src="webjars/jquery/2.1.4/jquery.min.js"></script>
+        <script src="webjars/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+      <div class="container">
+  <h3>Admin Dashboard</h3>
+  <ul class="nav nav-pills nav-justified">
+    <li><a th:href="@{/admindash_view_accounts}">View Internal User Accounts</a></li>
+    <li><a th:href="@{/admindash_create_account}">Create Internal User Account</a></li>
+    <li class="active"><a href="#">System Logs</a></li>
+  </ul>
+</div>
+    </body>
+</html>
