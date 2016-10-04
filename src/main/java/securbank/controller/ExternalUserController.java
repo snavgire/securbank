@@ -29,6 +29,6 @@ public class ExternalUserController {
 		
 		model.addAttribute("user", user);
 		
-        return "internal/detail";
+        return "external/detail";
     }
 }
