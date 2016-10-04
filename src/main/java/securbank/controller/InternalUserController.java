@@ -61,6 +61,10 @@ public class InternalUserController {
 		if (token == null) {
 			return "redirect:/error?code=400&path=bad-request";
 		}
+		else {
+			// clears session
+			session.removeAttribute("validation.token");
+		}
 		NewUserRequest newUserRequest = userService.getNewUserRequest(token);
 		if (newUserRequest == null) {
 			return "redirect:/error?code=400&path=token-invalid";
