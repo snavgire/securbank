@@ -3,11 +3,13 @@
  */
 package securbank.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
 
 import org.joda.time.LocalDateTime;
+import org.omg.CORBA.INTERNAL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.ehcache.EhCacheManagerUtils;
@@ -65,6 +67,7 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(false);
+		user.setType("external");
 		user = userDao.save(user);
 		
 		//setup up email message
@@ -99,6 +102,7 @@ public class UserServiceImpl implements UserService {
 		newUserRequestDao.update(newUserRequest);
 		
 		// creates new user
+		user.setType("internal");
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
@@ -154,6 +158,33 @@ public class UserServiceImpl implements UserService {
 		return userDao.findById(user.getUserId());
 	}
 
+	/**
+     * Get all users by type
+     *
+	 * @return List<user>
+     */
+	@Override
+	public List<User> getUsersByType(String type) {
+		List<User> users = userDao.findAllByType(type);
+		
+		return users;
+	}
+	
+	/**
+     * Get all users by id
+     *
+	 * @return user
+     */
+	@Override
+	public User getUserByIdAndActive(UUID id) {
+		User user = userDao.findById(id);
+		if (user == null || user.getActive() == false) {
+			return null;
+		}
+		
+		return user;
+	}
+	
 	/**
      * Creates new user request
      * 
