@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -36,11 +37,8 @@ public class InternalUserController {
 	@Autowired
     public HttpSession session;
 	
-	@GetMapping("/internal/user/verify")
-    public String verifyNewUser(Model model, @RequestParam UUID id) {
-		if (id == null) {
-			return "redirect/error";
-		}
+	@GetMapping("/internal/user/verify/{id}")
+    public String verifyNewUser(Model model, @PathVariable UUID id) {
 		NewUserRequest newUserRequest = userService.getNewUserRequest(id);
 		if (newUserRequest == null) {
 			return "redirect/error?code=400&path=no-request";

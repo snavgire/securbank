@@ -17,5 +17,6 @@ public interface UserService {
 	public User createInternalUser(User user);
 	public NewUserRequest createUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
+	public boolean verifyNewUser(UUID userId);
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
 }

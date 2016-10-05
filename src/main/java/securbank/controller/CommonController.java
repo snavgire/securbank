@@ -3,12 +3,15 @@
  */
 package securbank.controller;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import securbank.models.User;
@@ -43,5 +46,14 @@ public class CommonController {
     	userService.createExternalUser(user);
     	
         return "redirect:/";
+    }
+	
+	@GetMapping("/user/verify/{id}")
+    public String verifyNewUser(Model model, @PathVariable UUID id, BindingResult bindingResult) {
+		if (userService.verifyNewUser(id) == false) {
+			return "redirect:/error?code=400";
+		}
+		
+		return "redirect:/";
     }
 }

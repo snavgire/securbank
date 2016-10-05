@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.ehcache.EhCacheManagerUtils;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,16 +64,17 @@ public class UserServiceImpl implements UserService {
 	public User createExternalUser(User user) {
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
-		user.setActive(true);
+		user.setActive(false);
+		user = userDao.save(user);
 		
-		// Creates new checking account
-		Account account = new Account();
-		account.setUser(user);
-		account.setType("checking");
-		account.setBalance(0.0);
-		account = accountService.createAccount(account);
+		//setup up email message
+		message = new SimpleMailMessage();
+		message.setText(verificationBody.replace(":id:",user.getUserId().toString()));
+		message.setSubject(verificationSubject);
+		message.setTo(user.getEmail());
+		emailService.sendEmail(message);
 		
-		return account.getUser();
+		return user;
 	}
 	
 	/**
@@ -102,6 +104,39 @@ public class UserServiceImpl implements UserService {
 		user.setActive(true);
 		
 		return userDao.save(user);
+	}
+	
+	/**
+     * Verify new user
+     * @param userId
+     * 			User id to be verified
+     * @return user
+     */
+	@Override
+	public boolean verifyNewUser(UUID userId) {
+		User user = userDao.findById(userId);
+		if (user == null || userDao.emailExists(user.getEmail()) || userDao.phoneExists(user.getPhone()) || userDao.usernameExists(user.getUsername())) {
+			return false;
+		}
+		
+		if (user.getActive() == true) {
+			return true;
+		}
+		user.setActive(true);
+		user = userDao.update(user);
+
+		// Creates new checking account
+		Account account = new Account();
+		account.setUser(user);
+		account.setType("checking");
+		account.setBalance(0.0);
+		account = accountService.createAccount(account);
+				
+		if (user == null) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -166,5 +201,4 @@ public class UserServiceImpl implements UserService {
 	
 		return newUserRequest;
 	}
-
 }
