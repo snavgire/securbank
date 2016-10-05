@@ -1,6 +1,3 @@
-/**
- * 
- */
 package securbank.controller;
 
 import java.util.UUID;

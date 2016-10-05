@@ -1,6 +1,3 @@
-/**
- * 
- */
 package securbank.controller;
 
 import java.util.UUID;
@@ -52,7 +49,6 @@ public class InternalUserController {
 		return "internal/signup";
     }
 	
-	// TODO: add check to verify if this request comes from verification link
 	@PostMapping("/internal/user/signup")
     public String internalSignupSubmit(@ModelAttribute User user, BindingResult bindingResult) {
 		UUID token = (UUID) session.getAttribute("verification.token");
