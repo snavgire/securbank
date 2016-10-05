@@ -48,7 +48,7 @@ public class ManagerController {
     }
 	
 	@GetMapping("/manager/user/{id}")
-    public String getUsers(Model model, @PathVariable UUID id) {
+    public String getUserDetails(Model model, @PathVariable UUID id) {
 		User user = userService.getUserByIdAndActive(id);
 		if (user == null) {
 			return "redirect:/error?code=400";

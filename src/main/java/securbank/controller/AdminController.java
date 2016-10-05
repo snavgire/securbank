@@ -69,7 +69,7 @@ public class AdminController {
         return "redirect:/admin/user/add?success=true";
     }
 	
-	@GetMapping("/manager/user")
+	@GetMapping("/admin/user")
     public String getUsers(Model model) {
 		List<User> users = userService.getUsersByType("internal");
 		if (users == null) {
@@ -77,11 +77,11 @@ public class AdminController {
 		}
 		model.addAttribute("users", users);
 			
-        return "manager/internalusers";
+        return "admin/internalusers";
     }
 	
-	@GetMapping("/manager/user/{id}")
-    public String getUsers(Model model, @PathVariable UUID id) {
+	@GetMapping("/admin/user/{id}")
+    public String getUserDetail(Model model, @PathVariable UUID id) {
 		User user = userService.getUserByIdAndActive(id);
 		if (user == null) {
 			return "redirect:/error?code=400";
@@ -92,7 +92,7 @@ public class AdminController {
 		
 		model.addAttribute("user", user);
 			
-        return "manager/userdetail";
+        return "admin/userdetail";
     }
 
 }

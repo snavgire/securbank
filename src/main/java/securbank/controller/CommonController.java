@@ -37,6 +37,7 @@ public class CommonController {
     public String signupSubmit(@ModelAttribute User user, BindingResult bindingResult) {
 		userFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
+			System.out.println(bindingResult);
 			return "signup";
         }
 		
@@ -46,7 +47,7 @@ public class CommonController {
     }
 	
 	@GetMapping("/user/verify/{id}")
-    public String verifyNewUser(Model model, @PathVariable UUID id, BindingResult bindingResult) {
+    public String verifyNewUser(Model model, @PathVariable UUID id) {
 		if (userService.verifyNewUser(id) == false) {
 			return "redirect:/error?code=400";
 		}

@@ -60,7 +60,7 @@ public class NewUserFormValidator implements Validator{
 			if (!ContraintUtils.validateEmail(user.getEmail())) {
 				errors.rejectValue("email", "user.email.contraint", "Invalid Email");
 			}
-			else if (userDao.emailExists(user.getEmail())) {
+			else if (userDao.emailExists(user.getEmail().toLowerCase())) {
 				errors.rejectValue("email", "user.email.exists", "Email exists");
 			}
 		}
