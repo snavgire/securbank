@@ -36,7 +36,6 @@ public class ModificationRequest {
 	@NotNull
 	private String role;
 	
-	@NotNull
 	@Transient
 	private String username;
 	

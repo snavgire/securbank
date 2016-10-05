@@ -40,7 +40,7 @@ public class ExternalUserController {
 		}
 		model.addAttribute("user", user);
 		
-        return "signup";
+        return "external/edit";
     }
 	
 	@PostMapping("/user/edit")

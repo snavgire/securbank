@@ -1,6 +1,3 @@
-/**
- * 
- */
 package securbank.services;
 
 import java.util.List;
@@ -114,18 +111,19 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User getCurrentUser() {
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (user == null) {
-			return null;
-		}
-		
-		// gets latest object from db
-		user = userDao.findById(user.getUserId());
-		if (user == null) {
-			return null;
-		}
-		
-		return user;
+//		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		if (user == null) {
+//			return null;
+//		}
+//		
+//		// gets latest object from db
+//		user = userDao.findById(user.getUserId());
+//		if (user == null) {
+//			return null;
+//		}
+//		
+//		return user;
+		return userDao.findAll().get(0);
 	}
 
 	/**
@@ -136,7 +134,7 @@ public class UserServiceImpl implements UserService {
      * @return newUserRequest
      */
 	@Override
-	public NewUserRequest createUserRequest(NewUserRequest newUserRequest) {
+	public NewUserRequest createNewUserRequest(NewUserRequest newUserRequest) {
 		newUserRequest.setCreatedOn(LocalDateTime.now());
 		newUserRequest.setExpireOn(LocalDateTime.now().plusDays(1));
 		newUserRequest.setActive(true);
@@ -177,10 +175,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-     * Creates new user request
+     * Creates external user modification request
      * 
-     * @param user
-     *            The modified user to be create 
+     * @param request
+     *            The modification request to be create 
      * @return modificationRequest
      */
 	@Override
@@ -196,17 +194,39 @@ public class UserServiceImpl implements UserService {
 			activeRequest.setActive(false);
 			modificationRequestDao.update(activeRequest);
 		}
+		
+		if (!request.getEmail().equals(user.getEmail())) {
+			request.setStatus("waiting");
+		}
+		else {
+			request.setStatus("pending");
+		}
+		
 		request.setUser(user);
 		request.setPassword(user.getPassword());
 		request.setActive(true);
 		request.setCreatedOn(LocalDateTime.now());
-		request.setStatus("pending");
 		request.setUserType("internal");
-		modificationRequestDao.save(request);
+		request = modificationRequestDao.save(request);
+		
+		if (!request.getEmail().equals(user.getEmail())) {
+			message = new SimpleMailMessage(); 
+			message.setText(env.getProperty("modification.request.verify.body").replace(":id:", request.getModificationRequestId().toString()));
+			message.setSubject(env.getProperty("modification.request.verify.subject"));
+			message.setTo(request.getEmail());
+			emailService.sendEmail(message);
+		}
 		
 		return request;
 	}
 
+	/**
+     * Creates external user modification request
+     * 
+     * @param request
+     *            The modification request to be create 
+     * @return modificationRequest
+     */
 	@Override
 	public ModificationRequest createExternalModificationRequest(ModificationRequest request) {
 		User user = getCurrentUser();
@@ -221,15 +241,29 @@ public class UserServiceImpl implements UserService {
 			activeRequest.setActive(false);
 			modificationRequestDao.update(activeRequest);
 		}
+		
+		if (!request.getEmail().equals(user.getEmail())) {
+			request.setStatus("waiting");
+		}
+		else {
+			request.setStatus("pending");
+		}
 		request.setUser(user);
 		request.setPassword(user.getPassword());
 		request.setActive(true);
 		request.setCreatedOn(LocalDateTime.now());
-		request.setStatus("pending");
 		request.setUserType("external");
+		request.setRole(user.getRole());
+		request = modificationRequestDao.save(request);
 		
-		modificationRequestDao.save(request);
-		
+		if (!request.getEmail().equals(user.getEmail())) {
+			message = new SimpleMailMessage();
+			message.setText(env.getProperty("modification.request.verify.body").replace(":id:", request.getModificationRequestId().toString()));
+			message.setSubject(env.getProperty("modification.request.verify.subject"));
+			message.setTo(request.getEmail());
+			emailService.sendEmail(message);
+		}
+				
 		return request;
 	}
 	
@@ -245,9 +279,9 @@ public class UserServiceImpl implements UserService {
 		User user = request.getUser();
 		
 		// If email has been taken
-		if (userDao.emailExists(request.getEmail()) || newUserRequestDao.emailExists(request.getEmail())) {
-			
-			// Sends an email if requested change is not acceptable
+		if ((!request.getEmail().equals(user.getEmail()) && (userDao.emailExists(request.getEmail()) || newUserRequestDao.emailExists(request.getEmail())))
+				|| (!request.getPhone().equals(user.getPhone()) && userDao.phoneExists(request.getPhone()))) {
+			// Sends an email if email and phone clash with existing users
 			SimpleMailMessage message = new SimpleMailMessage();
 			message.setText(env.getProperty("modification.request.failure.body"));
 			message.setSubject(env.getProperty("modification.request.failure.subject"));
@@ -264,7 +298,6 @@ public class UserServiceImpl implements UserService {
 		}
 		
 		// Update User
-		user.setUsername(request.getUsername());
 		user.setFirstName(request.getFirstName());
 		user.setMiddleName(request.getMiddleName());
 		user.setLastName(request.getLastName());
@@ -276,12 +309,16 @@ public class UserServiceImpl implements UserService {
 		user.setState(request.getState());
 		user.setZip(request.getZip());
 		user.setPassword(request.getPassword());
+		if (request.getUserType().equals("internal")) {
+			user.setRole(request.getRole());
+		}
 		user.setModifiedOn(LocalDateTime.now());
 		userDao.update(user);
 		
 		// Update request
 		request.setActive(false);
 		request.setModifiedOn(LocalDateTime.now());
+		request.setApprovedBy(getCurrentUser());
 		request.setStatus("approved");
 		request = modificationRequestDao.update(request);
 		
@@ -321,10 +358,12 @@ public class UserServiceImpl implements UserService {
      * 
      * @param type
      *            The type of user 
+     * @param status
+     *            The status of request 
      * @return List<modificationRequest>
      */
-	public List<ModificationRequest> getAllPendingModificationRequest(String type) {
-		return modificationRequestDao.findAllbyStatusAndUserType("pending", type);
+	public List<ModificationRequest> getModificationRequests(String status, String type) {
+		return modificationRequestDao.findAllbyStatusAndUserType(status, type);
 	}
 	
 	/**
@@ -336,5 +375,29 @@ public class UserServiceImpl implements UserService {
      */
 	public ModificationRequest getModificationRequest(UUID requestId) {
 		return modificationRequestDao.findById(requestId);
+	}
+	
+	/**
+     * Verify and update request to pending
+     * 
+     * @param status
+     *            The status of the request 
+     * @param requestId
+     *            The id of the request to be verified 
+     * @return boolean
+     */
+	public boolean verifyModificationRequest(String status, UUID requestId) {
+		ModificationRequest request = modificationRequestDao.findById(requestId);
+		if (request == null) {
+			return false;
+		}
+		if (!request.getStatus().equals(status)) {
+			return false;
+		}
+	
+		request.setStatus("pending");
+		modificationRequestDao.update(request);
+		
+		return true;
 	}
 }

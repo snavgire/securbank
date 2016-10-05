@@ -17,13 +17,14 @@ import securbank.models.User;
 public interface UserService {
 	public User createExternalUser(User user);
 	public User createInternalUser(User user);
-	public NewUserRequest createUserRequest(NewUserRequest newUserRequest);
+	public NewUserRequest createNewUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
 	public ModificationRequest createInternalModificationRequest(ModificationRequest request);
 	public ModificationRequest createExternalModificationRequest(ModificationRequest request);
 	public ModificationRequest approveModificationRequest(ModificationRequest request);
 	public ModificationRequest rejectModificationRequest(ModificationRequest requestId);
-	public List<ModificationRequest> getAllPendingModificationRequest(String type);
+	public List<ModificationRequest> getModificationRequests(String status, String type);
 	public ModificationRequest getModificationRequest(UUID requestId);
+	public boolean verifyModificationRequest(String status, UUID requestId);
 }

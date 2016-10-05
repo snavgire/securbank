@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -62,43 +63,16 @@ public class AdminController {
 		if (bindingResult.hasErrors()) {
 			return "admin/newuserrequest";
         }
-		if (userService.createUserRequest(newUserRequest) == null) {
+		if (userService.createNewUserRequest(newUserRequest) == null) {
 			return "redirect:/error";
 		};
     	
         return "redirect:/admin/user/add?success=true";
     }	
 	
-	@PostMapping("/admin/user/request/action")
-    public String approveEdit(@RequestParam UUID requestId, @RequestParam String action, BindingResult bindingResult) {
-		if (!action.equals("approve") && !action.equals("reject")) {
-			return "redirect:/error?code=400&path=action-invalid";
-		}
-		
-		ModificationRequest request = userService.getModificationRequest(requestId);
-		// checks validity of request
-		if (request == null) {
-			return "redirect:/error?code=400&path=request-invalid";
-		}
-		
-		// checks if admin is authorized for the request to approve
-		if (!request.getUserType().equals("internal")) {
-			return "redirect:/error?code=401&path=request.unauthorised";
-		}
-		if (action.equals("approve")) {
-			userService.approveModificationRequest(request);
-		}
-		// rejects request
-		else {
-			userService.rejectModificationRequest(request);
-		}
-		
-        return "redirect:/admin/user/request";
-    }
-	
 	@GetMapping("/admin/user/request")
     public String getAllUserRequest(Model model) {
-		List<ModificationRequest> modificationRequests = userService.getAllPendingModificationRequest("internal");
+		List<ModificationRequest> modificationRequests = userService.getModificationRequests("pending", "internal");
 		if (modificationRequests == null) {
 			model.addAttribute("modificationrequests", new ArrayList<ModificationRequest>());
 		}
@@ -106,11 +80,11 @@ public class AdminController {
 			model.addAttribute("modificationrequests", modificationRequests);	
 		}
 		
-        return "userrequests";
+        return "admin/modificationrequests";
     }
 	
-	@GetMapping("/admin/user/request/view")
-    public String getUserRequest(Model model, @RequestParam UUID id) {
+	@GetMapping("/admin/user/request/{id}")
+    public String getUserRequest(Model model, @PathVariable() UUID id) {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
 		if (modificationRequest == null) {
@@ -119,6 +93,35 @@ public class AdminController {
 		
 		model.addAttribute("modificationrequest", modificationRequest);
     	
-        return "userrequest";
+        return "admin/modificationrequest_detail";
+    }
+	
+	@PostMapping("/admin/user/request/{requestId}")
+    public String approveEdit(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) {
+		String status = request.getStatus();
+		if (status == null || !(request.getStatus().equals("approved") || !request.getStatus().equals("rejected"))) {
+			return "redirect:/error?code=400&path=request-action-invalid";
+		}
+		request = userService.getModificationRequest(requestId);
+		
+		// checks validity of request
+		if (request == null) {
+			return "redirect:/error?code=400&path=request-invalid";
+		}
+		
+		// checks if admin is authorized for the request to approve
+		if (!request.getUserType().equals("internal")) {
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		request.setStatus(status);
+		if (status.equals("approved")) {
+			userService.approveModificationRequest(request);
+		}
+		// rejects request
+		else {
+			userService.rejectModificationRequest(request);
+		}
+		
+        return "redirect:/admin/user/request";
     }
 }

@@ -48,7 +48,7 @@ public class ModificationRequestDaoImpl extends BaseDaoImpl<ModificationRequest,
      */
 	@Override
 	public List<ModificationRequest> findAllbyStatusAndUserType(String status, String userType) {
-		return this.entityManager.createQuery("SELECT request from ModificationRequest request where request.status = :status AND userType = type AND request.active = TRUE", ModificationRequest.class)
+		return this.entityManager.createQuery("SELECT request from ModificationRequest request where request.status = :status AND userType = :type AND request.active = TRUE", ModificationRequest.class)
 				.setParameter("status", status)							
 				.setParameter("type", userType)							
 				.getResultList();

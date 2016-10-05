@@ -14,8 +14,8 @@ import securbank.dao.UserDao;
  * @author Ayush Gupta
  *
  */
-@Component("editUserFormValidator")
-public class EditUserFormValidator implements Validator{
+@Component("intenralEditUserFormValidator")
+public class InternalEditUserFormValidator implements Validator{
 
 	@Autowired
 	private UserDao userDao;
@@ -54,6 +54,7 @@ public class EditUserFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "city", "user.city.required", "City is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "zip", "user.zip.required", "Zip is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "state", "user.phone.required", "State is required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "role", "user.role.required", "Role is required");
 		
 		User user = userDao.findByUsername(request.getUsername());
 		if (user == null) {
