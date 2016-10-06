@@ -6,6 +6,8 @@ package securbank.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,14 +35,17 @@ public class AdminController {
 	@Autowired 
 	private NewUserRequestFormValidator newUserRequestFormValidator;
 	
+	final static Logger logger = LoggerFactory.getLogger(AdminController.class);
 
 	@GetMapping("/admin/details")
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
+			logger.info("GET request: Unauthorized request for admin user detail");
 			return "redirect:/error?code=user.notfound";
 		}
 		
+		logger.info("GET request: Admin user detail");
 		model.addAttribute("user", user);
 		
         return "admin/detail";
@@ -52,7 +57,8 @@ public class AdminController {
 			model.addAttribute("success", success);
 		}
 		model.addAttribute("newUserRequest", new NewUserRequest());
-
+		logger.info("GET request: Admin new user request");
+		
 		return "admin/newuserrequest";
     }
 
@@ -66,6 +72,8 @@ public class AdminController {
 			return "redirect:/error";
 		};
     	
+		logger.info("POST request: Admin new user request");
+		
         return "redirect:/admin/user/add?success=true";
     }
 	
@@ -76,8 +84,9 @@ public class AdminController {
 			return "redirect:/error?code=500";
 		}
 		model.addAttribute("users", users);
-			
-        return "admin/internalusers";
+		logger.info("GET request: All internal users");
+        
+		return "admin/internalusers";
     }
 	
 	@GetMapping("/admin/user/{id}")
@@ -87,11 +96,14 @@ public class AdminController {
 			return "redirect:/error?code=400";
 		}
 		if (user.getType().equals("external")) {
+			logger.warn("GET request: Unauthorized request for external user");
+			
 			return "redirect:/error?code=409";
 		}
 		
 		model.addAttribute("user", user);
-			
+		logger.info("GET request: Internal user details by id");
+        	
         return "admin/userdetail";
     }
 

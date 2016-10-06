@@ -6,6 +6,8 @@ package securbank.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +26,8 @@ public class ManagerController {
 	@Autowired
 	private UserService userService;
 	
+	final static Logger logger = LoggerFactory.getLogger(ManagerController.class);
+	
 	@GetMapping("/manager/details")
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
@@ -32,6 +36,7 @@ public class ManagerController {
 		}
 		
 		model.addAttribute("user", user);
+		logger.info("GET request: Manager user detail");
 			
         return "manager/detail";
     }
@@ -43,7 +48,8 @@ public class ManagerController {
 			return "redirect:/error?code=500";
 		}
 		model.addAttribute("users", users);
-			
+		logger.info("GET request:  All external users");
+		
         return "manager/externalusers";
     }
 	
@@ -54,11 +60,14 @@ public class ManagerController {
 			return "redirect:/error?code=400";
 		}
 		if (user.getType().equals("internal")) {
+			logger.warn("GET request: Unauthorised request for internal user detail");
+			
 			return "redirect:/error?code=409";
 		}
 		
 		model.addAttribute("user", user);
-			
+		logger.info("GET request:  External user detail by id");
+		
         return "manager/userdetail";
     }
 }
