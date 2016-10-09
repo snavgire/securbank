@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import securbank.dao.UserDao;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
@@ -32,6 +33,9 @@ import securbank.validators.NewUserRequestFormValidator;
 public class AdminController {
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UserDao userDao;
 
 	@Autowired
 	private NewUserRequestFormValidator newUserRequestFormValidator;
@@ -40,7 +44,11 @@ public class AdminController {
 
 	@GetMapping("/admin/details")
 	public String currentUserDetails(Model model) {
-		User user = userService.getCurrentUser();
+		
+		//Sample user. Replace with the getCurrentUser() method when authorization implemented
+		User user = userDao.findByUsernameOrEmail("nloney");
+//		User user = userService.getCurrentUser();
+		
 		if (user == null) {
 			logger.info("GET request: Unauthorized request for admin user detail");
 			return "redirect:/error?code=user.notfound";
