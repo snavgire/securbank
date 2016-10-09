@@ -20,7 +20,7 @@
 		   		<td th:text="${user.lastName}"></td>
 		   		<td th:text="${user.email}"></td>
 		   		<td th:text="${user.role}"></td>
-		   		<td><a th:href="@{/admin/user/{id}(id=${request.modificationRequestId})}">View</a></td>
+		   		<td><a th:href="@{/admin/user/{id}(id=${user.userId})}">View</a></td>
 		   	</tr>    
        </table>
     </body>
