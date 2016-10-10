@@ -1,24 +1,24 @@
-/**
- * 
- */
 package securbank.controller;
 
 import java.util.UUID;
 
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
 import securbank.validators.NewUserFormValidator;
-import securbank.validators.NewUserRequestFormValidator;
 
 /**
  * @author Ayush Gupta
@@ -30,66 +30,65 @@ public class InternalUserController {
 	private UserService userService;
 	
 	@Autowired 
-	private NewUserRequestFormValidator newUserRequestFormValidator;
-	
-	@Autowired 
 	NewUserFormValidator userFormValidator;
 	
-	@GetMapping("/admin/register")
-    public String signupForm(Model model) {
-		model.addAttribute("newUserRequest", new NewUserRequest());
-
-		return "newuserrequest";
-    }
-
-	@GetMapping("/admin/register/success")
-    public String signupSuccess(Model model) {
-		return "home";
-    }
-
-	@PostMapping("/admin/register")
-    public String signupSubmit(@ModelAttribute NewUserRequest newUserRequest, BindingResult bindingResult) {
-		newUserRequestFormValidator.validate(newUserRequest, bindingResult);
-		if (bindingResult.hasErrors()) {
-			return "newuserrequest";
-        }
-		if (userService.createUserRequest(newUserRequest) == null) {
-			return "redirect:/error";
-		};
-    	
-        return "redirect:/admin/register";
-    }
+	@Autowired
+    public HttpSession session;
 	
-
-	@GetMapping("/internal/verify")
-    public String verifyNewUser(Model model, @RequestParam UUID id) {
-		if (id == null) {
-			return "redirect/error";
-		}
+	final static Logger logger = LoggerFactory.getLogger(InternalUserController.class);
+	
+	@GetMapping("/internal/user/verify/{id}")
+    public String verifyNewUser(Model model, @PathVariable UUID id) {
 		NewUserRequest newUserRequest = userService.getNewUserRequest(id);
 		if (newUserRequest == null) {
-			return "redirect/error";
+			logger.info("GET request: Invalid verfication for new user");
+			
+			return "redirect/error?code=400&path=no-request";
 		}
+		
+		logger.info("GET request: Verify new internal user");
+		session.setAttribute("verification.token", newUserRequest.getNewUserRequestId());
 		User user = new User();
 		user.setEmail(newUserRequest.getEmail());
 		user.setRole(newUserRequest.getRole());
 		model.addAttribute("user", user);
-		  
-		return "internal_signup";
+		
+		return "internal/signup";
     }
 	
-	@PostMapping("/internal/signup")
+	@PostMapping("/internal/user/signup")
     public String internalSignupSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		UUID token = (UUID) session.getAttribute("verification.token");
+		if (token == null) {
+			logger.info("POST request: Signup internal user with invalid session token");
+			return "redirect:/error?code=400&path=bad-request";
+		}
+		else {
+			// clears session
+			session.removeAttribute("validation.token");
+		}
+		logger.info("POST request: Signup internal user");
+		NewUserRequest newUserRequest = userService.getNewUserRequest(token);
+		if (newUserRequest == null) {
+			logger.info("POST request: Signup internal user with invalid id");
+			
+			return "redirect:/error?code=400&path=token-invalid";
+		}
+		if(!newUserRequest.getEmail().equals(user.getEmail()) || !newUserRequest.getRole().equals(user.getRole())) {
+			logger.info("GET request: Signup internal user with invalid credentials");
+			
+			return "redirect:/error?code=400";
+		}
 		userFormValidator.validate(user, bindingResult);
 		
 		if (bindingResult.hasErrors()) {
-			return "internal_signup";
+			return "internal/signup";
         }
 		
 		if (userService.createInternalUser(user) == null) {
-			return "redirect:/error";
+			return "redirect:/error?code=400&path=user-invalid";
 		};
     	
-        return "redirect:/";
+        return "redirect:/login";
     }
 }

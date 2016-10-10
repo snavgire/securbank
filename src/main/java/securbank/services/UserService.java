@@ -3,6 +3,7 @@
  */
 package securbank.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import securbank.models.NewUserRequest;
@@ -17,5 +18,8 @@ public interface UserService {
 	public User createInternalUser(User user);
 	public NewUserRequest createUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
+	public boolean verifyNewUser(UUID userId);
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
+	public List<User> getUsersByType(String type);
+	public User getUserByIdAndActive(UUID id);
 }

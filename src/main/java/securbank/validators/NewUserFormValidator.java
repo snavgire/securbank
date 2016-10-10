@@ -9,6 +9,7 @@ import org.springframework.validation.ValidationUtils;
 import securbank.models.User;
 import securbank.utils.ContraintUtils;
 import securbank.dao.UserDao;
+
 /**
  * @author Ayush Gupta
  *
@@ -47,7 +48,7 @@ public class NewUserFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "user.username.required", "Username is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "user.firstName.required", "First Name is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lastName", "user.lastName.required", "Last Name is required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "user.password.required", "Password is required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "user.email.required", "Email is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "phone", "user.phone.required", "Phone Number is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "addressLine1", "user.addressLine1.required", "Address is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "city", "user.city.required", "City is required");
@@ -59,7 +60,7 @@ public class NewUserFormValidator implements Validator{
 			if (!ContraintUtils.validateEmail(user.getEmail())) {
 				errors.rejectValue("email", "user.email.contraint", "Invalid Email");
 			}
-			else if (userDao.emailExists(user.getEmail())) {
+			else if (userDao.emailExists(user.getEmail().toLowerCase())) {
 				errors.rejectValue("email", "user.email.exists", "Email exists");
 			}
 		}
@@ -73,8 +74,13 @@ public class NewUserFormValidator implements Validator{
 			}
 		}
 		
-		if (!errors.hasFieldErrors("password") && !ContraintUtils.validatePassword(user.getPassword())) {
-			errors.rejectValue("password", "user.password.contraint", "Password should contain one letter, number and special character. Length of password should be between 6 and 20");
+		if (!errors.hasFieldErrors("password")) {
+			if (!ContraintUtils.validatePassword(user.getPassword())) {
+				errors.rejectValue("password", "user.password.contraint", "Password should contain one letter, number and special character. Length of password should be between 6 and 20");
+			}
+			else if (!user.getPassword().equals(user.getConfirmPassword())) {
+				errors.rejectValue("password", "user.password.match", "Password doesn't match");
+			}
 		}
 		
 		if (!errors.hasFieldErrors("phone")) {

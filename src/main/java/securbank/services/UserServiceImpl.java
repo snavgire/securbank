@@ -3,10 +3,13 @@
  */
 package securbank.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,9 +47,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PasswordEncoder encoder;
 	
-	@Value("${application.url}")
-	private String url;
-	
 	@Value("${user.verification.body}")
 	private String verificationBody;
 	
@@ -54,6 +54,8 @@ public class UserServiceImpl implements UserService {
 	private String verificationSubject;
 	
 	private SimpleMailMessage message;
+	
+	final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 	
 	/**
      * Creates new user
@@ -64,18 +66,21 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User createExternalUser(User user) {
+		logger.info("Creating new external user");
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
-		user.setActive(true);
+		user.setActive(false);
+		user.setType("external");
+		user = userDao.save(user);
 		
-		// Creates new checking account
-		Account account = new Account();
-		account.setUser(user);
-		account.setType("checking");
-		account.setBalance(0.0);
-		account = accountService.createAccount(account);
+		//setup up email message
+		message = new SimpleMailMessage();
+		message.setText(verificationBody.replace(":id:",user.getUserId().toString()));
+		message.setSubject(verificationSubject);
+		message.setTo(user.getEmail());
+		emailService.sendEmail(message);
 		
-		return account.getUser();
+		return user;
 	}
 	
 	/**
@@ -92,6 +97,7 @@ public class UserServiceImpl implements UserService {
 		// verify if request exists
 		newUserRequest = newUserRequestDao.findByEmailAndRole(user.getEmail(), user.getRole()); 
 		if (newUserRequest == null) {
+			logger.info("Invalid request for new internal user");
 			return null;
 		}
 		
@@ -99,12 +105,53 @@ public class UserServiceImpl implements UserService {
 		newUserRequest.setActive(false);
 		newUserRequestDao.update(newUserRequest);
 		
+		logger.info("Creating new internal user");
+		
 		// creates new user
+		user.setType("internal");
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(true);
 		
 		return userDao.save(user);
+	}
+	
+	/**
+     * Verify new user
+     * @param userId
+     * 			User id to be verified
+     * @return user
+     */
+	@Override
+	public boolean verifyNewUser(UUID userId) {
+		User user = userDao.findById(userId);
+		if (user == null || userDao.emailExists(user.getEmail()) || userDao.phoneExists(user.getPhone()) || userDao.usernameExists(user.getUsername())) {
+			logger.info("Verification for existing email, phone or username");
+			return false;
+		}
+		
+		if (user.getActive() == true) {
+			logger.info("Verification for active user");
+			return true;
+		}
+		
+		logger.info("Verifying and create account for new external user");
+		
+		user.setActive(true);
+		user = userDao.update(user);
+
+		// Creates new checking account
+		Account account = new Account();
+		account.setUser(user);
+		account.setType("checking");
+		account.setBalance(0.0);
+		account = accountService.createAccount(account);
+				
+		if (user == null) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -115,10 +162,43 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getCurrentUser() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	      
+		if (user == null) {
+			return null;
+		}
+		logger.info("Getting current logged in user");
 		return userDao.findById(user.getUserId());
 	}
 
+	/**
+     * Get all users by type
+     *
+	 * @return List<user>
+     */
+	@Override
+	public List<User> getUsersByType(String type) {
+		List<User> users = userDao.findAllByType(type);
+		logger.info("Getting users by type");
+		
+		return users;
+	}
+	
+	/**
+     * Get all users by id
+     *
+	 * @return user
+     */
+	@Override
+	public User getUserByIdAndActive(UUID id) {
+		User user = userDao.findById(id);
+		if (user == null || user.getActive() == false) {
+			return null;
+		}
+		
+		logger.info("Getting user by id");
+		
+		return user;
+	}
+	
 	/**
      * Creates new user request
      * 
@@ -133,6 +213,8 @@ public class UserServiceImpl implements UserService {
 		newUserRequest.setActive(true);
 		newUserRequest = newUserRequestDao.save(newUserRequest);
 		
+		logger.info("Creating new internal user request");
+		
 		//setup up email message
 		message = new SimpleMailMessage();
 		message.setText(verificationBody.replace(":id:",newUserRequest.getNewUserRequestId().toString()));
@@ -144,6 +226,7 @@ public class UserServiceImpl implements UserService {
 			// Deactivate request if email fails
 			newUserRequest.setActive(false);
 			newUserRequestDao.update(newUserRequest);
+			logger.warn("Email message failed");
 			
 			return null;
 		};
@@ -161,10 +244,10 @@ public class UserServiceImpl implements UserService {
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId) {
 		NewUserRequest newUserRequest = newUserRequestDao.findById(newUserRequestId);
 		if (newUserRequest == null) {
+			logger.info("Request for getting new user request with invalid id");
 			return null;
 		}
-	
+		logger.info("Getting new user request by id");
 		return newUserRequest;
 	}
-
 }
