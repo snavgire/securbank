@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,13 +48,10 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PasswordEncoder encoder;
 	
-	@Value("${user.verification.body}")
-	private String verificationBody;
-	
-	@Value("${user.verification.subject}")
-	private String verificationSubject;
-	
 	private SimpleMailMessage message;
+	
+	@Autowired
+	private Environment env;
 	
 	final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 	
@@ -77,6 +75,8 @@ public class UserServiceImpl implements UserService {
 		message = new SimpleMailMessage();
 		message.setText(verificationBody.replace(":id:",user.getUserId().toString()));
 		message.setSubject(verificationSubject);
+		message.setText(env.getProperty("external.user.verification.body").replace(":id:",user.getUserId().toString()));
+		message.setSubject(env.getProperty("external.user.verification.subject"));
 		message.setTo(user.getEmail());
 		emailService.sendEmail(message);
 		
@@ -217,8 +217,9 @@ public class UserServiceImpl implements UserService {
 		
 		//setup up email message
 		message = new SimpleMailMessage();
-		message.setText(verificationBody.replace(":id:",newUserRequest.getNewUserRequestId().toString()));
-		message.setSubject(verificationSubject);
+		message.setText(env.getProperty("internal.user.verification.body").replace(":id:",newUserRequest.getNewUserRequestId().toString()));
+		message.setSubject(env.getProperty("internal.user.verification.subject"));
+		
 		message.setTo(newUserRequest.getEmail());
 		
 		// send email
