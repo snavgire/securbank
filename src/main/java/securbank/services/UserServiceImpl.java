@@ -48,12 +48,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PasswordEncoder encoder;
 	
-	@Value("${user.verification.body}")
-	private String verificationBody;
-	
-	@Value("${user.verification.subject}")
-	private String verificationSubject;
-	
 	private SimpleMailMessage message;
 	
 	@Autowired
