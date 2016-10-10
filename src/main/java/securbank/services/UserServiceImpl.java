@@ -48,6 +48,12 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PasswordEncoder encoder;
 	
+	@Value("${user.verification.body}")
+	private String verificationBody;
+	
+	@Value("${user.verification.subject}")
+	private String verificationSubject;
+	
 	private SimpleMailMessage message;
 	
 	@Autowired
@@ -73,8 +79,6 @@ public class UserServiceImpl implements UserService {
 		
 		//setup up email message
 		message = new SimpleMailMessage();
-		message.setText(verificationBody.replace(":id:",user.getUserId().toString()));
-		message.setSubject(verificationSubject);
 		message.setText(env.getProperty("external.user.verification.body").replace(":id:",user.getUserId().toString()));
 		message.setSubject(env.getProperty("external.user.verification.subject"));
 		message.setTo(user.getEmail());
@@ -219,7 +223,6 @@ public class UserServiceImpl implements UserService {
 		message = new SimpleMailMessage();
 		message.setText(env.getProperty("internal.user.verification.body").replace(":id:",newUserRequest.getNewUserRequestId().toString()));
 		message.setSubject(env.getProperty("internal.user.verification.subject"));
-		
 		message.setTo(newUserRequest.getEmail());
 		
 		// send email
