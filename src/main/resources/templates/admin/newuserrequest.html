@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <title>Spring Security Example </title>
+    </head>
+    <body>
+        <form action="#" th:action="@{/admin/user/add}" th:object="${newUserRequest}" method="post">
+    	<p th:if="${success}"> Request Sent</p>
+    	<p>
+    		Email: <input type="text" th:field="*{email}" />
+    		<p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+    	</p>
+        <p>
+        	Role: <select th:field="*{role}">
+        	<option value="employee">Employee</option>
+        	<option value="manager">System Manager</option>
+        	<option value="admin">Admin</option>
+        	</select>
+        	<p th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></p>
+        </p>
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+    </form>
+    </body>
+</html>
