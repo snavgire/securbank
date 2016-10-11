@@ -5,9 +5,6 @@
         <title>Spring Security Example </title>
     </head>
     <body>
-        <div th:if="${param.error}">
-            Invalid username and password.
-        </div>
         <form action="#" th:action="@{/internal/user/signup}" th:object="${user}" method="post">
     	<p>
     		Username: <input type="text" th:field="*{username}" />

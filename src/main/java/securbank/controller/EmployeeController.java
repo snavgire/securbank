@@ -1,12 +1,11 @@
-/**
- * 
- */
 package securbank.controller;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +31,8 @@ public class EmployeeController {
 	
 	@Autowired
 	private InternalEditUserFormValidator editUserFormValidator;
+
+	final static Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 	
 	@GetMapping("/employee/details")
     public String currentUserDetails(Model model) {
@@ -41,6 +42,7 @@ public class EmployeeController {
 		}
 		
 		model.addAttribute("user", user);
+		logger.info("GET request: Employee user detail");
 		
         return "employee/detail";
     }

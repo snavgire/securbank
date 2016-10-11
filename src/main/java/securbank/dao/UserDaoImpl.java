@@ -1,6 +1,7 @@
 package securbank.dao;
 
 import org.springframework.stereotype.Repository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -85,7 +86,24 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
 		return this.entityManager.createQuery("SELECT user from User user", User.class)
 											.getResultList();
 	}
+	
+	/**
+     * Returns list of all users by type
+     * @param type
+     * 			The type of the user to be retrieved
+     * @return users
+     */
+	public List<User> findAllByType(String type) {
+		return this.entityManager.createQuery("SELECT user from User user where user.type = :type", User.class)
+				.setParameter("type", type)
+				.getResultList();
+	}
 
+	public List<User> findAllInternalUsers() {
+		return this.entityManager.createQuery("SELECT user from User user where user.role = manager OR user.role= employee OR user.role = admin", User.class)
+				.getResultList();
+	}
+	
 	/**
      * Returns if username exists in table
      * 

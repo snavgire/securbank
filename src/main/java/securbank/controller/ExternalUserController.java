@@ -3,6 +3,8 @@
  */
 package securbank.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +34,21 @@ public class ExternalUserController {
 	@Autowired 
 	EditUserFormValidator editUserFormValidator;
 	
+	final static Logger logger = LoggerFactory.getLogger(ExternalUserController.class);
+
+	@GetMapping("/user/details")
+    public String currentUserDetails(Model model) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error?code=400&path=user-notfound";
+		}
+		
+		model.addAttribute("user", user);
+		logger.info("GET request: External user detail");
+		
+        return "external/detail";
+    }
+	
 	@GetMapping("/user/edit")
     public String editUser(Model model) {
 		User user = userService.getCurrentUser();
@@ -54,17 +71,5 @@ public class ExternalUserController {
     	userService.createExternalModificationRequest(request);
 	
         return "redirect:/";
-    }
-	
-	@GetMapping("/user/details")
-    public String currentUserDetails(Model model) {
-		User user = userService.getCurrentUser();
-		if (user == null) {
-			return "redirect:/error?code=400&path=user-notfound";
-		}
-		
-		model.addAttribute("user", user);
-		
-        return "external/detail";
     }
 }

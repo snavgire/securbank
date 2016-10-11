@@ -19,7 +19,10 @@ public interface UserService {
 	public User createInternalUser(User user);
 	public NewUserRequest createNewUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
+	public boolean verifyNewUser(UUID userId);
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
+	public List<User> getUsersByType(String type);
+	public User getUserByIdAndActive(UUID id);
 	public ModificationRequest createInternalModificationRequest(ModificationRequest request);
 	public ModificationRequest createExternalModificationRequest(ModificationRequest request);
 	public ModificationRequest approveModificationRequest(ModificationRequest request);

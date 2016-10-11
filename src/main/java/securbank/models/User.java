@@ -40,6 +40,9 @@ public class User {
 	private String role;
 	
 	@NotNull
+	private String type;
+	
+	@NotNull
 	@Size(min = 3, max = 15)
 	@Column(name = "username", unique = true)
 	private String username;
@@ -112,12 +115,14 @@ public class User {
 	public User() {
 		
 	}
-	
+
 	/**
 	 * @param userId
 	 * @param role
+	 * @param type
 	 * @param username
 	 * @param password
+	 * @param confirmPassword
 	 * @param firstName
 	 * @param middleName
 	 * @param lastName
@@ -134,15 +139,17 @@ public class User {
 	 * @param active
 	 * @param accounts
 	 */
-	public User(UUID userId, String role, String username, String password, String firstName, String middleName,
-			String lastName, String email, String phone, String addressLine1, String addressLine2, String city,
-			String state, String zip, LocalDateTime createdOn, LocalDateTime modifiedOn, LocalDateTime lastLogin,
-			Boolean active, Set<Account> accounts) {
+	public User(UUID userId, String role, String type, String username, String password, String confirmPassword,
+			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
+			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
+			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts) {
 		super();
 		this.userId = userId;
 		this.role = role;
+		this.type = type;
 		this.username = username;
 		this.password = password;
+		this.confirmPassword = confirmPassword;
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.lastName = lastName;
@@ -159,7 +166,7 @@ public class User {
 		this.active = active;
 		this.accounts = accounts;
 	}
-	
+
 	/**
 	 * @return the userId
 	 */
@@ -186,6 +193,20 @@ public class User {
 	 */
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	/**
@@ -445,10 +466,11 @@ public class User {
 	 */
 	@Override
 	public String toString() {
-		return "User [userId=" + userId + ", role=" + role + ", username=" + username + ", password=" + password
-				+ ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", email="
-				+ email + ", phone=" + phone + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2
-				+ ", city=" + city + ", state=" + state + ", zip=" + zip + ", createdOn=" + createdOn + ", modifiedOn="
-				+ modifiedOn + ", lastLogin=" + lastLogin + ", active=" + active + ", accounts=" + accounts + "]";
-	}	
+		return "User [userId=" + userId + ", role=" + role + ", type=" + type + ", username=" + username + ", password="
+				+ password + ", confirmPassword=" + confirmPassword + ", firstName=" + firstName + ", middleName="
+				+ middleName + ", lastName=" + lastName + ", email=" + email + ", phone=" + phone + ", addressLine1="
+				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
+				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
+				+ ", active=" + active + ", accounts=" + accounts + "]";
+	}
 }
