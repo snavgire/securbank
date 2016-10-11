@@ -48,6 +48,7 @@ public class CommonController {
         }
 		
 		logger.info("POST request: signup");
+		logger.info("Username: "+user.getUsername());
 		
     	userService.createExternalUser(user);
     	
