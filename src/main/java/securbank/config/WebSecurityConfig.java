@@ -28,11 +28,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
+
+
+//        http
+//        .authorizeRequests()
+//	        .antMatchers("/", "/home").permitAll()
+//	        .anyRequest().authenticated()
+//	        .and()
+//        .formLogin()
+//            .loginPage("/login")
+//            .failureForwardUrl("/login?error")
+//            .permitAll()
+//            .and()
+//        .logout()
+//            .permitAll();
+
         http
         .authorizeRequests()
 //        	.antMatchers("/admin/**").access("hasRole('ADMIN')")
 	        .antMatchers("/", "/home").permitAll()
-	        //.anyRequest().authenticated()
+//	        .anyRequest().authenticated()
 	        .and()
         .formLogin()
             .loginPage("/login")
@@ -41,6 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
         .logout()
             .permitAll();
+
     }
 
     @Autowired
