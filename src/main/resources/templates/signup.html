@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+  <title>Create New Account</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="webjars/bootstrap/3.3.6/css/bootstrap.min.css"/>
+  <script src="webjars/jquery/2.1.4/jquery.min.js"></script>
+  <script src="webjars/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <form class="form-horizontal" action="#" th:action="@{/createExternalUser}" th:object="${user}" method="post">
+      <fieldset>
+
+        <!-- Form Name -->
+        <legend>New External User</legend>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Username</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{username}"/>
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">First Name</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{firstName}"/>
+
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Middle Name</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{middleName}"/>
+
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Last Name</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{lastName}"/>
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">E-mail</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{email}"/>
+
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Phone Number</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{phone}"/>
+
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Address Line 1</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{addressLine1}"/>
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Address Line 2</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{addressLine2}"/>
+
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">City</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{city}"/>
+
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">State</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{state}"/>
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Zipcode</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{zipcode}"/>
+
+          </div>
+        </div>
+
+
+        <!-- Button -->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="singlebutton"></label>
+          <div class="col-md-4">
+            <button id="singlebutton" name="singlebutton" type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+
+      </fieldset>
+    </form>
+  </div>
+
+</body>
+</html>
