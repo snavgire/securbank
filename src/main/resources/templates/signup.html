@@ -28,8 +28,8 @@
         <p>State: <input type="text" th:field="*{state}" /></p>
         <p>
         	Role: <select th:field="*{role}">
-        	<option value="individual">Individual</option>
-        	<option value="merchant">Merchant</option>
+        	<option value="ROLE_INDIVIDUAL">Individual</option>
+        	<option value="ROLE_MERCHANT">Merchant</option>
         	</select>
         	<p th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></p>
         </p>
