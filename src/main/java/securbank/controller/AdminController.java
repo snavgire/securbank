@@ -38,8 +38,10 @@ public class AdminController {
 	final static Logger logger = LoggerFactory.getLogger(AdminController.class);
 
 	@GetMapping("/admin/details")
-    public String currentUserDetails(Model model) {
+	public String currentUserDetails(Model model) {
+		
 		User user = userService.getCurrentUser();
+		
 		if (user == null) {
 			logger.info("GET request: Unauthorized request for admin user detail");
 			return "redirect:/error?code=user.notfound";

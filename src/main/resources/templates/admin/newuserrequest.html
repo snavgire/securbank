@@ -13,9 +13,9 @@
     	</p>
         <p>
         	Role: <select th:field="*{role}">
-        	<option value="employee">Employee</option>
-        	<option value="manager">System Manager</option>
-        	<option value="admin">Admin</option>
+        	<option value="ROLE_EMPLOYEE">Employee</option>
+        	<option value="ROLE_MANAGER">System Manager</option>
+        	<option value="ROLE_ADMIN">Admin</option>
         	</select>
         	<p th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></p>
         </p>
