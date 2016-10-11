@@ -59,6 +59,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		if (user == null) {
 			return null;
 		}
+		
 		return user;
 	}
 	

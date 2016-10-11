@@ -10,19 +10,51 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 </head>
 <body>
 
+  <div class="alert alert-danger" th:if="${param.error}"></div>
+
   <div class="container">
-    <form class="form-horizontal" action="#" th:action="@{/createExternalUser}" th:object="${user}" method="post">
+    <form class="form-horizontal" action="#" th:action="@{/signup}" th:object="${user}" method="post">
       <fieldset>
 
         <!-- Form Name -->
-        <legend>New External User</legend>
+        <legend>User Signup Page</legend>
 
         <!-- Text input-->
         <div class="form-group">
           <label class="col-md-4 control-label" for="textinput">Username</label>
           <div class="col-md-4">
             <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{username}"/>
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
           </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Password</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{password}"/>
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+          </div>
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="textinput">Confirm Password</label>
+          <div class="col-md-4">
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{confirmPassword}"/>
+          </div>
+        </div>
+
+
+        <div class="form-group">
+          <label class="col-md-4 control-label" for="selectbasic">Role</label>
+          <div class="col-md-4">
+            <select id="selectbasic" name="selectbasic" class="form-control" th:field="*{role}">
+              <option value="ROLE_INDIVIDUAL">Individual</option>
+              <option value="ROLE_MERCHANT">Merchant</option>
+            </select>
+          </div>
+          <div class="alert alert-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
         </div>
 
         <!-- Text input-->
@@ -56,7 +88,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
           <label class="col-md-4 control-label" for="textinput">E-mail</label>
           <div class="col-md-4">
             <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{email}"/>
-
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
           </div>
         </div>
 
@@ -65,7 +97,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
           <label class="col-md-4 control-label" for="textinput">Phone Number</label>
           <div class="col-md-4">
             <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" required="" th:field="*{phone}"/>
-
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
           </div>
         </div>
 
@@ -107,17 +139,18 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
         <div class="form-group">
           <label class="col-md-4 control-label" for="textinput">Zipcode</label>
           <div class="col-md-4">
-            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{zipcode}"/>
-
+            <input id="textinput" name="textinput" type="text" placeholder="" class="form-control input-md" th:field="*{zip}"/>
+            <div class="alert alert-danger" th:if="${#fields.hasErrors('zip')}" th:errors="*{zip}"></div>
           </div>
         </div>
 
 
         <!-- Button -->
         <div class="form-group">
-          <label class="col-md-4 control-label" for="singlebutton"></label>
-          <div class="col-md-4">
-            <button id="singlebutton" name="singlebutton" type="submit" class="btn btn-primary">Submit</button>
+          <label class="col-md-4 control-label" for="submitbutton"></label>
+          <div class="col-md-8">
+            <button id="submitbutton" name="submitbutton" type="submit" class="btn btn-primary">Submit</button>
+            <button id="resetbutton" name="resetbutton" type="reset" class="btn btn-default">Reset</button>
           </div>
         </div>
 
