@@ -45,9 +45,7 @@ public class AdminController {
 	@GetMapping("/admin/details")
 	public String currentUserDetails(Model model) {
 		
-		//Sample user. Replace with the getCurrentUser() method when authorization implemented
-		User user = userDao.findByUsernameOrEmail("nloney");
-//		User user = userService.getCurrentUser();
+		User user = userService.getCurrentUser();
 		
 		if (user == null) {
 			logger.info("GET request: Unauthorized request for admin user detail");

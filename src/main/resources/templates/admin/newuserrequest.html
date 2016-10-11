@@ -41,9 +41,9 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
           <label class="col-md-4 control-label" for="selectbasic">Role</label>
           <div class="col-md-4">
             <select id="selectbasic" name="selectbasic" class="form-control" th:field="*{role}">
-              <option value="employee">Employee</option>
-              <option value="manager">System Manager</option>
-              <option value="admin">Admin</option>
+              <option value="ROLE_EMPLOYEE">Employee</option>
+              <option value="ROLE_MANAGER">System Manager</option>
+              <option value="ROLE_ADMIN">Admin</option>
             </select>
           </div>
           <div class="alert alert-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>

@@ -1,17 +1,22 @@
 package securbank.services;
 
+import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.joda.time.LocalDateTime;
+import org.springframework.transaction.annotation.Transactional;
 
-import securbank.models.User;
 import securbank.dao.UserDao;
+import securbank.models.User;
 
 /**
  * @author Ayush Gupta
  *
  */
+@Transactional
 @Service("authenticationService")
 public class AuthenticationServiceImpl implements AuthenticationService {
 	
@@ -20,6 +25,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	
 	@Autowired 
 	private PasswordEncoder encoder;
+	
+	
 	
 	/**
      * Verify the username and password for current user
@@ -37,8 +44,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return null;
 		}
 		
-		if (encoder.encode(password).equals(user.getPassword())) {
-			return user;
+		if (!BCrypt.checkpw(password, user.getPassword())) {
+			return null;
 		};
 		
 		return user;
