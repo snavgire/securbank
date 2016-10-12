@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import securbank.models.ModificationRequest;
@@ -34,75 +35,77 @@ public class AdminController {
 	@Autowired
 	private UserService userService;
 	
-	@Autowired 
+	@Autowired
 	private NewUserRequestFormValidator newUserRequestFormValidator;
-	
+
 	final static Logger logger = LoggerFactory.getLogger(AdminController.class);
 
 	@GetMapping("/admin/details")
-    public String currentUserDetails(Model model) {
+	public String currentUserDetails(Model model) {
+		
 		User user = userService.getCurrentUser();
+		
 		if (user == null) {
 			logger.info("GET request: Unauthorized request for admin user detail");
 			return "redirect:/error?code=user.notfound";
 		}
-		
+
 		logger.info("GET request: Admin user detail");
 		model.addAttribute("user", user);
-		
-        return "admin/detail";
-    }
-	
+
+		return "admin/detail";
+	}
+
 	@GetMapping("/admin/user/add")
-    public String signupForm(Model model, @RequestParam(required = false) Boolean success) {
+	public String signupForm(Model model, @RequestParam(required = false) Boolean success) {
 		if (success != null) {
 			model.addAttribute("success", success);
 		}
 		model.addAttribute("newUserRequest", new NewUserRequest());
 		logger.info("GET request: Admin new user request");
-		
+
 		return "admin/newuserrequest";
-    }
+	}
 
 	@PostMapping("/admin/user/add")
-    public String signupSubmit(@ModelAttribute NewUserRequest newUserRequest, BindingResult bindingResult) {
+	public String signupSubmit(@ModelAttribute NewUserRequest newUserRequest, BindingResult bindingResult) {
 		newUserRequestFormValidator.validate(newUserRequest, bindingResult);
 		if (bindingResult.hasErrors()) {
 			return "admin/newuserrequest";
         }
 		if (userService.createNewUserRequest(newUserRequest) == null) {
 			return "redirect:/error";
-		};
-    	
+		}
+
 		logger.info("POST request: Admin new user request");
-		
-        return "redirect:/admin/user/add?success=true";
-    }	
-	
+
+		return "redirect:/admin/user/add?success=true";
+	}
+
 	@GetMapping("/admin/user")
-    public String getUsers(Model model) {
+	public String getUsers(Model model) {
 		List<User> users = userService.getUsersByType("internal");
 		if (users == null) {
 			return "redirect:/error?code=500";
 		}
 		model.addAttribute("users", users);
 		logger.info("GET request: All internal users");
-        
+
 		return "admin/internalusers";
-    }
-	
+	}
+
 	@GetMapping("/admin/user/{id}")
-    public String getUserDetail(Model model, @PathVariable UUID id) {
+	public String getUserDetail(Model model, @PathVariable UUID id) {
 		User user = userService.getUserByIdAndActive(id);
 		if (user == null) {
 			return "redirect:/error?code=400";
 		}
 		if (user.getType().equals("external")) {
 			logger.warn("GET request: Unauthorized request for external user");
-			
+
 			return "redirect:/error?code=409";
 		}
-		
+
 		model.addAttribute("user", user);
 		logger.info("GET request: Internal user details by id");
         	
@@ -163,4 +166,10 @@ public class AdminController {
 		
         return "redirect:/admin/user/request";
     }	
+
+	@RequestMapping("/admin/syslogs")
+	public String adminControllerSystemLogs(Model model) {
+		return "admin/systemlogs";
+	}
+
 }

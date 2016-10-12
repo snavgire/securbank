@@ -1,16 +1,18 @@
 package securbank.services;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -160,12 +162,13 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User getCurrentUser() {
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (user == null) {
+		String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (username == null) {
 			return null;
 		}
+		
 		logger.info("Getting current logged in user");
-		return userDao.findById(user.getUserId());
+		return userDao.findByUsernameOrEmail(username);
 	}
 
 	/**
