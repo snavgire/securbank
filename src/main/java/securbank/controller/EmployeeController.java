@@ -54,6 +54,7 @@ public class EmployeeController {
 			return "redirect:/error";
 		}
 		model.addAttribute("user", user);
+		logger.info("GET request: Employee profile edit");
 		
         return "employee/edit";
     }
@@ -67,7 +68,8 @@ public class EmployeeController {
 		
 		// create request
     	userService.createInternalModificationRequest(request);
-	
+    	logger.info("POST request: Employee New modification request");
+    	
         return "redirect:/";
     }
 	
@@ -80,6 +82,7 @@ public class EmployeeController {
 		else {
 			model.addAttribute("modificationrequests", modificationRequests);	
 		}
+		logger.info("GET request: Employee All external modification requests");
 		
         return "employee/modificationrequests";
     }
@@ -93,7 +96,8 @@ public class EmployeeController {
 		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
-    	
+		logger.info("GET request: Employee external modification request by ID");
+		
         return "employee/modificationrequest_detail";
     }
 	
@@ -122,6 +126,7 @@ public class EmployeeController {
 		else {
 			userService.rejectModificationRequest(request);
 		}
+		logger.info("POST request: Employee approves external modification request");
 		
         return "redirect:/employee/user/request";
     }

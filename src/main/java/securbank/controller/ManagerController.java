@@ -58,6 +58,7 @@ public class ManagerController {
 			return "redirect:/error";
 		}
 		model.addAttribute("user", user);
+		logger.info("GET request: Manager profile edit");
 		
         return "manager/edit";
     }
@@ -71,7 +72,8 @@ public class ManagerController {
 		
 		// create request
     	userService.createInternalModificationRequest(request);
-	
+    	logger.info("POST request: Manager New modification request");
+    	
         return "redirect:/";
     }
 	
@@ -84,6 +86,7 @@ public class ManagerController {
 		else {
 			model.addAttribute("modificationrequests", modificationRequests);	
 		}
+		logger.info("GET request: Manager All external modification requests");
 		
         return "manager/modificationrequests";
     }
@@ -97,7 +100,8 @@ public class ManagerController {
 		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
-    	
+		logger.info("GET request: Manager external modification request by ID");
+		
         return "manager/modificationrequest_detail";
     }
 	
@@ -126,6 +130,7 @@ public class ManagerController {
 		else {
 			userService.rejectModificationRequest(request);
 		}
+		logger.info("POST request: Employee approves external modification request");
 		
         return "redirect:/manager/user/request";
 	}

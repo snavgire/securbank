@@ -121,6 +121,7 @@ public class AdminController {
 		else {
 			model.addAttribute("modificationrequests", modificationRequests);	
 		}
+		logger.info("GET request: All user requests");
 		
         return "admin/modificationrequests";
     }
@@ -132,9 +133,10 @@ public class AdminController {
 		if (modificationRequest == null) {
 			return "redirect:/error?=code=400&path=request-invalid";
 		}
-		
 		model.addAttribute("modificationrequest", modificationRequest);
-    	
+		logger.info("GET request: User modification request by ID");
+		
+		
         return "admin/modificationrequest_detail";
     }
 	
@@ -153,6 +155,8 @@ public class AdminController {
 		
 		// checks if admin is authorized for the request to approve
 		if (!request.getUserType().equals("internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
 			return "redirect:/error?code=401&path=request-unauthorised";
 		}
 		request.setStatus(status);
@@ -163,6 +167,7 @@ public class AdminController {
 		else {
 			userService.rejectModificationRequest(request);
 		}
+		logger.info("POST request: Admin approves modification request");
 		
         return "redirect:/admin/user/request";
     }	

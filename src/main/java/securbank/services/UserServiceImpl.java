@@ -1,6 +1,5 @@
 package securbank.services;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -174,7 +172,7 @@ public class UserServiceImpl implements UserService {
 	/**
      * Get all users by type
      *
-	 * @return List<user>
+	 * @return List<User>
      */
 	@Override
 	public List<User> getUsersByType(String type) {
@@ -264,9 +262,12 @@ public class UserServiceImpl implements UserService {
 	public ModificationRequest createInternalModificationRequest(ModificationRequest request) {
 		User user = getCurrentUser();
 		if (user == null) {
+			logger.warn("Request for user who is not logged in");
+			
 			return null;
 		}
 		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(user);
+		logger.debug("Deactivating existing modification requests");
 		
 		// Deactivate all active request 
 		for (ModificationRequest activeRequest : requests) {
@@ -287,6 +288,7 @@ public class UserServiceImpl implements UserService {
 		request.setCreatedOn(LocalDateTime.now());
 		request.setUserType("internal");
 		request = modificationRequestDao.save(request);
+		logger.info("Request for creating new internal user modification request");
 		
 		if (!request.getEmail().equals(user.getEmail())) {
 			message = new SimpleMailMessage(); 
@@ -334,6 +336,7 @@ public class UserServiceImpl implements UserService {
 		request.setUserType("external");
 		request.setRole(user.getRole());
 		request = modificationRequestDao.save(request);
+		logger.info("Request for creating new external user modification request");
 		
 		if (!request.getEmail().equals(user.getEmail())) {
 			message = new SimpleMailMessage();
@@ -360,6 +363,8 @@ public class UserServiceImpl implements UserService {
 		// If email has been taken
 		if ((!request.getEmail().equals(user.getEmail()) && (userDao.emailExists(request.getEmail()) || newUserRequestDao.emailExists(request.getEmail())))
 				|| (!request.getPhone().equals(user.getPhone()) && userDao.phoneExists(request.getPhone()))) {
+			logger.info("Rejecting request due to unique contraint conflict");
+			
 			// Sends an email if email and phone clash with existing users
 			SimpleMailMessage message = new SimpleMailMessage();
 			message.setText(env.getProperty("modification.request.failure.body"));
@@ -375,6 +380,7 @@ public class UserServiceImpl implements UserService {
 			
 			return null;
 		}
+		logger.info("Request for approving modification request");
 		
 		// Update User
 		user.setFirstName(request.getFirstName());
@@ -421,7 +427,8 @@ public class UserServiceImpl implements UserService {
 		message.setSubject(env.getProperty("modification.request.reject.subject"));
 		message.setTo(user.getEmail());
 		emailService.sendEmail(message);
-	
+		logger.info("Request for rejecting modification request");
+		
 		// update request
 		request.setActive(false);
 		request.setStatus("rejected");
@@ -442,6 +449,8 @@ public class UserServiceImpl implements UserService {
      * @return List<modificationRequest>
      */
 	public List<ModificationRequest> getModificationRequests(String status, String type) {
+		logger.info("Getting all modification request by user type and status of request");
+		
 		return modificationRequestDao.findAllbyStatusAndUserType(status, type);
 	}
 	
@@ -453,11 +462,13 @@ public class UserServiceImpl implements UserService {
      * @return modificationRequest
      */
 	public ModificationRequest getModificationRequest(UUID requestId) {
+		logger.info("Getting modification request by ID");
+		
 		return modificationRequestDao.findById(requestId);
 	}
 	
 	/**
-     * Verify and update request to pending
+     * Verify email and update request to pending
      * 
      * @param status
      *            The status of the request 
@@ -474,6 +485,8 @@ public class UserServiceImpl implements UserService {
 			return false;
 		}
 	
+		logger.info("Verifying changes email address of user");
+		
 		request.setStatus("pending");
 		modificationRequestDao.update(request);
 		
