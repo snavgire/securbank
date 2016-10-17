@@ -19,6 +19,8 @@ public interface UserService {
 	public User createInternalUser(User user);
 	public NewUserRequest createNewUserRequest(NewUserRequest newUserRequest);
 	public User getCurrentUser();
+	public User editUser(User user);
+	public void deleteUser(UUID id);
 	public boolean verifyNewUser(UUID userId);
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
 	public List<User> getUsersByType(String type);
@@ -31,5 +33,6 @@ public interface UserService {
 	public ModificationRequest getModificationRequest(UUID requestId);
 	public boolean verifyModificationRequest(String status, UUID requestId);
 	public boolean verifyModificationRequestUserType(UUID requestId, String type);
+	public boolean verifyUserType(UUID id, String type);
 	public void deleteModificationRequest(ModificationRequest request);
 }

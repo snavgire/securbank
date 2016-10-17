@@ -25,6 +25,7 @@ import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
 import securbank.validators.ApprovalUserFormValidator;
+import securbank.validators.EditUserFormValidator;
 import securbank.validators.NewUserRequestFormValidator;
 
 /**
@@ -41,6 +42,9 @@ public class AdminController {
 
 	@Autowired
 	private ApprovalUserFormValidator approvalUserRequestFormValidator;
+
+	@Autowired
+	private EditUserFormValidator editUserFormValidator;
 
 	final static Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -98,6 +102,86 @@ public class AdminController {
 		return "admin/internalusers";
 	}
 
+	@GetMapping("/admin/user/edit/{id}")
+	public String editUser(Model model, @PathVariable UUID id) {
+		User user = userService.getUserByIdAndActive(id);
+		if (user == null) {
+			return "redirect:/error?code=404";
+		}
+		if (!userService.verifyUserType(id, "internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		model.addAttribute("user", user);
+		logger.info("GET request: All internal users");
+
+		return "admin/internalusers_edit";
+	}
+	
+	@PostMapping("/admin/user/edit/{id}")
+    public String editSubmit(@ModelAttribute User user, @PathVariable UUID id, BindingResult bindingResult) {
+		User current = userService.getUserByIdAndActive(id);
+		if (current == null) {
+			return "redirect:/error?code=404";
+		}
+		
+		editUserFormValidator.validate(user, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "redirect:/error?code=400?path=form-validation";
+        }
+		if (!userService.verifyUserType(id, "internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		user.setUserId(id);
+		logger.info("POST request: Internal user edit");
+		user = userService.editUser(user);
+		if (user == null) {
+			return "redirect:/error?code=500";
+		}
+		
+        return "redirect:/admin/user";
+    }
+	
+	@GetMapping("/admin/user/delete/{id}")
+	public String deleteUser(Model model, @PathVariable UUID id) {
+		User user = userService.getUserByIdAndActive(id);
+		if (user == null) {
+			return "redirect:/error?code=404";
+		}
+		if (!userService.verifyUserType(id, "internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		model.addAttribute("user", user);
+		logger.info("GET request: Delete internal user");
+		
+		return "admin/internalusers_delete";
+	}
+	
+	@PostMapping("/admin/user/delete/{id}")
+    public String deleteSubmit(@ModelAttribute User user, @PathVariable UUID id, BindingResult bindingResult) {
+		User current = userService.getUserByIdAndActive(id);
+		if (current == null) {
+			return "redirect:/error?code=404";
+		}
+		if (!userService.verifyUserType(id, "internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		userService.deleteUser(id);
+		logger.info("POST request: Employee New modification request");
+    	
+        return "redirect:/admin/user";
+    }
+	
 	@GetMapping("/admin/user/{id}")
 	public String getUserDetail(Model model, @PathVariable UUID id) {
 		User user = userService.getUserByIdAndActive(id);
@@ -137,6 +221,11 @@ public class AdminController {
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
+		if (!userService.verifyModificationRequestUserType(id, "internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
 		model.addAttribute("modificationrequest", modificationRequest);
 		logger.info("GET request: User modification request by ID");
 		
@@ -166,9 +255,8 @@ public class AdminController {
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
 		}
-		else {
-			request.setUserType("internal");
-		}
+		
+		request.setUserType("internal");
 		request.setStatus(status);
 		if (status.equals("approved")) {
 			userService.approveModificationRequest(request);
@@ -189,6 +277,11 @@ public class AdminController {
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
+		if (!userService.verifyModificationRequestUserType(id, "internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
 		model.addAttribute("modificationrequest", modificationRequest);
 		logger.info("GET request: User modification request by ID");
 		
@@ -205,8 +298,7 @@ public class AdminController {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
 		
-		// checks if admin is authorized for the request to approve
-		if (!request.getUserType().equals("internal")) {
+		if (!userService.verifyModificationRequestUserType(requestId, "internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";

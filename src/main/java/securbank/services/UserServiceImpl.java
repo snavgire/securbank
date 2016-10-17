@@ -170,6 +170,43 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
+     * Edit user
+     * @param user
+     * 			User to be edited
+     * @return user
+     */
+	public User editUser(User user) {
+		User current = userDao.findById(user.getUserId());
+		current.setEmail(user.getEmail());
+		current.setPhone(user.getPhone());
+		current.setFirstName(user.getFirstName());
+		current.setMiddleName(user.getMiddleName());
+		current.setLastName(user.getLastName());
+		current.setAddressLine1(user.getAddressLine1());
+		current.setAddressLine2(user.getAddressLine2());
+		current.setCity(user.getCity());
+		current.setState(user.getState());
+		current.setZip(user.getZip());
+		current.setModifiedOn(LocalDateTime.now());
+		current = userDao.update(current);
+		
+		return current;
+	}
+	
+	/**
+     * Delete user
+     * @param user
+     * 			User to be deleted
+     * @return void
+     */
+	public void deleteUser(UUID id) {
+		User current = userDao.findById(id);
+		userDao.remove(current);
+		
+		return;
+	}
+	
+	/**
      * Get all users by type
      *
 	 * @return List<User>
@@ -547,6 +584,29 @@ public class UserServiceImpl implements UserService {
 		}
 	
 		logger.info("Verifying type of user for request");
+		
+		return true;
+	}
+	
+	/**
+     * Verify the usertype of user
+     * 
+     * @param requestId
+     *            The id of the request to be verified 
+     * @param type
+     *            The type of user of the request 
+     * @return boolean
+     */
+	public boolean verifyUserType(UUID id, String type) {
+		User user = userDao.findById(id);
+		if (user == null) {
+			return false;
+		}
+		if (!user.getType().equals(type)) {
+			return false;
+		}
+	
+		logger.info("Verifying type of user");
 		
 		return true;
 	}
