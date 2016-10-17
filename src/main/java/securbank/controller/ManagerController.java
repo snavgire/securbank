@@ -96,7 +96,7 @@ public class ManagerController {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
 		if (modificationRequest == null) {
-			return "redirect:/error?=code=400&path=request-invalid";
+			return "redirect:/error?code=400&path=request-invalid";
 		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
