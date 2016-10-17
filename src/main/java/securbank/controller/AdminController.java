@@ -24,6 +24,7 @@ import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
+import securbank.validators.ApprovalUserFormValidator;
 import securbank.validators.NewUserRequestFormValidator;
 
 /**
@@ -37,6 +38,9 @@ public class AdminController {
 	
 	@Autowired
 	private NewUserRequestFormValidator newUserRequestFormValidator;
+
+	@Autowired
+	private ApprovalUserFormValidator approvalUserRequestFormValidator;
 
 	final static Logger logger = LoggerFactory.getLogger(AdminController.class);
 
@@ -136,7 +140,6 @@ public class AdminController {
 		model.addAttribute("modificationrequest", modificationRequest);
 		logger.info("GET request: User modification request by ID");
 		
-		
         return "admin/modificationrequest_detail";
     }
 	
@@ -146,18 +149,25 @@ public class AdminController {
 		if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
 			return "redirect:/error?code=400&path=request-action-invalid";
 		}
-		request = userService.getModificationRequest(requestId);
 		
 		// checks validity of request
-		if (request == null) {
+		if (userService.getModificationRequest(requestId) == null) {
 			return "redirect:/error?code=404&path=request-invalid";
+		}
+		request.setModificationRequestId(requestId);
+		approvalUserRequestFormValidator.validate(request, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "redirect:/error?code=400&path=request-action-validation";
 		}
 		
 		// checks if admin is authorized for the request to approve
-		if (!request.getUserType().equals("internal")) {
+		if (!userService.verifyModificationRequestUserType(requestId, "internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		else {
+			request.setUserType("internal");
 		}
 		request.setStatus(status);
 		if (status.equals("approved")) {

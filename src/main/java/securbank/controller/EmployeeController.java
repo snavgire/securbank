@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import securbank.models.ModificationRequest;
 import securbank.models.User;
 import securbank.services.UserService;
+import securbank.validators.ApprovalUserFormValidator;
 import securbank.validators.InternalEditUserFormValidator;
 
 /**
@@ -31,6 +32,9 @@ public class EmployeeController {
 	
 	@Autowired
 	private InternalEditUserFormValidator editUserFormValidator;
+
+	@Autowired
+	private ApprovalUserFormValidator approvalUserFormValidator;
 
 	final static Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 	
@@ -60,14 +64,14 @@ public class EmployeeController {
     }
 	
 	@PostMapping("/employee/edit")
-    public String editSubmit(@ModelAttribute ModificationRequest request, BindingResult bindingResult) {
-		editUserFormValidator.validate(request, bindingResult);
+    public String editSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		editUserFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
 			return "employee/edit";
         }
 		
 		// create request
-    	userService.createInternalModificationRequest(request);
+    	userService.createInternalModificationRequest(user);
     	logger.info("POST request: Employee New modification request");
     	
         return "redirect:/";
@@ -107,17 +111,27 @@ public class EmployeeController {
 		if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
 			return "redirect:/error?code=400&path=request-action-invalid";
 		}
-		request = userService.getModificationRequest(requestId);
 		
 		// checks validity of request
-		if (request == null) {
-			return "redirect:/error?code=400&path=request-invalid";
+		if (userService.getModificationRequest(requestId) == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		request.setModificationRequestId(requestId);
+		approvalUserFormValidator.validate(request, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "redirect:/error?code=400&path=request-action-validation";
 		}
 		
 		// checks if employee is authorized for the request to approve
-		if (!request.getUserType().equals("external")) {
+		if (!userService.verifyModificationRequestUserType(requestId, "external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
 			return "redirect:/error?code=401&path=request-unauthorised";
 		}
+		else {
+			request.setUserType("external");
+		}
+		
 		request.setStatus(status);
 		if (status.equals("approved")) {
 			userService.approveModificationRequest(request);

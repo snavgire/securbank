@@ -43,7 +43,7 @@ public class InternalEditUserFormValidator implements Validator{
      */
 	@Override
 	public void validate(Object target, Errors errors) {
-		ModificationRequest request = (ModificationRequest) target;
+		User user = (User) target;
 		
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "user.username.required", "Username is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstName", "user.firstName.required", "First Name is required");
@@ -56,30 +56,30 @@ public class InternalEditUserFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "state", "user.phone.required", "State is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "role", "user.role.required", "Role is required");
 		
-		User user = userDao.findByUsername(request.getUsername());
-		if (user == null) {
+		User current = userDao.findByUsername(user.getUsername());
+		if (current == null) {
 			errors.rejectValue("username", "user.username.invalid", "Invalid Username");
 		}
 		
 		if (!errors.hasFieldErrors("email")) {
-			if (!ContraintUtils.validateEmail(request.getEmail())) {
+			if (!ContraintUtils.validateEmail(user.getEmail())) {
 				errors.rejectValue("email", "user.email.contraint", "Invalid Email");
 			}
-			else if (!request.getEmail().equals(user.getEmail()) && userDao.emailExists(request.getEmail())) {
+			else if (!user.getEmail().equals(current.getEmail()) && userDao.emailExists(user.getEmail())) {
 				errors.rejectValue("email", "user.email.exists", "Email exists");
 			}
 		}
 		
 		if (!errors.hasFieldErrors("phone")) {
-			if (!ContraintUtils.validatePhone(request.getPhone())) {
+			if (!ContraintUtils.validatePhone(user.getPhone())) {
 				errors.rejectValue("phone", "user.phone.contraint", "Invalid Phone");
 			}
-			else if (!request.getPhone().equals(user.getPhone()) && userDao.phoneExists(request.getPhone())) {
+			else if (!user.getPhone().equals(current.getPhone()) && userDao.phoneExists(user.getPhone())) {
 				errors.rejectValue("phone", "user.phone.exists", "Phone number exists");
 			}
 		}
 		
-		if (!errors.hasFieldErrors("zip") && !ContraintUtils.validateZip(request.getZip())) {
+		if (!errors.hasFieldErrors("zip") && !ContraintUtils.validateZip(user.getZip())) {
 			errors.rejectValue("zip", "user.zip.invalid", "Invalid Zip");
 		}
 	} 

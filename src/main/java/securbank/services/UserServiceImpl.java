@@ -250,7 +250,7 @@ public class UserServiceImpl implements UserService {
 		logger.info("Getting new user request by id");
 		return newUserRequest;
 	}
-
+	
 	/**
      * Creates external user modification request
      * 
@@ -259,14 +259,15 @@ public class UserServiceImpl implements UserService {
      * @return modificationRequest
      */
 	@Override
-	public ModificationRequest createInternalModificationRequest(ModificationRequest request) {
-		User user = getCurrentUser();
+	public ModificationRequest createInternalModificationRequest(User user) {
+		User current = getCurrentUser();
+		ModificationRequest request = new ModificationRequest();
 		if (user == null) {
 			logger.warn("Request for user who is not logged in");
 			
 			return null;
 		}
-		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(user);
+		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(current);
 		logger.debug("Deactivating existing modification requests");
 		
 		// Deactivate all active request 
@@ -275,22 +276,33 @@ public class UserServiceImpl implements UserService {
 			modificationRequestDao.update(activeRequest);
 		}
 		
-		if (!request.getEmail().equals(user.getEmail())) {
+		if (!user.getEmail().equals(current.getEmail())) {
 			request.setStatus("waiting");
 		}
 		else {
 			request.setStatus("pending");
 		}
-		
-		request.setUser(user);
-		request.setPassword(user.getPassword());
+		request.setUsername(current.getUsername());
+		request.setEmail(user.getEmail());
+		request.setPhone(user.getPhone());
+		request.setFirstName(user.getFirstName());
+		request.setMiddleName(user.getMiddleName());
+		request.setLastName(user.getLastName());
+		request.setAddressLine1(user.getAddressLine1());
+		request.setAddressLine2(user.getAddressLine2());
+		request.setCity(user.getCity());
+		request.setState(user.getState());
+		request.setZip(user.getZip());
+		request.setUser(current);
+		request.setPassword(current.getPassword());
 		request.setActive(true);
 		request.setCreatedOn(LocalDateTime.now());
 		request.setUserType("internal");
+		request.setRole(user.getRole());
 		request = modificationRequestDao.save(request);
 		logger.info("Request for creating new internal user modification request");
 		
-		if (!request.getEmail().equals(user.getEmail())) {
+		if (!request.getEmail().equals(current.getEmail())) {
 			message = new SimpleMailMessage(); 
 			message.setText(env.getProperty("modification.request.verify.body").replace(":id:", request.getModificationRequestId().toString()));
 			message.setSubject(env.getProperty("modification.request.verify.subject"));
@@ -304,18 +316,18 @@ public class UserServiceImpl implements UserService {
 	/**
      * Creates external user modification request
      * 
-     * @param request
+     * @param user
      *            The modification request to be create 
      * @return modificationRequest
      */
 	@Override
-	public ModificationRequest createExternalModificationRequest(ModificationRequest request) {
-		User user = getCurrentUser();
+	public ModificationRequest createExternalModificationRequest(User user) {
+		User current = getCurrentUser();
 		if (user == null) {
 			return null;
 		}
-		
-		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(user);
+		ModificationRequest request = new ModificationRequest();
+		List<ModificationRequest> requests = modificationRequestDao.findAllbyUser(current);
 		
 		// Deactivate all active request 
 		for (ModificationRequest activeRequest : requests) {
@@ -323,22 +335,33 @@ public class UserServiceImpl implements UserService {
 			modificationRequestDao.update(activeRequest);
 		}
 		
-		if (!request.getEmail().equals(user.getEmail())) {
+		if (!request.getEmail().equals(current.getEmail())) {
 			request.setStatus("waiting");
 		}
 		else {
 			request.setStatus("pending");
 		}
-		request.setUser(user);
-		request.setPassword(user.getPassword());
+		request.setUsername(current.getUsername());
+		request.setEmail(user.getEmail());
+		request.setPhone(user.getPhone());
+		request.setFirstName(user.getFirstName());
+		request.setMiddleName(user.getMiddleName());
+		request.setLastName(user.getLastName());
+		request.setAddressLine1(user.getAddressLine1());
+		request.setAddressLine2(user.getAddressLine2());
+		request.setCity(user.getCity());
+		request.setState(user.getState());
+		request.setZip(user.getZip());
+		request.setUser(current);
+		request.setPassword(current.getPassword());
 		request.setActive(true);
 		request.setCreatedOn(LocalDateTime.now());
 		request.setUserType("external");
-		request.setRole(user.getRole());
+		request.setRole(current.getRole());
 		request = modificationRequestDao.save(request);
 		logger.info("Request for creating new external user modification request");
 		
-		if (!request.getEmail().equals(user.getEmail())) {
+		if (!request.getEmail().equals(current.getEmail())) {
 			message = new SimpleMailMessage();
 			message.setText(env.getProperty("modification.request.verify.body").replace(":id:", request.getModificationRequestId().toString()));
 			message.setSubject(env.getProperty("modification.request.verify.subject"));
@@ -358,7 +381,8 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public ModificationRequest approveModificationRequest(ModificationRequest request) {
-		User user = request.getUser();
+		ModificationRequest current = modificationRequestDao.findById(request.getModificationRequestId());
+		User user = current.getUser();
 		
 		// If email has been taken
 		if ((!request.getEmail().equals(user.getEmail()) && (userDao.emailExists(request.getEmail()) || newUserRequestDao.emailExists(request.getEmail())))
@@ -382,6 +406,17 @@ public class UserServiceImpl implements UserService {
 		}
 		logger.info("Request for approving modification request");
 		
+		current.setEmail(request.getEmail());
+		current.setPhone(request.getPhone());
+		current.setFirstName(request.getFirstName());
+		current.setMiddleName(request.getMiddleName());
+		current.setLastName(request.getLastName());
+		current.setAddressLine1(request.getAddressLine1());
+		current.setAddressLine2(request.getAddressLine2());
+		current.setCity(request.getCity());
+		current.setState(request.getState());
+		current.setZip(request.getZip());
+		
 		// Update User
 		user.setFirstName(request.getFirstName());
 		user.setMiddleName(request.getMiddleName());
@@ -393,7 +428,6 @@ public class UserServiceImpl implements UserService {
 		user.setCity(request.getCity());
 		user.setState(request.getState());
 		user.setZip(request.getZip());
-		user.setPassword(request.getPassword());
 		if (request.getUserType().equals("internal")) {
 			user.setRole(request.getRole());
 		}
@@ -401,13 +435,13 @@ public class UserServiceImpl implements UserService {
 		userDao.update(user);
 		
 		// Update request
-		request.setActive(false);
-		request.setModifiedOn(LocalDateTime.now());
-		request.setApprovedBy(getCurrentUser());
-		request.setStatus("approved");
-		request = modificationRequestDao.update(request);
+		current.setActive(false);
+		current.setModifiedOn(LocalDateTime.now());
+		current.setApprovedBy(getCurrentUser());
+		current.setStatus("approved");
+		current = modificationRequestDao.update(current);
 		
-		return request;
+		return current;
 	}
 	
 	/**
@@ -419,24 +453,25 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public ModificationRequest rejectModificationRequest(ModificationRequest request) {
-		User user = request.getUser();
+		ModificationRequest current = modificationRequestDao.findById(request.getModificationRequestId());
+		User user = current.getUser();
 			
+		logger.info("Request for rejecting modification request");
+		
+		// update request
+		current.setActive(false);
+		current.setStatus("rejected");
+		current.setModifiedOn(LocalDateTime.now());
+		current.setApprovedBy(getCurrentUser());
+		current = modificationRequestDao.update(current);
 		// Sends an email if request is rejected
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setText(env.getProperty("modification.request.reject.body"));
 		message.setSubject(env.getProperty("modification.request.reject.subject"));
 		message.setTo(user.getEmail());
 		emailService.sendEmail(message);
-		logger.info("Request for rejecting modification request");
 		
-		// update request
-		request.setActive(false);
-		request.setStatus("rejected");
-		request.setModifiedOn(LocalDateTime.now());
-		request.setApprovedBy(getCurrentUser());
-		request = modificationRequestDao.update(request);
-		
-		return request;
+		return current;
 	}
 	
 	/**
@@ -492,7 +527,30 @@ public class UserServiceImpl implements UserService {
 		
 		return true;
 	}
+
+	/**
+     * Verify the usertype of request
+     * 
+     * @param requestId
+     *            The id of the request to be verified 
+     * @param type
+     *            The type of user of the request 
+     * @return boolean
+     */
+	public boolean verifyModificationRequestUserType(UUID requestId, String type) {
+		ModificationRequest request = modificationRequestDao.findById(requestId);
+		if (request == null) {
+			return false;
+		}
+		if (!request.getUserType().equals(type)) {
+			return false;
+		}
 	
+		logger.info("Verifying type of user for request");
+		
+		return true;
+	}
+
 	/**
      * Deletes a request
      * 

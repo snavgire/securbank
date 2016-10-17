@@ -23,12 +23,13 @@ public interface UserService {
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
 	public List<User> getUsersByType(String type);
 	public User getUserByIdAndActive(UUID id);
-	public ModificationRequest createInternalModificationRequest(ModificationRequest request);
-	public ModificationRequest createExternalModificationRequest(ModificationRequest request);
+	public ModificationRequest createInternalModificationRequest(User user);
+	public ModificationRequest createExternalModificationRequest(User user);
 	public ModificationRequest approveModificationRequest(ModificationRequest request);
 	public ModificationRequest rejectModificationRequest(ModificationRequest requestId);
 	public List<ModificationRequest> getModificationRequests(String status, String type);
 	public ModificationRequest getModificationRequest(UUID requestId);
 	public boolean verifyModificationRequest(String status, UUID requestId);
+	public boolean verifyModificationRequestUserType(UUID requestId, String type);
 	public void deleteModificationRequest(ModificationRequest request);
 }

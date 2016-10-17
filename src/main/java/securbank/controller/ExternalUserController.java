@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import securbank.models.ModificationRequest;
 import securbank.models.User;
 import securbank.services.UserService;
 import securbank.validators.EditUserFormValidator;
@@ -61,14 +60,14 @@ public class ExternalUserController {
     }
 	
 	@PostMapping("/user/edit")
-    public String editSubmit(@ModelAttribute ModificationRequest request, BindingResult bindingResult) {
-		editUserFormValidator.validate(request, bindingResult);
+    public String editSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		editUserFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
-			return "edit";
+			return "external/edit";
         }
 		
 		// create request
-    	userService.createExternalModificationRequest(request);
+    	userService.createExternalModificationRequest(user);
 	
         return "redirect:/";
     }
