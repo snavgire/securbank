@@ -38,7 +38,7 @@ public class EmployeeController {
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
-			return "redirect:/error?code=user-notfound";
+			return "redirect:/error?code=404&path=user-notfound";
 		}
 		
 		model.addAttribute("user", user);
@@ -92,7 +92,7 @@ public class EmployeeController {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
 		if (modificationRequest == null) {
-			return "redirect:/error?code=400&path=request-invalid";
+			return "redirect:/error?code=404&path=request-invalid";
 		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
@@ -104,7 +104,7 @@ public class EmployeeController {
 	@PostMapping("/employee/user/request/{requestId}")
     public String approveEdit(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) {
 		String status = request.getStatus();
-		if (status == null || !(request.getStatus().equals("approved") || !request.getStatus().equals("rejected"))) {
+		if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
 			return "redirect:/error?code=400&path=request-action-invalid";
 		}
 		request = userService.getModificationRequest(requestId);

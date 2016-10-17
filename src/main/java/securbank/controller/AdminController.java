@@ -74,7 +74,7 @@ public class AdminController {
 			return "admin/newuserrequest";
         }
 		if (userService.createNewUserRequest(newUserRequest) == null) {
-			return "redirect:/error";
+			return "redirect:/error?code=500";
 		}
 
 		logger.info("POST request: Admin new user request");
@@ -98,7 +98,7 @@ public class AdminController {
 	public String getUserDetail(Model model, @PathVariable UUID id) {
 		User user = userService.getUserByIdAndActive(id);
 		if (user == null) {
-			return "redirect:/error?code=400";
+			return "redirect:/error?code=404";
 		}
 		if (user.getType().equals("external")) {
 			logger.warn("GET request: Unauthorized request for external user");
@@ -131,7 +131,7 @@ public class AdminController {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
 		if (modificationRequest == null) {
-			return "redirect:/error?=code=400&path=request-invalid";
+			return "redirect:/error?code=404&path=request-invalid";
 		}
 		model.addAttribute("modificationrequest", modificationRequest);
 		logger.info("GET request: User modification request by ID");
@@ -143,14 +143,14 @@ public class AdminController {
 	@PostMapping("/admin/user/request/{requestId}")
     public String approveEdit(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) {
 		String status = request.getStatus();
-		if (status == null || !(request.getStatus().equals("approved") || !request.getStatus().equals("rejected"))) {
+		if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
 			return "redirect:/error?code=400&path=request-action-invalid";
 		}
 		request = userService.getModificationRequest(requestId);
 		
 		// checks validity of request
 		if (request == null) {
-			return "redirect:/error?code=400&path=request-invalid";
+			return "redirect:/error?code=404&path=request-invalid";
 		}
 		
 		// checks if admin is authorized for the request to approve

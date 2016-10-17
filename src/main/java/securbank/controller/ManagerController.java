@@ -42,7 +42,7 @@ public class ManagerController {
 		User user = userService.getCurrentUser();
 		if (user == null) {
 
-			return "redirect:/error?code=400&path=user.notfound";
+			return "redirect:/error?code=400&path=user-notfound";
 		}
 		
 		model.addAttribute("user", user);
@@ -96,7 +96,7 @@ public class ManagerController {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
 		if (modificationRequest == null) {
-			return "redirect:/error?code=400&path=request-invalid";
+			return "redirect:/error?code=404&path=request-invalid";
 		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
@@ -115,7 +115,7 @@ public class ManagerController {
 		
 		// checks validity of request
 		if (request == null) {
-			return "redirect:/error?code=400&path=request-invalid";
+			return "redirect:/error?code=404&path=request-invalid";
 		}
 		
 		// checks if manager is authorized for the request to approve
@@ -156,7 +156,7 @@ public class ManagerController {
 		if (user.getType().equals("internal")) {
 			logger.warn("GET request: Unauthorised request for internal user detail");
 			
-			return "redirect:/error?code=409";
+			return "redirect:/error?code=401";
 		}
 		
 		model.addAttribute("user", user);
