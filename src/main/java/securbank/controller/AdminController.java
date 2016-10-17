@@ -55,7 +55,7 @@ public class AdminController {
 		
 		if (user == null) {
 			logger.info("GET request: Unauthorized request for admin user detail");
-			return "redirect:/error?code=user.notfound";
+			return "redirect:/error?code=401";
 		}
 
 		logger.info("GET request: Admin user detail");
@@ -64,6 +64,43 @@ public class AdminController {
 		return "admin/detail";
 	}
 
+	@GetMapping("/admin/edit")
+	public String editUser(Model model) {
+		User user = userService.getCurrentUser();
+		
+		if (user == null) {
+			logger.info("GET request: Unauthorized request for admin user detail");
+			return "redirect:/error?code=401";
+		}
+		
+		logger.info("GET request: Admin user detail");
+		model.addAttribute("user", user);
+
+		return "admin/edit";
+	}
+	
+	@PostMapping("/admin/edit")
+    public String editSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		User current = userService.getCurrentUser();
+		
+		if (user == null) {
+			logger.info("GET request: Unauthorized request for admin user detail");
+			return "redirect:/error?code=401";
+		}
+		editUserFormValidator.validate(user, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "manager/edit";
+        }
+		user.setRole("ROLE_ADMIN");
+		user.setUserId(current.getUserId());
+		
+		// create request
+    	userService.editUser(user);
+    	logger.info("POST request: Admin edit");
+    	
+        return "redirect:/";
+    }
+	
 	@GetMapping("/admin/user/add")
 	public String signupForm(Model model, @RequestParam(required = false) Boolean success) {
 		if (success != null) {

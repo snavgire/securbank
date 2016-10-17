@@ -98,11 +98,6 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
 				.setParameter("type", type)
 				.getResultList();
 	}
-
-	public List<User> findAllInternalUsers() {
-		return this.entityManager.createQuery("SELECT user from User user where user.role = manager OR user.role= employee OR user.role = admin", User.class)
-				.getResultList();
-	}
 	
 	/**
      * Returns if username exists in table
