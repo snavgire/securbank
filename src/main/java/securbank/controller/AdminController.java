@@ -126,7 +126,7 @@ public class AdminController {
         return "admin/modificationrequests";
     }
 	
-	@GetMapping("/admin/user/request/{id}")
+	@GetMapping("/admin/user/request/view/{id}")
     public String getUserRequest(Model model, @PathVariable() UUID id) {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
@@ -172,6 +172,41 @@ public class AdminController {
         return "redirect:/admin/user/request";
     }	
 
+	@GetMapping("/admin/user/request/delete/{id}")
+    public String getDeleteRequest(Model model, @PathVariable() UUID id) {
+		ModificationRequest modificationRequest = userService.getModificationRequest(id);
+		
+		if (modificationRequest == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		model.addAttribute("modificationrequest", modificationRequest);
+		logger.info("GET request: User modification request by ID");
+		
+		
+        return "admin/modificationrequest_delete";
+    }
+	
+	@PostMapping("/admin/user/request/delete/{requestId}")
+    public String deleteRequest(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) {
+		request = userService.getModificationRequest(requestId);
+		
+		// checks validity of request
+		if (request == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		
+		// checks if admin is authorized for the request to approve
+		if (!request.getUserType().equals("internal")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		userService.deleteModificationRequest(request);
+		logger.info("POST request: Admin approves modification request");
+		
+        return "redirect:/admin/user/request";
+    }	
+	
 	@RequestMapping("/admin/syslogs")
 	public String adminControllerSystemLogs(Model model) {
 		return "admin/systemlogs";

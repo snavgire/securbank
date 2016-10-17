@@ -492,4 +492,15 @@ public class UserServiceImpl implements UserService {
 		
 		return true;
 	}
+	
+	/**
+     * Deletes a request
+     * 
+     * @param request
+     *            The request to be deleted 
+     */
+	public void deleteModificationRequest(ModificationRequest request) {
+		modificationRequestDao.remove(request);
+		return;
+	}
 }

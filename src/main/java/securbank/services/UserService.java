@@ -30,4 +30,5 @@ public interface UserService {
 	public List<ModificationRequest> getModificationRequests(String status, String type);
 	public ModificationRequest getModificationRequest(UUID requestId);
 	public boolean verifyModificationRequest(String status, UUID requestId);
+	public void deleteModificationRequest(ModificationRequest request);
 }
