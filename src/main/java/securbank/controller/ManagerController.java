@@ -102,6 +102,13 @@ public class ManagerController {
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
+
+		// checks if manager is authorized for the request to approve
+		if (!modificationRequest.getUserType().equals("external")) {
+			logger.warn("GET request: Manager unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
 		logger.info("GET request: Manager external modification request by ID");
@@ -119,6 +126,7 @@ public class ManagerController {
 		if (userService.getModificationRequest(requestId) == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
+
 		request.setModificationRequestId(requestId);
 		approvalUserFormValidator.validate(request, bindingResult);
 		if (bindingResult.hasErrors()) {
@@ -166,8 +174,8 @@ public class ManagerController {
 		if (user == null) {
 			return "redirect:/error?code=400";
 		}
-		if (user.getType().equals("internal")) {
-			logger.warn("GET request: Unauthorised request for internal user detail");
+		if (!user.getType().equals("external")) {
+			logger.warn("GET request: Unauthorised request for external user detail");
 			
 			return "redirect:/error?code=401";
 		}
@@ -178,12 +186,100 @@ public class ManagerController {
         return "manager/userdetail";
     }
 	
+	@GetMapping("/manager/user/edit/{id}")
+	public String editUser(Model model, @PathVariable UUID id) {
+		User user = userService.getUserByIdAndActive(id);
+		if (user == null) {
+			return "redirect:/error?code=404";
+		}
+		if (!user.getType().equals("external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		model.addAttribute("user", user);
+		logger.info("GET request: All external users");
+
+		return "manager/externalusers_edit";
+	}
+	
+	@PostMapping("/manager/user/edit/{id}")
+    public String editSubmit(@ModelAttribute User user, @PathVariable UUID id, BindingResult bindingResult) {
+		User current = userService.getUserByIdAndActive(id);
+		if (current == null) {
+			return "redirect:/error?code=404";
+		}
+		
+		editUserFormValidator.validate(user, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "redirect:/error?code=400?path=form-validation";
+        }
+		if (!current.getType().equals("external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		user.setUserId(id);
+		logger.info("POST request: Internal user edit");
+		user = userService.editUser(user);
+		if (user == null) {
+			return "redirect:/error?code=500";
+		}
+		
+        return "redirect:/manager/user";
+    }
+	
+	@GetMapping("/manager/user/delete/{id}")
+	public String deleteUser(Model model, @PathVariable UUID id) {
+		User user = userService.getUserByIdAndActive(id);
+		if (user == null) {
+			return "redirect:/error?code=404";
+		}
+		if (!user.getType().equals("external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		model.addAttribute("user", user);
+		logger.info("GET request: Delete external user");
+		
+		return "manager/externalusers_delete";
+	}
+	
+	@PostMapping("/manager/user/delete/{id}")
+    public String deleteSubmit(@ModelAttribute User user, @PathVariable UUID id, BindingResult bindingResult) {
+		User current = userService.getUserByIdAndActive(id);
+		if (current == null) {
+			return "redirect:/error?code=404";
+		}
+		if (!current.getType().equals("external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		userService.deleteUser(id);
+		logger.info("POST request: Employee New modification request");
+    	
+        return "redirect:/manager/user";
+    }
+
+	
 	@GetMapping("/manager/user/request/delete/{id}")
     public String deleteRequest(Model model, @PathVariable() UUID id) {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
+		}
+		
+		// checks if manager is authorized for the request to approve
+		if (!modificationRequest.getUserType().equals("external")) {
+			logger.warn("GET request: Manager unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
 		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
@@ -201,7 +297,7 @@ public class ManagerController {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
 		
-		// checks if admin is authorized for the request to approve
+		// checks if manager is authorized for the request to approve
 		if (!request.getUserType().equals("external")) {
 			logger.warn("GET request: Manager unauthrorised request access");
 			

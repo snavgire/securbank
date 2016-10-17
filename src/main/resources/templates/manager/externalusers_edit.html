@@ -6,8 +6,7 @@
 <title>Edit Profile</title>
 </head>
 <body>
-	<form action="#" th:action="@{/manager/edit}" th:object="${user}"
-		method="post">
+	<form action="#" th:action="@{/manager/user/edit/{id}(id=${user.userId})}" th:object="${user}" method="post">
 		<p>
 			Username: <input type="text" th:field="*{username}" readonly="true" />
 		</p>
@@ -46,9 +45,8 @@
 		</p>
 		<p>
 			Role: <select th:field="*{role}">
-				<option th:value="ROLE_EMPLOYEE" th:selected="(*{role} == ROLE_EMPLOYEE")>Employee</option>
-				<option th:value="ROLE_MANAGER" th:selected="(*{role} == ROLE_MANAGER)">System
-					Manager</option>
+				<option th:value="ROLE_INDIVIDUAL" th:selected="(*{role} == ROLE_INDIVIDUAL)">Individual</option>
+				<option th:value="ROLE_MERCHANT" th:selected="(*{role} == ROLE_MERCHANT)">Merchant</option>
 			</select>
 		<p th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></p>
 		</p>

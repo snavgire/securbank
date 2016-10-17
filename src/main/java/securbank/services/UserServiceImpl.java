@@ -188,6 +188,7 @@ public class UserServiceImpl implements UserService {
 		current.setState(user.getState());
 		current.setZip(user.getZip());
 		current.setModifiedOn(LocalDateTime.now());
+		current.setRole(user.getRole());
 		current = userDao.update(current);
 		
 		return current;
@@ -584,29 +585,6 @@ public class UserServiceImpl implements UserService {
 		}
 	
 		logger.info("Verifying type of user for request");
-		
-		return true;
-	}
-	
-	/**
-     * Verify the usertype of user
-     * 
-     * @param requestId
-     *            The id of the request to be verified 
-     * @param type
-     *            The type of user of the request 
-     * @return boolean
-     */
-	public boolean verifyUserType(UUID id, String type) {
-		User user = userDao.findById(id);
-		if (user == null) {
-			return false;
-		}
-		if (!user.getType().equals(type)) {
-			return false;
-		}
-	
-		logger.info("Verifying type of user");
 		
 		return true;
 	}

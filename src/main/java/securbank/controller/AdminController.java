@@ -108,7 +108,7 @@ public class AdminController {
 		if (user == null) {
 			return "redirect:/error?code=404";
 		}
-		if (!userService.verifyUserType(id, "internal")) {
+		if (!user.getType().equals("internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
@@ -131,7 +131,7 @@ public class AdminController {
 		if (bindingResult.hasErrors()) {
 			return "redirect:/error?code=400?path=form-validation";
         }
-		if (!userService.verifyUserType(id, "internal")) {
+		if (!current.getType().equals("internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
@@ -152,7 +152,7 @@ public class AdminController {
 		if (user == null) {
 			return "redirect:/error?code=404";
 		}
-		if (!userService.verifyUserType(id, "internal")) {
+		if (!user.getType().equals("internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
@@ -170,7 +170,7 @@ public class AdminController {
 		if (current == null) {
 			return "redirect:/error?code=404";
 		}
-		if (!userService.verifyUserType(id, "internal")) {
+		if (!current.getType().equals("internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
@@ -188,7 +188,7 @@ public class AdminController {
 		if (user == null) {
 			return "redirect:/error?code=404";
 		}
-		if (user.getType().equals("external")) {
+		if (!user.getType().equals("internal")) {
 			logger.warn("GET request: Unauthorized request for external user");
 
 			return "redirect:/error?code=409";
@@ -221,7 +221,7 @@ public class AdminController {
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
-		if (!userService.verifyModificationRequestUserType(id, "internal")) {
+		if (!modificationRequest.getUserType().equals("internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
@@ -277,7 +277,7 @@ public class AdminController {
 		if (modificationRequest == null) {
 			return "redirect:/error?code=404&path=request-invalid";
 		}
-		if (!userService.verifyModificationRequestUserType(id, "internal")) {
+		if (!modificationRequest.getUserType().equals("internal")) {
 			logger.warn("GET request: Admin unauthrorised request access");
 			
 			return "redirect:/error?code=401&path=request-unauthorised";
