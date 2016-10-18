@@ -21,6 +21,8 @@ public class ContraintUtils {
 	private static final String ZIP_PATTERN = "[0-9]{5}";
 	private static final String PHONE_PATTERN = "[0-9]{10}";
 	private static final String PASSWORD_PATTERN =  "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$!%]).{6,20})";
+	private static final String TRANSACTION_TYPE_PATTERN = "CREIDIT|TRANSFER|DEBIT";
+	private static final String AMOUNT_PATTERN = "/^[0-9]+(\\.[0-9]+)?$";
 	
 	/**
      * Validates username
@@ -92,4 +94,31 @@ public class ContraintUtils {
 		return matcher.matches();
 	}
 	
+	/**
+	 * Validates transacitonType
+	 * 
+	 * @param transactionType
+	 * 		The transaction type to be validated
+	 * @return boolean
+	 */
+	public static boolean validateTransactionType(String transactionType){
+		pattern = Pattern.compile(TRANSACTION_TYPE_PATTERN);
+		matcher = pattern.matcher(transactionType);
+		
+		return matcher.matches();
+	}
+	
+	/**
+	 * Validates transacitonAmount
+	 * 
+	 * @param transacitonAmount
+	 * 		The transaction amount to be validated
+	 * @return boolean
+	 */
+	public static boolean validateTransactionAmount(String transactionAmount){
+		pattern = Pattern.compile(AMOUNT_PATTERN);
+		matcher = pattern.matcher(transactionAmount);
+		
+		return matcher.matches();
+	}
 }

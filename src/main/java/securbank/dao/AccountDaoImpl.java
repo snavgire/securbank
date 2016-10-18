@@ -35,7 +35,7 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 	
 	/**
      * Returns if account exists for user
-     * 
+     *  
      * @param user
      * 			The user for which account to check
      * @param type
@@ -48,6 +48,12 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 				.setParameter("user", user)
 				.setParameter("type", type)
 				.getSingleResult() != 0;
+	}
+
+	@Override
+	public boolean updateBalance() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 }

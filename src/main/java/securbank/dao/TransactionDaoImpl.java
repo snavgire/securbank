@@ -44,10 +44,11 @@ public class TransactionDaoImpl extends BaseDaoImpl<Transaction, UUID> implement
      * 
      * @return transactions
      */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Transaction findByAccount(String accountNumber) {
+	public List<Transaction> findByAccount(String accountNumber) {
 		try {
-			return (Transaction) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+			return (List<Transaction>) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
 					+ " where transaction.accountnumber = :accountNumber")
 					.setParameter("accountNumber", accountNumber)
 					.getSingleResult();
@@ -64,10 +65,11 @@ public class TransactionDaoImpl extends BaseDaoImpl<Transaction, UUID> implement
      * 
      * @return transactions
      */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Transaction findByAccountAndType(String accountNumber, String type) {
+	public List<Transaction> findByAccountAndType(String accountNumber, String type) {
 		try {
-			return (Transaction) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+			return (List<Transaction>) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
 					+ " where (transaction.accountnumber = :accountNumber AND transaction.type = type)")
 					.setParameter("accountNumber", accountNumber)
 					.setParameter("type", type)
@@ -84,10 +86,11 @@ public class TransactionDaoImpl extends BaseDaoImpl<Transaction, UUID> implement
      * 
      * @return transactions
      */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Transaction findByStatus(Boolean criticalStatus) {
+	public List<Transaction> findByCriticalStatus(Boolean criticalStatus) {
 		try {
-			return (Transaction) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+			return (List<Transaction>) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
 					+ " where transaction.criticalStatus = :criticalStatus")
 					.setParameter("criticalStatus", criticalStatus)
 					.getSingleResult();
@@ -98,4 +101,87 @@ public class TransactionDaoImpl extends BaseDaoImpl<Transaction, UUID> implement
 		}
 	}
 
+	/**
+	 Returns list of transactions in the table filtered by the approval status of the transaction
+     * 
+     * @return transactions
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Transaction> findByApprovalStatus(String approvalStatus) {
+		try {
+			return (List<Transaction>) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+					+ " where transaction.status = :approvalStatus")
+					.setParameter("approvalStatus", approvalStatus)
+					.getSingleResult();
+		}
+		catch(NoResultException e) {
+			// returns null if no transaction is found
+			return null;
+		}
+	}
+	
+	/**
+     * Returns list of transactions in the table filtered by account number and type
+     * 
+     * @return transactions
+     */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Transaction> findPendingByAccountAndType(String accountNumber, String type) {
+		try {
+			return (List<Transaction>) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+					+ " where (transaction.accountnumber = :accountNumber AND transaction.type = type)")
+					.setParameter("accountNumber", accountNumber)
+					.setParameter("type", type)
+					.setParameter("approvalStatus", "Pending")
+					.getSingleResult();
+		}
+		catch(NoResultException e) {
+			// returns null if no transaction is found
+			return null;
+		}
+	}
+
+	/**
+     * Returns list of transactions in the table filtered by critical status of the transaction
+     * 
+     * @return transactions
+     */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Transaction> findPendingByCriticalStatus(Boolean criticalStatus) {
+		try {
+			return (List<Transaction>) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+					+ " where transaction.criticalStatus = :criticalStatus")
+					.setParameter("criticalStatus", criticalStatus)
+					.setParameter("approvalStatus", "Pending")
+					.getSingleResult();
+		}
+		catch(NoResultException e) {
+			// returns null if no transaction is found
+			return null;
+		}
+	}
+
+	/**
+     * Returns list of transactions in the table filtered by account number
+     * 
+     * @return transactions
+     */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Transaction> findPendingByAccount(String accountNumber) {
+		try {
+			return (List<Transaction>) this.entityManager.createQuery("SELECT transaction from Transaction transaction"
+					+ " where (transaction.accountnumber = :accountNumber AND transaction.type = type)")
+					.setParameter("accountNumber", accountNumber)
+					.setParameter("approvalStatus", "Pending")
+					.getSingleResult();
+		}
+		catch(NoResultException e) {
+			// returns null if no transaction is found
+			return null;
+		}
+	}
 }
