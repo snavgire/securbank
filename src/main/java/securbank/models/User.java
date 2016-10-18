@@ -112,6 +112,10 @@ public class User {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<Account> accounts = new HashSet<Account>(0);
 
+	/** One to many relation ship  */
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private Set<ModificationRequest> modificationRequest = new HashSet<ModificationRequest>(0);
+
 	public User() {
 		
 	}
@@ -138,11 +142,13 @@ public class User {
 	 * @param lastLogin
 	 * @param active
 	 * @param accounts
+	 * @param modificationRequest
 	 */
 	public User(UUID userId, String role, String type, String username, String password, String confirmPassword,
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
-			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts) {
+			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts,
+			Set<ModificationRequest> modificationRequest) {
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -165,6 +171,7 @@ public class User {
 		this.lastLogin = lastLogin;
 		this.active = active;
 		this.accounts = accounts;
+		this.modificationRequest = modificationRequest;
 	}
 
 	/**
@@ -461,6 +468,20 @@ public class User {
 		this.accounts = accounts;
 	}
 
+	/**
+	 * @return the modificationRequest
+	 */
+	public Set<ModificationRequest> getModificationRequest() {
+		return modificationRequest;
+	}
+
+	/**
+	 * @param modificationRequest the modificationRequest to set
+	 */
+	public void setModificationRequest(Set<ModificationRequest> modificationRequest) {
+		this.modificationRequest = modificationRequest;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -471,6 +492,7 @@ public class User {
 				+ middleName + ", lastName=" + lastName + ", email=" + email + ", phone=" + phone + ", addressLine1="
 				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
 				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
-				+ ", active=" + active + ", accounts=" + accounts + "]";
+				+ ", active=" + active + ", accounts=" + accounts + ", modificationRequest=" + modificationRequest
+				+ "]";
 	}
 }

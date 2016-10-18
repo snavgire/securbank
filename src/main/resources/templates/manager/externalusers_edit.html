@@ -3,12 +3,13 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-<title>Spring Security Example</title>
+<title>Edit Profile</title>
 </head>
 <body>
-	<form action="#"
-		th:action="@{/manager/user/request/{id}(id=${modificationrequest.modificationRequestId})}"
-		th:object="${modificationrequest}" method="post">
+	<form action="#" th:action="@{/manager/user/edit/{id}(id=${user.userId})}" th:object="${user}" method="post">
+		<p>
+			Username: <input type="text" th:field="*{username}" readonly="true" />
+		</p>
 		<p>
 			Email: <input type="text" th:field="*{email}" />
 		<p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
@@ -43,11 +44,11 @@
 		<p th:if="${#fields.hasErrors('state')}" th:errors="*{state}"></p>
 		</p>
 		<p>
-			<input type="radio" th:field="*{status}" th:value="approved">Approve</input>
-		</p>
-		<p>
-			<input type="radio" th:field="*{status}" th:value="rejected"
-				th:checked="1">Reject</input>
+			Role: <select th:field="*{role}">
+				<option th:value="ROLE_INDIVIDUAL" th:selected="(*{role} == ROLE_INDIVIDUAL)">Individual</option>
+				<option th:value="ROLE_MERCHANT" th:selected="(*{role} == ROLE_MERCHANT)">Merchant</option>
+			</select>
+		<p th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></p>
 		</p>
 		<p>
 			<input type="submit" value="Submit" /> <input type="reset"

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import securbank.models.ModificationRequest;
 import securbank.models.User;
 import securbank.services.UserService;
+import securbank.validators.ApprovalUserFormValidator;
 import securbank.validators.InternalEditUserFormValidator;
 
 /**
@@ -32,13 +33,16 @@ public class EmployeeController {
 	@Autowired
 	private InternalEditUserFormValidator editUserFormValidator;
 
+	@Autowired
+	private ApprovalUserFormValidator approvalUserFormValidator;
+
 	final static Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 	
 	@GetMapping("/employee/details")
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
-			return "redirect:/error?code=user-notfound";
+			return "redirect:/error?code=404&path=user-notfound";
 		}
 		
 		model.addAttribute("user", user);
@@ -60,14 +64,14 @@ public class EmployeeController {
     }
 	
 	@PostMapping("/employee/edit")
-    public String editSubmit(@ModelAttribute ModificationRequest request, BindingResult bindingResult) {
-		editUserFormValidator.validate(request, bindingResult);
+    public String editSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		editUserFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
 			return "employee/edit";
         }
 		
 		// create request
-    	userService.createInternalModificationRequest(request);
+    	userService.createInternalModificationRequest(user);
     	logger.info("POST request: Employee New modification request");
     	
         return "redirect:/";
@@ -87,12 +91,12 @@ public class EmployeeController {
         return "employee/modificationrequests";
     }
 	
-	@GetMapping("/employee/user/request/{id}")
+	@GetMapping("/employee/user/request/view/{id}")
     public String getUserRequest(Model model, @PathVariable() UUID id) {
 		ModificationRequest modificationRequest = userService.getModificationRequest(id);
 		
 		if (modificationRequest == null) {
-			return "redirect:/error?=code=400&path=request-invalid";
+			return "redirect:/error?code=404&path=request-invalid";
 		}
 		
 		model.addAttribute("modificationrequest", modificationRequest);
@@ -104,20 +108,30 @@ public class EmployeeController {
 	@PostMapping("/employee/user/request/{requestId}")
     public String approveEdit(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) {
 		String status = request.getStatus();
-		if (status == null || !(request.getStatus().equals("approved") || !request.getStatus().equals("rejected"))) {
+		if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
 			return "redirect:/error?code=400&path=request-action-invalid";
 		}
-		request = userService.getModificationRequest(requestId);
 		
 		// checks validity of request
-		if (request == null) {
-			return "redirect:/error?code=400&path=request-invalid";
+		if (userService.getModificationRequest(requestId) == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		request.setModificationRequestId(requestId);
+		approvalUserFormValidator.validate(request, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "redirect:/error?code=400&path=request-action-validation";
 		}
 		
 		// checks if employee is authorized for the request to approve
-		if (!request.getUserType().equals("external")) {
+		if (!userService.verifyModificationRequestUserType(requestId, "external")) {
+			logger.warn("GET request: Admin unauthrorised request access");
+			
 			return "redirect:/error?code=401&path=request-unauthorised";
 		}
+		else {
+			request.setUserType("external");
+		}
+		
 		request.setStatus(status);
 		if (status.equals("approved")) {
 			userService.approveModificationRequest(request);
@@ -130,4 +144,39 @@ public class EmployeeController {
 		
         return "redirect:/employee/user/request";
     }
+	
+	@GetMapping("/employee/user/request/delete/{id}")
+    public String deleteRequest(Model model, @PathVariable() UUID id) {
+		ModificationRequest modificationRequest = userService.getModificationRequest(id);
+		
+		if (modificationRequest == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		
+		model.addAttribute("modificationrequest", modificationRequest);
+		logger.info("GET request: Employee external modification request by ID");
+		
+        return "employee/modificationrequest_delete";
+    }
+	
+	@PostMapping("/employee/user/request/delete/{requestId}")
+    public String deleteRequest(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) {
+		request = userService.getModificationRequest(requestId);
+		
+		// checks validity of request
+		if (request == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		
+		// checks if admin is authorized for the request to approve
+		if (!request.getUserType().equals("external")) {
+			logger.warn("GET request: Employee unauthrorised request access");
+			
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		userService.deleteModificationRequest(request);
+		logger.info("POST request: Employee approves modification request");
+		
+        return "redirect:/employee/user/request";
+    }	
 }
