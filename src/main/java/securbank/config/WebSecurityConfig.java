@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import securbank.authentication.CustomAuthenticationProvider;
 import securbank.controller.CommonController;
+import securbank.services.AuthenticationServiceImpl;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -23,27 +24,45 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
 	@Autowired
 	private CustomAuthenticationProvider customAuthenticationProvider;
 	
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
+
+
+//        http
+//        .authorizeRequests()
+//	        .antMatchers("/", "/home").permitAll()
+//	        .anyRequest().authenticated()
+//	        .and()
+//        .formLogin()
+//            .loginPage("/login")
+//            .failureForwardUrl("/login?error")
+//            .permitAll()
+//            .and()
+//        .logout()
+//            .permitAll();
+
         http
         .authorizeRequests()
 //        	.antMatchers("/admin/**").access("hasRole('ADMIN')")
 	        .antMatchers("/", "/home").permitAll()
-	        //.anyRequest().authenticated()
+//	        .anyRequest().authenticated()
 	        .and()
         .formLogin()
             .loginPage("/login")
-            .failureForwardUrl("/login?error")
+            //.failureForwardUrl("/login?error")
             .permitAll()
+            
             .and()
         .logout()
             .permitAll();
+
     }
 
-    @Autowired
+	@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     	auth.authenticationProvider(this.customAuthenticationProvider);
     }
