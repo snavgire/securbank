@@ -373,7 +373,7 @@ public class UserServiceImpl implements UserService {
 			modificationRequestDao.update(activeRequest);
 		}
 		
-		if (!request.getEmail().equals(current.getEmail())) {
+		if (!user.getEmail().equals(current.getEmail())) {
 			request.setStatus("waiting");
 		}
 		else {
