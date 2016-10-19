@@ -3,6 +3,7 @@ package securbank.models;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,54 +25,50 @@ public class Account {
 	
 	/** Account number is unique. */
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "accountNumber", nullable = false, unique = true, columnDefinition = "BINARY(16)")
 	private Long accountNumber;
 	
 	/** multiple account can be associated with an user	 */
-	@ManyToOne(cascade = CascadeType.ALL)
-	@NotNull
-	@JoinColumn(name = "user", unique = true, nullable = false)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "userId", nullable = false)
 	private User user;
 	
 	/** balance on the account */
 	@NotNull
-	@Column(name = "balance", unique = false, nullable = false)
 	private Double balance;
 	
-	/** account type. Default an account will be checking(0), (1) for savings account	*/
 	@NotNull
-	@Column(name = "accountType", unique = false, nullable = false, columnDefinition = "int(1) DEFAULT '0' ")
-	private Integer accountType;
+	private String type;
 	
 	@NotNull
-	@Column(name = "createdOn", nullable = false, updatable = false)
+	@Column(name = "createdOn", updatable = false)
 	private LocalDateTime createdOn;
 	
 	@NotNull
-	@Column(name = "active", nullable = false, columnDefinition = "BIT")
+	@Column(name = "active", columnDefinition = "BIT")
 	private Boolean active;
 	
 	/**
 	 * 
 	 * @param accountNumber
-	 * @param userId
+	 * @param user
 	 * @param balance
 	 * @param accountType
 	 * @param createdOn
 	 * @param active
 	 */
-	public Account(Long accountNumber, User user, double balance, int accountType, LocalDateTime createdOn
-			,Boolean active){
-		
+	public Account(Long accountNumber, User user, double balance, String type, LocalDateTime createdOn, Boolean active){
 		super();
 		this.accountNumber = accountNumber;
 		this.user = user;
 		this.balance = balance;
-		this.accountType = accountType;
+		this.type = type;
 		this.createdOn = createdOn;
 		this.active = active;	
+		
+	}
+	
+	public Account() {
 		
 	}
 	
@@ -93,17 +90,17 @@ public class Account {
 	
 	/**
 	 * 
-	 * @return userId
+	 * @return user
 	 */
-	public User getUserId() {
+	public User getUser() {
 		return user;
 	}
 	
 	/**
 	 * 
-	 * @param userId sets userId
+	 * @param user sets user
 	 */
-	public void setUserId(User user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 
@@ -125,18 +122,18 @@ public class Account {
 
 	/**
 	 * 
-	 * @return accountType
+	 * @return type
 	 */
-	public Integer getAccountType() {
-		return accountType;
+	public String getType() {
+		return type;
 	}
 	
 	/**
 	 * 
-	 * @param accountType sets accountType
+	 * @param type sets type
 	 */
-	public void setAccountType(Integer accountType) {
-		this.accountType = accountType;
+	public void setType(String type) {
+		this.type = type;
 	}
 		
 	/**
@@ -177,7 +174,7 @@ public class Account {
 	@Override
 	public String toString(){
 		return "Account [accountNumber=" + accountNumber + ", user=" + user + ", balance="
-				+ balance + ", accountType=" + accountType + ", active=" + active + ", balance=" +
+				+ balance + ", type=" + type + ", active=" + active + ", balance=" +
 				", createdOn=" + createdOn + "]";
 	}
 

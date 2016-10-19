@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -28,86 +29,50 @@ import org.joda.time.LocalDateTime;
 @Entity
 @Table(name = "User")
 public class User {
-
-	
-	/**
-	 * @param userId
-	 * @param username
-	 * @param password
-	 * @param firstName
-	 * @param middleName
-	 * @param lastName
-	 * @param email
-	 * @param phone
-	 * @param addressLine1
-	 * @param addressLine2
-	 * @param city
-	 * @param state
-	 * @param zip
-	 * @param createdOn
-	 * @param modifiedOn
-	 * @param lastLogin
-	 * @param active
-	 */
-	public User(UUID userId, String username, String password, String firstName, String middleName, String lastName,
-			String email, String phone, String addressLine1, String addressLine2, String city, String state, String zip,
-			LocalDateTime createdOn, LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active) {
-		super();
-		this.userId = userId;
-		this.username = username;
-		this.password = password;
-		this.firstName = firstName;
-		this.middleName = middleName;
-		this.lastName = lastName;
-		this.email = email;
-		this.phone = phone;
-		this.addressLine1 = addressLine1;
-		this.addressLine2 = addressLine2;
-		this.city = city;
-		this.state = state;
-		this.zip = zip;
-		this.createdOn = createdOn;
-		this.modifiedOn = modifiedOn;
-		this.lastLogin = lastLogin;
-		this.active = active;
-	}
 	
 	@Id
 	@GeneratedValue(generator = "uuid2")
 	@GenericGenerator(name = "uuid2", strategy = "uuid2")
-	@NotNull
-	@Column(name = "userId", unique = true, nullable = false, columnDefinition = "BINARY(16)")
+	@Column(name = "userId", unique = true, columnDefinition = "BINARY(16)")
 	private UUID userId;
 	
 	@NotNull
-	@Size(min = 2, max = 35)
-	@Column(name = "username", unique = true, nullable = false)
+	private String role;
+	
+	@NotNull
+	private String type;
+	
+	@NotNull
+	@Size(min = 3, max = 15)
+	@Column(name = "username", unique = true)
 	private String username;
 	
 	@NotNull
 	@Size(min = 60, max = 60)
 	private String password;
 	
+	@Transient
+	private String confirmPassword;
+	
 	@NotNull
-	@Size(min = 2, max = 50)
+	@Size(min = 2)
 	private String firstName;
 	
-	@Size(min = 2, max = 50)
+	@Size(min = 0)
 	private String middleName;
 	
 	@NotNull
-	@Size(min = 2, max = 50)
+	@Size(min = 2)
 	private String lastName;
 	
 	@NotNull
 	@Email
-	@Size(min = 2, max = 35)
-	@Column(name = "email", unique = true, nullable = false)
+	@Column(name = "email", unique = true)
 	private String email;
 
 	@NotNull
 	@Size(min = 10, max = 10)
-	@Column(name = "phone", unique = true, nullable = false)
+	@Column(name = "phone", unique = true)
 	private String phone;
 
 	@NotNull
@@ -130,17 +95,17 @@ public class User {
 	private String zip;
 
 	@NotNull
-	@Column(name = "createdOn", nullable = false, updatable = false)
+	@Column(name = "createdOn", updatable = false)
 	private LocalDateTime createdOn;
 
-	@Column(name = "modifiedOn", nullable = true, updatable = true)
+	@Column(name = "modifiedOn", updatable = true)
 	private LocalDateTime modifiedOn;
 
-	@Column(name = "lastLogin", nullable = true, updatable = true)
+	@Column(name = "lastLogin", updatable = true)
 	private LocalDateTime lastLogin;
 
 	@NotNull
-	@Column(name = "active", nullable = false, columnDefinition = "BIT")
+	@Column(name = "active", columnDefinition = "BIT")
 	private Boolean active;
 	
 	/** One to many relation ship  */
@@ -150,7 +115,58 @@ public class User {
 	public User() {
 		
 	}
-	
+
+	/**
+	 * @param userId
+	 * @param role
+	 * @param type
+	 * @param username
+	 * @param password
+	 * @param confirmPassword
+	 * @param firstName
+	 * @param middleName
+	 * @param lastName
+	 * @param email
+	 * @param phone
+	 * @param addressLine1
+	 * @param addressLine2
+	 * @param city
+	 * @param state
+	 * @param zip
+	 * @param createdOn
+	 * @param modifiedOn
+	 * @param lastLogin
+	 * @param active
+	 * @param accounts
+	 */
+	public User(UUID userId, String role, String type, String username, String password, String confirmPassword,
+			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
+			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
+			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts) {
+		super();
+		this.userId = userId;
+		this.role = role;
+		this.type = type;
+		this.username = username;
+		this.password = password;
+		this.confirmPassword = confirmPassword;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phone = phone;
+		this.addressLine1 = addressLine1;
+		this.addressLine2 = addressLine2;
+		this.city = city;
+		this.state = state;
+		this.zip = zip;
+		this.createdOn = createdOn;
+		this.modifiedOn = modifiedOn;
+		this.lastLogin = lastLogin;
+		this.active = active;
+		this.accounts = accounts;
+	}
+
 	/**
 	 * @return the userId
 	 */
@@ -163,6 +179,34 @@ public class User {
 	 */
 	public void setUserId(UUID userId) {
 		this.userId = userId;
+	}
+
+	/**
+	 * @return the role
+	 */
+	public String getRole() {
+		return role;
+	}
+
+	/**
+	 * @param role the role to set
+	 */
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	/**
@@ -191,6 +235,20 @@ public class User {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	/**
+	 * @return the confirmPassword
+	 */
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	/**
+	 * @param confirmPassword the confirmPassword to set
+	 */
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 
 	/**
@@ -389,17 +447,30 @@ public class User {
 		this.active = active;
 	}
 
+	/**
+	 * @return the accounts
+	 */
+	public Set<Account> getAccounts() {
+		return accounts;
+	}
+
+	/**
+	 * @param accounts the accounts to set
+	 */
+	public void setAccounts(Set<Account> accounts) {
+		this.accounts = accounts;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "User [userId=" + userId + ", username=" + username + ", password=" + password + ", firstName="
-				+ firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", email=" + email + ", phone="
-				+ phone + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city
-				+ ", state=" + state + ", zip=" + zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn
-				+ ", lastLogin=" + lastLogin + ", active=" + active + "]";
+		return "User [userId=" + userId + ", role=" + role + ", type=" + type + ", username=" + username + ", password="
+				+ password + ", confirmPassword=" + confirmPassword + ", firstName=" + firstName + ", middleName="
+				+ middleName + ", lastName=" + lastName + ", email=" + email + ", phone=" + phone + ", addressLine1="
+				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
+				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
+				+ ", active=" + active + ", accounts=" + accounts + "]";
 	}
-
-	
 }
