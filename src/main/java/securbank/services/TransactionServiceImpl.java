@@ -10,6 +10,7 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import securbank.dao.AccountDao;
@@ -42,6 +43,9 @@ public class TransactionServiceImpl implements TransactionService{
 	@Autowired
 	private EmailService emailService;
 	
+	@Autowired
+	private Environment env;
+	
 	final static Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
 	/**
@@ -54,26 +58,23 @@ public class TransactionServiceImpl implements TransactionService{
 	@Override
 	public Transaction initiateDebit(Transaction transaction) {
 		logger.info("Initiating new debit request");
-		Account account = accountService.accountExists((transaction.getAccount()).getAccountNumber());
-		if(account.getActive()==true){
-			//transaction is valid if account exists
-			transaction.setApprovalStatus("Pending");
-			transaction.setType("Debit");
-			transaction.setCreatedOn(LocalDateTime.now());
-			transaction.setOldBalance(0.0);
-			transaction.setNewBalance(0.0);
-			transaction.setActive(false);
-			transaction = transactionDao.save(transaction);
+		
+		//get user's checking account 
+		for (Account acc: userService.getCurrentUser().getAccounts()){
+			if (acc.getType().equals("checking")){
+				transaction.setAccount(acc);
+			}
 		}
-		else {
-			transaction.setApprovalStatus("Denied");
-			transaction.setType("Debit");
-			transaction.setCreatedOn(LocalDateTime.now());
-			transaction.setOldBalance(0.0);
-			transaction.setNewBalance(0.0);
-			transaction.setActive(false);
-			transaction = transactionDao.save(transaction);
+		transaction.setApprovalStatus("Pending");
+		if (transaction.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
+			transaction.setCriticalStatus(true);
 		}
+
+		transaction.setType("DEBIT");
+		transaction.setCreatedOn(LocalDateTime.now());
+		transaction.setActive(true);
+		transaction = transactionDao.save(transaction);
+		logger.info("After TransactionDao save");
 		return transaction;
 	}
 
@@ -86,26 +87,23 @@ public class TransactionServiceImpl implements TransactionService{
      * */
 	@Override
 	public Transaction initiateCredit(Transaction transaction) {
-		logger.info("Initiating new credit request");
-		Account account = accountService.accountExists((transaction.getAccount()).getAccountNumber());
-		if(account.getActive()==true){
-			transaction.setApprovalStatus("Pending");
-			transaction.setType("Credit");
-			transaction.setCreatedOn(LocalDateTime.now());
-			transaction.setOldBalance(0.0);
-			transaction.setNewBalance(0.0);
-			transaction.setActive(false);
-			transaction = transactionDao.save(transaction);
+		logger.info("Initiating new debit request");
+		//get user's checking account 
+		for (Account acc: userService.getCurrentUser().getAccounts()){
+			if (acc.getType().equals("checking")){
+				transaction.setAccount(acc);
+			}
 		}
-		else {
-			transaction.setApprovalStatus("Denied");
-			transaction.setType("Credit");
-			transaction.setCreatedOn(LocalDateTime.now());
-			transaction.setOldBalance(0.0);
-			transaction.setNewBalance(0.0);
-			transaction.setActive(false);
-			transaction = transactionDao.save(transaction);
+		transaction.setApprovalStatus("Pending");
+		if (transaction.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
+			transaction.setCriticalStatus(true);
 		}
+
+		transaction.setType("CREDIT");
+		transaction.setCreatedOn(LocalDateTime.now());
+		transaction.setActive(true);
+		transaction = transactionDao.save(transaction);
+		logger.info("After TransactionDao save");
 		return transaction;
 	}
 

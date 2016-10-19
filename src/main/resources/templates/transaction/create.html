@@ -5,15 +5,15 @@
         <title>Create New Transaction Request</title>
     </head>
     <body>
-        <form action="#" th:action="@{/user/transaction/create}" th:object="${transaction}" method="post">
+        <form action="#" th:action="@{/transaction/create}" th:object="${transaction}" method="post">
    		<p>
     		Type: <select name="type" th:field="*{type}">
-  					<option value="debit">Debit</option>
-  					<option value="credit">Credit</option>
+  					<option th:value="DEBIT">DEBIT</option>
+  					<option th:value="CREDIT">CREDIT</option>
 				</select>
     	</p>
         <p>
-        	Amount: <input type="text" th:field="*{amount}" />
+        	Amount: <input type="text" th:field="*{amount}" /> </p>
         	<p th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Amount Error</p>
         	
         <p><input type="submit" value="Submit" /> <input type="reset" value="Reset"/></p>

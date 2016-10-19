@@ -51,9 +51,9 @@ public class NewTransactionFormValidator implements Validator{
 				errors.rejectValue("type", "transaction.type.invalid", "Invalid Transaction Type");
 		}
 		
-		if (!errors.hasFieldErrors("amount") && !ContraintUtils.validateTransactionAmount(Double.toString(transaction.getAmount()))) {
-			errors.rejectValue("amount", "transaction.amount.invalid", "Invalid Amount");
-		}
+//		if (!errors.hasFieldErrors("amount") && !ContraintUtils.validateTransactionAmount(Double.toString(transaction.getAmount()))) {
+//			errors.rejectValue("amount", "transaction.amount.invalid", "Invalid Amount");
+//		}
 		
 	}
 

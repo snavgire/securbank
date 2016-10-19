@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import securbank.models.Account;
 import securbank.models.NewUserRequest;
@@ -46,46 +47,31 @@ public class TransactionController {
 	
 	final static Logger logger = LoggerFactory.getLogger(TransactionController.class);
 	
-	@PostMapping("/user/transaction/create")
-    public String createNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
-		UUID token = (UUID) session.getAttribute("verification.token");
-		if(token == null){
-			logger.info("POST request: Create new transaction with invalid session token");
-			return "redirect:/error?code=400&path=bad-request";
-		}
-		else {
-			// clears session
-			session.removeAttribute("validation.token");
-		}
-		logger.info("POST request: Create new transaction");
+	@GetMapping("/transaction/create")
+	public String newTransactionForm(Model model){
+		model.addAttribute("transaction", new Transaction());
+		logger.info("GET request: Extrernal user transaction creation request");
+		return "transaction/create";
+	}
+	
+	@PostMapping("/transaction/create")
+    public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
+		logger.info("POST request: Submit transaction");
 		transactionFormValidator.validate(transaction, bindingResult);
-		
 		if(bindingResult.hasErrors()){
-			return "/user/transaction/create";
+			return "transaction/create";
 		}
-		
-		if(transaction.getAmount()>5000){
-			transaction.setCriticalStatus(true);
-		}
-		
-		for (Account acc: userService.getCurrentUser().getAccounts()){
-			if (acc.getType().equals("Checking")){
-				transaction.setAccount(acc);
-			}
-		}
-		
-		if(transaction.getType()=="Credit"){
-			if (transactionService.initiateCredit(transaction)== null) {
-				return "redirect:/error?code=400&path=transaction-invalid";
+		if(transaction.getType()=="CREDIT"){
+			if (transactionService.initiateCredit(transaction) == null) {
+				return "redirect:/";
 			}
 		}
 		else {
-			if (transactionService.initiateDebit(transaction)== null) {
-				return "redirect:/error?code=400&path=transaction-invalid";
+			if (transactionService.initiateDebit(transaction) == null) {
+				return "redirect:/";
 			}
 		}
-		 
-		return "redirect:/transaction";
+		return "redirect:/error";
     }
 	
 }
