@@ -94,7 +94,7 @@ public class UserDaoImpl extends BaseDaoImpl<User, UUID> implements UserDao {
      * @return users
      */
 	public List<User> findAllByType(String type) {
-		return this.entityManager.createQuery("SELECT user from User user where user.type = :type", User.class)
+		return this.entityManager.createQuery("SELECT user from User user where user.type = :type AND user.active = true", User.class)
 				.setParameter("type", type)
 				.getResultList();
 	}
