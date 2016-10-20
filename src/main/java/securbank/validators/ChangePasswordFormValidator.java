@@ -33,7 +33,7 @@ public class ChangePasswordFormValidator implements Validator{
 				errors.rejectValue("newPassword", "changePasswordRequest.newPassword.contraint", "Password should contain one letter, number and special character. Length of password should be between 6 and 20");
 			}
 			else if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
-				errors.rejectValue("password", "user.password.match", "Password doesn't match");
+				errors.rejectValue("newPassword", "changePasswordRequest.newPassword.match", "Password doesn't match");
 			}
 		}
 	}
