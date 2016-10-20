@@ -24,7 +24,7 @@ import securbank.models.ModificationRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
-import securbank.validators.ApprovalUserFormValidator;
+import securbank.validators.ApprovalInternalUserFormValidator;
 import securbank.validators.EditUserFormValidator;
 import securbank.validators.NewUserRequestFormValidator;
 
@@ -41,7 +41,7 @@ public class AdminController {
 	private NewUserRequestFormValidator newUserRequestFormValidator;
 
 	@Autowired
-	private ApprovalUserFormValidator approvalUserRequestFormValidator;
+	private ApprovalInternalUserFormValidator approvalUserRequestFormValidator;
 
 	@Autowired
 	private EditUserFormValidator editUserFormValidator;
