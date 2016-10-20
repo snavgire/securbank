@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import securbank.models.ChangePasswordRequest;
 import securbank.models.User;
 import securbank.services.UserService;
 import securbank.validators.NewUserFormValidator;
@@ -82,5 +83,39 @@ public class CommonController {
 		logger.info("GET request: verification of new external user");
 		
 		return "redirect:/";
+    }
+	
+	@GetMapping("/changepassword")
+	public String ChangePasswordform(Model model){
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			logger.info("GET request: verification failed for user");
+			return "redirect:/error?code=400&path=user.notfound";
+		}		
+		model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
+		logger.info("GET request: Change password");
+			
+        return "changepassword";
+		
+	}
+	
+	@PostMapping("/changepassword")
+    public String changeUserPassword(@ModelAttribute ChangePasswordRequest request, BindingResult binding) {		
+		if(request.getNewPassword().compareTo(request.getConfirmPassword()) == 0){		
+			User user = userService.getCurrentUser();
+			if(binding.hasErrors()){
+				logger.info("POST request: changepassword form with validation errors");
+				return "user/changepassword";
+			}			
+			if(userService.changeUserPassword(request, user.getUserId()) != null){
+				return "redirect:/login";
+			}
+			else
+			{
+				return "redirect:/error?code=400&path=bad-request";
+			}
+		}
+		return "redirect:/error?code=400&path=token-invalid";
+		
     }
 }
