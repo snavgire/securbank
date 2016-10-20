@@ -82,5 +82,9 @@ public class InternalEditUserFormValidator implements Validator{
 		if (!errors.hasFieldErrors("zip") && !ContraintUtils.validateZip(user.getZip())) {
 			errors.rejectValue("zip", "user.zip.invalid", "Invalid Zip");
 		}
+
+		if (!errors.hasFieldErrors("role") && !ContraintUtils.validateInternalRole(user.getRole())) {
+			errors.rejectValue("role", "user.role.invalid", "Invalid Role");
+		}
 	} 
 }
