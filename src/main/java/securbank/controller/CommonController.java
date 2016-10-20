@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import securbank.models.ChangePasswordRequest;
 import securbank.models.User;
 import securbank.services.UserService;
+import securbank.validators.ChangePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
 /**
  * @author Ayush Gupta
@@ -36,6 +37,9 @@ public class CommonController {
 	
 	@Autowired 
 	NewUserFormValidator userFormValidator;
+	
+	@Autowired 
+	ChangePasswordFormValidator changePasswordFormValidator;
 	
 	final static Logger logger = LoggerFactory.getLogger(CommonController.class);
 	
@@ -96,11 +100,11 @@ public class CommonController {
 		logger.info("GET request: Change password");
 			
         return "changepassword";
-		
 	}
 	
 	@PostMapping("/changepassword")
-    public String changeUserPassword(@ModelAttribute ChangePasswordRequest request, BindingResult binding) {		
+    public String changeUserPassword(@ModelAttribute ChangePasswordRequest request, BindingResult binding) {
+		changePasswordFormValidator.validate(request, binding);
 		if(request.getNewPassword().compareTo(request.getConfirmPassword()) == 0){		
 			User user = userService.getCurrentUser();
 			if(binding.hasErrors()){
