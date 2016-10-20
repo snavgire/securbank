@@ -15,7 +15,7 @@ import securbank.utils.ContraintUtils;
  * @author Ayush Gupta
  *
  */
-@Component("approvalUserFormValidator")
+@Component("approvalInternalUserFormValidator")
 public class ApprovalInternalUserFormValidator implements Validator{
 
 	@Autowired
