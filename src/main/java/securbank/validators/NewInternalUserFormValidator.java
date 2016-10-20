@@ -14,7 +14,7 @@ import securbank.dao.UserDao;
  * @author Ayush Gupta
  *
  */
-@Component("newUserFormValidator")
+@Component("newInternalUserFormValidator")
 public class NewInternalUserFormValidator implements Validator{
 
 	@Autowired
