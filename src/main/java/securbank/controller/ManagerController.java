@@ -119,7 +119,7 @@ public class ManagerController {
 	@PostMapping("/manager/user/request/{requestId}")
     public String approveEdit(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) {
 		String status = request.getStatus();
-		if (status == null || !(request.getStatus().equals("approved") || !request.getStatus().equals("rejected"))) {
+		if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
 			return "redirect:/error?code=400&path=request-action-invalid";
 		}
 		
