@@ -35,6 +35,9 @@ public class ChangePasswordFormValidator implements Validator{
 			else if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
 				errors.rejectValue("newPassword", "changePasswordRequest.newPassword.match", "Password doesn't match");
 			}
+			else if (changePasswordRequest.getNewPassword().equals(changePasswordRequest.getExistingPassword())) {
+				errors.rejectValue("newPassword", "changePasswordRequest.newPassword.match", "New Password same as existing password");
+			}
 		}
 	}
 
