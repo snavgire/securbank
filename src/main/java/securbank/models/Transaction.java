@@ -65,8 +65,8 @@ public class Transaction {
 	@Column(name = "criticalStatus", unique = false, nullable = false, columnDefinition = "BIT")
 	private boolean criticalStatus;
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "transferId", nullable = false)
+	@ManyToOne( optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "transferId", nullable = true)
 	private Transfer transfer;
 	
 	@NotNull
@@ -76,13 +76,17 @@ public class Transaction {
 	@Column(name = "modifiedOn", nullable = true, updatable = true)
 	private LocalDateTime modifiedOn;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@Column(name = "userId", nullable = true, updatable = true)
-	private Set<User> modifiedBy;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "userId", nullable = true)
+	private User modifiedBy;
 
 	@NotNull
 	@Column(name = "active", nullable = false, columnDefinition = "BIT")
 	private Boolean active;
+	
+	public Transaction(){
+		
+	}
 	
 	/**
 	 * @param transactionId
@@ -102,7 +106,7 @@ public class Transaction {
 	public Transaction(UUID transactionId, Account accountNumber, double amount, 
 			String type, String approvalStatus, double oldBalance, double newBalance, Boolean criticalStatus, 
 			Transfer transfer, LocalDateTime createdOn, LocalDateTime modifiedOn, 
-			Set<User> modifiedBy, Boolean active){
+			User modifiedBy, Boolean active){
 		super();
 		this.transactionId = transactionId;
 		this.account = accountNumber;
@@ -164,14 +168,14 @@ public class Transaction {
 	/**
 	 * @return the modifiedBy
 	 */
-	public Set<User> getModifiedBy() {
+	public User getModifiedBy() {
 		return modifiedBy;
 	}
 
 	/**
 	 * @param modifiedBy the modifiedBy to set
 	 */
-	public void setModifiedBy(Set<User> modifiedBy) {
+	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
 

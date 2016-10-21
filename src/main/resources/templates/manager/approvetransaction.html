@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>Transaction Approval</title>
+</head>
+<body>
+	<form action="#"
+		th:action="@{/manager/transaction/request/{id}(id=${transaction.transactionId})}"
+		th:object="${transaction}" method="post">
+			<td th:text="${transaction.account.user.username}"></td>
+			<td th:text="${transaction.account.accountNumber}"></td>
+			<td th:text="${transaction.amount}"></td>
+			<td th:text="${transaction.type}"></td>
+			<td> <input type="radio" th:field="*{approvalStatus}" th:value="approved">Approve</input> </td>
+			<td> <input type="radio" th:field="*{approvalStatus}" th:value="rejected" th:checked="1">Reject</input> </td>
+			<td> <input type="submit" value="Submit" /> <input type="reset" value="Reset" /> </td>
+	</form>
+</body>
+</html>

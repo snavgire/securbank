@@ -1,6 +1,8 @@
 package securbank.services;
 
 import java.util.List;
+import java.util.UUID;
+
 import securbank.models.Transaction;
 import securbank.models.Transfer;
 
@@ -16,7 +18,9 @@ public interface TransactionService {
 	public Transaction approveTransfer(Transfer transfer);
 	public Transaction declineTransaction(Transaction transaction);
 	public Transaction declineTransaction(Transfer transfer);
-	public List<Transaction> getPendingTransactionsByAccountNumber(String accountNumber);
-	public List<Transaction> getPendingTransactionsByType(String accountNumber, String accountType);
-	public List<Transaction> getPendingTransactionsByStatus(String approvalStatus);
+	public List<Transaction> getPendingTransactionsByAccountNumber(Long accountNumber);
+	public List<Transaction> getPendingTransactionsByType(Long accountNumber, String accountType);
+	public List<Transaction> getTransactionsByStatus(String approvalStatus);
+	public Transaction getTransactionById(UUID id);
+	public Transaction getPendingTransactionByAccountNumber(Long accountNumber);
 }

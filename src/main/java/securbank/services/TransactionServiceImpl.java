@@ -2,6 +2,7 @@ package securbank.services;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import securbank.models.Account;
 import securbank.models.Transaction;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import securbank.dao.AccountDao;
@@ -46,6 +48,8 @@ public class TransactionServiceImpl implements TransactionService{
 	@Autowired
 	private Environment env;
 	
+	private SimpleMailMessage message;
+	
 	final static Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
 	/**
@@ -59,12 +63,32 @@ public class TransactionServiceImpl implements TransactionService{
 	public Transaction initiateDebit(Transaction transaction) {
 		logger.info("Initiating new debit request");
 		
-		//get user's checking account 
-		for (Account acc: userService.getCurrentUser().getAccounts()){
-			if (acc.getType().equals("checking")){
+		User currentUser = userService.getCurrentUser();
+		if(currentUser==null){
+			logger.info("Current logged in user is null");
+			return null;
+		}
+		
+		//get user's checking account
+		logger.info("Getting current user's checking account");
+		for (Account acc: currentUser.getAccounts()){
+			if (acc.getType().equalsIgnoreCase("checking")){
 				transaction.setAccount(acc);
 			}
 		}
+		
+		//check if debit transaction is valid
+		Account account = transaction.getAccount();
+		Double pendingAmount = 0.0;
+		for(Transaction trans: transactionDao.findPendingByAccountAndType(account, "DEBIT")){
+			pendingAmount += trans.getAmount();
+		}
+		
+		if(pendingAmount+transaction.getAmount() > transaction.getAccount().getBalance()){
+			logger.info("Invalid Debit transaction: amount requested is more than permitted");
+			return null;
+		}
+		
 		transaction.setApprovalStatus("Pending");
 		if (transaction.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
 			transaction.setCriticalStatus(true);
@@ -75,6 +99,15 @@ public class TransactionServiceImpl implements TransactionService{
 		transaction.setActive(true);
 		transaction = transactionDao.save(transaction);
 		logger.info("After TransactionDao save");
+		
+		//send email to user
+		User user = transaction.getAccount().getUser();
+		message = new SimpleMailMessage();
+		message.setText(env.getProperty("external.user.transaction.debit.body"));
+		message.setSubject(env.getProperty("external.user.transaction.subject"));
+		message.setTo(user.getEmail());
+		emailService.sendEmail(message);
+		
 		return transaction;
 	}
 
@@ -87,10 +120,18 @@ public class TransactionServiceImpl implements TransactionService{
      * */
 	@Override
 	public Transaction initiateCredit(Transaction transaction) {
-		logger.info("Initiating new debit request");
+		logger.info("Initiating new credit request");
+		
+		User currentUser = userService.getCurrentUser();
+		if(currentUser==null){
+			logger.info("Current logged in user is null");
+			return null;
+		}
+		
 		//get user's checking account 
+		logger.info("Getting current user's checking account");
 		for (Account acc: userService.getCurrentUser().getAccounts()){
-			if (acc.getType().equals("checking")){
+			if (acc.getType().equalsIgnoreCase("checking")){
 				transaction.setAccount(acc);
 			}
 		}
@@ -104,6 +145,15 @@ public class TransactionServiceImpl implements TransactionService{
 		transaction.setActive(true);
 		transaction = transactionDao.save(transaction);
 		logger.info("After TransactionDao save");
+
+		//send email to user
+		User user = transaction.getAccount().getUser();
+		message = new SimpleMailMessage();
+		message.setText(env.getProperty("external.user.transaction.credit.body"));
+		message.setSubject(env.getProperty("external.user.transaction.subject"));
+		message.setTo(user.getEmail());
+		emailService.sendEmail(message);
+		
 		return transaction;
 	}
 
@@ -129,22 +179,35 @@ public class TransactionServiceImpl implements TransactionService{
      * */
 	@Override
 	public Transaction approveTransaction(Transaction transaction) {
-		logger.info("Approving transaction request");
+		logger.info("Inside approve transaction");
+		
+		//check if transaction is pending
+		if(transactionDao.findById(transaction.getTransactionId())==null){
+			logger.info("Not a pending transaction");
+			return null;
+		}
+		
+		User currentUser = userService.getCurrentUser();
+		if(currentUser==null){
+			logger.info("Current logged in user is null");
+			return null;
+		}
+	    
 		Account account = transaction.getAccount();
 		Double oldBalance = account.getBalance();
 		Double newBalance = 0.0;
-		if(transaction.getType()=="Credit"){
-			newBalance = oldBalance + transaction.getAmount();
+		if(transaction.getType().equalsIgnoreCase("DEBIT")){
+			newBalance = oldBalance - transaction.getAmount();
 		}
 		else {
-			newBalance = oldBalance - transaction.getAmount();
+			newBalance = oldBalance + transaction.getAmount();
 		}
 		transaction.setApprovalStatus("Approved");
 		transaction.setOldBalance(oldBalance);
 		transaction.setNewBalance(newBalance);
 		account.setBalance(newBalance);
 		transaction.setModifiedOn(LocalDateTime.now());
-		//transaction.setModifiedBy(userService.getCurrentUser());
+		transaction.setModifiedBy(currentUser);
 		transaction.setActive(true);
 		transaction = transactionDao.update(transaction);
 		account = accountDao.update(account);
@@ -174,9 +237,14 @@ public class TransactionServiceImpl implements TransactionService{
 	@Override
 	public Transaction declineTransaction(Transaction transaction) {
 		logger.info("Declining transaction request");
+		User currentUser = userService.getCurrentUser();
+		if(currentUser==null){
+			logger.info("Current logged in user is null");
+			return null;
+		}
 		transaction.setApprovalStatus("Declined");
 		transaction.setModifiedOn(LocalDateTime.now());
-		//transaction.setModifiedBy(modifiedBy);
+		transaction.setModifiedBy(currentUser);
 		transaction.setActive(false);
 		transaction = transactionDao.update(transaction);
 		return transaction;
@@ -192,6 +260,7 @@ public class TransactionServiceImpl implements TransactionService{
 	@Override
 	public Transaction declineTransaction(Transfer transfer) {
 		logger.info("Declining transfer request");
+		//if transfer is not approved, no actions needed in transactions
 		return null;
 	}
 
@@ -203,12 +272,29 @@ public class TransactionServiceImpl implements TransactionService{
      * @return list of transactions
      * */
 	@Override
-	public List<Transaction> getPendingTransactionsByAccountNumber(String accountNumber) {
+	public List<Transaction> getPendingTransactionsByAccountNumber(Long accountNumber) {
 		logger.info("Getting pending transactions by account number");
 		if(accountNumber==null){
 			return null;
 		}
 		List<Transaction> transactions = transactionDao.findPendingByAccount(accountNumber);
+		return transactions;
+	}
+	
+	/**
+     * Fetches pending transactions by account number
+     * 
+     * @param accountNumber
+     *            The list of pending transactions
+     * @return list of transactions
+     * */
+	@Override
+	public Transaction getPendingTransactionByAccountNumber(Long accountNumber) {
+		logger.info("Getting pending transaction by account number");
+		if(accountNumber==null){
+			return null;
+		}
+		Transaction transactions = transactionDao.findPendingTransactionByAccount(accountNumber);
 		return transactions;
 	}
 
@@ -221,13 +307,14 @@ public class TransactionServiceImpl implements TransactionService{
      * @return list of transactions
      * */
 	@Override
-	public List<Transaction> getPendingTransactionsByType(String accountNumber, String accountType) {
+	public List<Transaction> getPendingTransactionsByType(Long accountNumber, String accountType) {
 		logger.info("Getting pending transactions by account number and account type");
 		if(accountNumber==null||accountType==null){
 			return null;
 		}
-		List<Transaction> transactions = transactionDao.findPendingByAccountAndType(accountNumber, accountType);
-		return transactions;
+		//List<Transaction> transactions = transactionDao.findPendingByAccountAndType(accountNumber, accountType);
+		//return transactions;
+		return null;
 	}
 
 	/**
@@ -238,12 +325,31 @@ public class TransactionServiceImpl implements TransactionService{
      * @return list of transactions
      * */
 	@Override
-	public List<Transaction> getPendingTransactionsByStatus(String approvalStatus) {
+	public List<Transaction> getTransactionsByStatus(String approvalStatus) {
 		logger.info("Getting pending transactions by approval status");
 		if(approvalStatus==null){
 			return null;
 		}
 		return transactionDao.findByApprovalStatus(approvalStatus);
+	}
+
+	/**
+     * Fetches transaction by transactionId
+     * 
+     * @param transactionId
+     *            The transactions 
+     * @return transaction
+     * */
+	@Override
+	public Transaction getTransactionById(UUID transactionId) {
+		Transaction transaction = transactionDao.findById(transactionId);
+		if (transaction == null || transaction.getActive() == false) {
+			return null;
+		}
+		
+		logger.info("Getting transaction by id");
+		
+		return transaction;
 	}
 
 

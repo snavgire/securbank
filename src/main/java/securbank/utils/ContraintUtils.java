@@ -21,7 +21,7 @@ public class ContraintUtils {
 	private static final String ZIP_PATTERN = "[0-9]{5}";
 	private static final String PHONE_PATTERN = "[0-9]{10}";
 	private static final String PASSWORD_PATTERN =  "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$!%]).{6,20})";
-	private static final String AMOUNT_PATTERN = "/^[0-9]+(\\.[0-9]+)?$";
+	private static final String AMOUNT_PATTERN = "^[0-9]+(\\.[0-9]+)?$";
 	
 	/**
      * Validates username

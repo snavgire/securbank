@@ -59,9 +59,9 @@ public class TransactionController {
 		logger.info("POST request: Submit transaction");
 		transactionFormValidator.validate(transaction, bindingResult);
 		if(bindingResult.hasErrors()){
-			return "transaction/create";
+			return "redirect:/";
 		}
-		if(transaction.getType()=="CREDIT"){
+		if(transaction.getType().contentEquals("CREDIT")){
 			if (transactionService.initiateCredit(transaction) == null) {
 				return "redirect:/";
 			}
@@ -71,7 +71,7 @@ public class TransactionController {
 				return "redirect:/";
 			}
 		}
-		return "redirect:/error";
+		return "transaction/create";
     }
 	
 }
