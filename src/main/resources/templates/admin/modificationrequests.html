@@ -4,8 +4,24 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
 <title>Modification Requests</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"
+	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+<script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/3.3.6/js/bootstrap.min.js}"></script>
 </head>
 <body>
+	<div class="container">
+		<h3>Admin Dashboard</h3>
+		<ul class="nav nav-tabs nav-justified">
+			<li><a th:href="@{/admin/user}">View Internal User Accounts</a></li>
+			<li><a th:href="@{/admin/user/add}">Create Internal User
+					Account</a></li>
+			<li><a th:href="@{/admin/details}">My Profile</a></li>
+			<li class="active"><a href="#">New Internal User Requests</a></li>
+			<li><a th:href="@{/admin/syslogs}">System Logs</a></li>
+		</ul>
+	</div>
 	<table>
 		<tr>
 			<td>Username</td>
