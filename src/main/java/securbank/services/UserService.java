@@ -23,7 +23,7 @@ public interface UserService {
 	public NewUserRequest getNewUserRequest(UUID newUserRequestId);
 	public List<User> getUsersByType(String type);
 	public User getUserByIdAndActive(UUID id);
-	public boolean verifyCurrentPassword(UUID id,String password);
-	public User changeUserPassword(ChangePasswordRequest changePasswordRequest, UUID id);
+	public boolean verifyCurrentPassword(User user,String password);
+	public User changeUserPassword(User user, ChangePasswordRequest model);
 	
 }

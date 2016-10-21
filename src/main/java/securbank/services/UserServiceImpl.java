@@ -3,7 +3,6 @@
  */
 package securbank.services;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,13 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 
 import securbank.dao.NewUserRequestDao;
 import securbank.dao.UserDao;
@@ -256,26 +252,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean verifyCurrentPassword(UUID id, String password) {
-		User user = userDao.findById(id);
+	public boolean verifyCurrentPassword(User user, String password) {
 		if (BCrypt.checkpw(password, user.getPassword()))
 			return true;
-		else
-			return false;
+	
+		return false;
 	}
 	
 	@Override
-	public User changeUserPassword(ChangePasswordRequest model, UUID id){
+	public User changeUserPassword(User user, ChangePasswordRequest model){
+		user.setPassword(encoder.encode(model.getNewPassword()));			
+		userDao.update(user);
 		
-		User user = userDao.findById(id);
-		// if they provided the correct current password
-		if(verifyCurrentPassword(user.getUserId(), model.getExistingPassword())){			
-			user.setPassword(encoder.encode(model.getNewPassword()));			
-			user.setConfirmPassword(encoder.encode(model.getNewPassword()));
-			userDao.save(user);
-			return user;			
-		}else{
-			return null;
-		}
+		return user;			
 	}
 }

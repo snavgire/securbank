@@ -91,11 +91,6 @@ public class CommonController {
 	
 	@GetMapping("/changepassword")
 	public String ChangePasswordform(Model model){
-		User user = userService.getCurrentUser();
-		if (user == null) {
-			logger.info("GET request: verification failed for user");
-			return "redirect:/error?code=400&path=user.notfound";
-		}		
 		model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
 		logger.info("GET request: Change password");
 			
@@ -105,21 +100,21 @@ public class CommonController {
 	@PostMapping("/changepassword")
     public String changeUserPassword(@ModelAttribute ChangePasswordRequest request, BindingResult binding) {
 		changePasswordFormValidator.validate(request, binding);
-		if(request.getNewPassword().compareTo(request.getConfirmPassword()) == 0){		
-			User user = userService.getCurrentUser();
-			if(binding.hasErrors()){
-				logger.info("POST request: changepassword form with validation errors");
-				return "user/changepassword";
-			}			
-			if(userService.changeUserPassword(request, user.getUserId()) != null){
-				return "redirect:/login";
-			}
-			else
-			{
-				return "redirect:/error?code=400&path=bad-request";
-			}
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error?code=401";
 		}
-		return "redirect:/error?code=400&path=token-invalid";
+		if (!userService.verifyCurrentPassword(user, request.getExistingPassword())) {
+			binding.rejectValue("existingPassword", "invalid.password", "Password is not valid");
+		}
+		if(binding.hasErrors()){
+			logger.info("POST request: changepassword form with validation errors");
+			return "changepassword";
+		}			
+		if(userService.changeUserPassword(user, request) != null){
+			return "redirect:/login";
+		}
 		
+		return "redirect:/error?code=500";
     }
 }
