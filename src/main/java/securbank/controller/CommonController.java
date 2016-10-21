@@ -37,13 +37,12 @@ public class CommonController {
 	
 	@Autowired 
 	NewUserFormValidator userFormValidator;
-	
+
 	@Autowired 
 	ChangePasswordFormValidator changePasswordFormValidator;
-	
+
 	final static Logger logger = LoggerFactory.getLogger(CommonController.class);
-	
-	
+		
 	@RequestMapping(value="/logout", method = RequestMethod.GET)
 	public String logoutPage (HttpServletRequest request, HttpServletResponse response) {
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -85,6 +84,17 @@ public class CommonController {
 			return "redirect:/error?code=400";
 		}
 		logger.info("GET request: verification of new external user");
+		
+		return "redirect:/";
+    }
+	
+	@GetMapping("/request/verify/{id}")
+    public String verifyEmailRequest(Model model, @PathVariable UUID id) {
+		if (userService.verifyModificationRequest("waiting", id) == false) {
+			logger.info("GET request: verification failed of request");
+			return "redirect:/error?code=400&path=request-invalid";
+		}
+		logger.info("GET request: verification of request");
 		
 		return "redirect:/";
     }

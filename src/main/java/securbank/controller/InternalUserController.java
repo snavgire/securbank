@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 import securbank.services.UserService;
-import securbank.validators.NewUserFormValidator;
+import securbank.validators.NewInternalUserFormValidator;
 
 /**
  * @author Ayush Gupta
@@ -30,7 +30,7 @@ public class InternalUserController {
 	private UserService userService;
 	
 	@Autowired 
-	NewUserFormValidator userFormValidator;
+	NewInternalUserFormValidator userFormValidator;
 	
 	@Autowired
     public HttpSession session;
@@ -61,6 +61,7 @@ public class InternalUserController {
 		UUID token = (UUID) session.getAttribute("verification.token");
 		if (token == null) {
 			logger.info("POST request: Signup internal user with invalid session token");
+			
 			return "redirect:/error?code=400&path=bad-request";
 		}
 		else {
