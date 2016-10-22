@@ -77,4 +77,14 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 	 	return user;			
 	 }
 
+	@Override
+	public User getUserbyUsername(String username) {
+		
+		User user = userDao.findByUsernameOrEmail(username);
+		if(user == null)
+			return null;
+		else
+			return user;
+	}
+
 }

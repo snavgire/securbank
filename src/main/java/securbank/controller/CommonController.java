@@ -115,17 +115,8 @@ public class CommonController {
 	
 	@PostMapping("/forgotpassword")
 	public String forgotpasswordsubmit(@ModelAttribute ForgotPasswordRequest forgotPasswordRequest){
-		UUID token = (UUID) session.getAttribute("verification.token");
-		if (token == null) {
-			logger.info("POST request: Email for forgot password with invalid session token");
-			return "redirect:/error?code=400&path=bad-request";
-		}
-		else {
-			// clears session
-			session.removeAttribute("validation.token");
-		}
 		
-		User user = userService.getUserByIdAndActive(token);
+		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getUserName());
 		if(user==null){
 			logger.info("POST request: Forgot password with invalid user id");
 			return "redirect:/error?code=400&path=bad-request";
@@ -139,7 +130,7 @@ public class CommonController {
 		forgotPasswordService.sendEmailForgotPassword(user);			
 		logger.info("POST request : Sending link to reset password");
 		
-		return "redirect:/";		
+		return "redirect:/";
 	}
 	
 	@GetMapping("/createpassword/{id}")
@@ -176,6 +167,7 @@ public class CommonController {
 		
 		if(!user.getEmail().equals(request.getEmail()) || !user.getPhone().equals(request.getPhone()) ){
 			logger.info("GET request : Creating new password with invalid credentials ");
+			return "redirect:/error?code=400&path=bad-request";			
 		}
 		
 		createPasswordFormValidator.validate(request, binding);

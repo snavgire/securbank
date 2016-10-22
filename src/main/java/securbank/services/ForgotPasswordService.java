@@ -13,5 +13,6 @@ public interface ForgotPasswordService {
 	public boolean sendEmailForgotPassword(User user);
 	public boolean verifyUserAndInfo(User user, ForgotPasswordRequest request);
 	public User createUserPassword(User user, CreatePasswordRequest model);
+	public User getUserbyUsername(String username);
 
 }
