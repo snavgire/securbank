@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import securbank.models.Transaction;
+import securbank.models.Transfer;
 import securbank.models.User;
+import securbank.services.AccountService;
 import securbank.services.TransactionService;
+import securbank.services.TransferService;
 import securbank.services.UserService;
 
 /**
@@ -33,6 +36,12 @@ public class ManagerController {
 	
 	@Autowired
 	private TransactionService transactionService;
+	
+	@Autowired
+	private TransferService transferService;
+	
+	@Autowired
+	private AccountService accountService;
 	
 	final static Logger logger = LoggerFactory.getLogger(ManagerController.class);
 	
@@ -140,5 +149,81 @@ public class ManagerController {
 		logger.info("GET request: Manager external transaction request by ID");
 		
         return "manager/approvetransaction";
+    }
+	
+	@GetMapping("/manager/transfers")
+    public String getTransfers(Model model) {
+		logger.info("GET request:  All pending transfers");
+		
+		List<Transfer> transfers = transferService.getTransfersByStatus("Pending");
+		if (transfers == null) {
+			return "redirect:/error?code=500";
+		}
+		model.addAttribute("transfers", transfers);
+		
+        return "manager/pendingtransfers";
+    }
+	
+	@PostMapping("/manager/transfer/request/{id}")
+    public String approveRejectTransfer(@ModelAttribute Transfer trans, @PathVariable() UUID id, BindingResult bindingResult) {
+		
+		Transfer transfer = transferService.getTransferById(id);
+		if (transfer == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		
+		//give error if account does not exist
+		if (accountService.accountExists(transfer.getToAccount().getAccountNumber())) {
+			logger.warn("TO account does not exist");	
+			return "redirect:/error?code=401&path=request-invalid";
+		}
+		
+		// checks if manager is authorized for the request to approve
+		if (!transfer.getToAccount().getUser().getType().equalsIgnoreCase("external")) {
+			logger.warn("Transafer made TO non external account");
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		if (!transfer.getFromAccount().getUser().getType().equalsIgnoreCase("external")) {
+			logger.warn("Transafer made FROM non external account");
+					
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		if("approved".equalsIgnoreCase(trans.getStatus())){
+			transferService.approveTransfer(transfer);
+		}
+		else if ("rejected".equalsIgnoreCase(trans.getStatus())) {
+			transferService.declineTransfer(transfer);
+		}
+		
+		logger.info("GET request: Manager approve/decline external transaction requests");
+		
+        return "redirect:manager/pendingtransfers";
+    }
+	
+	@GetMapping("/manager/transfer/{id}")
+    public String getTransferRequest(Model model, @PathVariable() UUID id) {
+		Transfer transfer = transferService.getTransferById(id);
+		
+		if (transfer == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+
+		// checks if manager is authorized for the request to approve
+		if (!transfer.getToAccount().getUser().getType().equalsIgnoreCase("external")) {
+			logger.warn("Transafer made TO non external account");		
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+				
+		if (!transfer.getFromAccount().getUser().getType().equalsIgnoreCase("external")) {
+			logger.warn("Transafer made FROM non external account");
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+				
+		model.addAttribute("transfer", transfer);
+		logger.info("GET request: Manager external transfer request by ID");
+		
+        return "manager/approvetransfer";
     }
 }

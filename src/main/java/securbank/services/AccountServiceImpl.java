@@ -37,8 +37,8 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Account accountExists(Long accountNumber) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean accountExists(Long accountNumber) {
+		
+		return false;
 	}
 }

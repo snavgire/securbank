@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import securbank.dao.AccountDao;
 import securbank.dao.AccountDaoImpl;
 import securbank.dao.TransactionDao;
+import securbank.dao.TransferDao;
 import securbank.models.Transfer;
 import securbank.models.User;
 
@@ -32,6 +33,9 @@ public class TransactionServiceImpl implements TransactionService{
 
 	@Autowired
 	private TransactionDao transactionDao;
+	
+	@Autowired
+	private TransferDao transferDao;
 	
 	@Autowired
 	private AccountDao accountDao;
@@ -80,8 +84,15 @@ public class TransactionServiceImpl implements TransactionService{
 		//check if debit transaction is valid
 		Account account = transaction.getAccount();
 		Double pendingAmount = 0.0;
+		
+		//in Transaction model
 		for(Transaction trans: transactionDao.findPendingByAccountAndType(account, "DEBIT")){
 			pendingAmount += trans.getAmount();
+		}	
+		
+		//check for pending transfer amounts
+		for(Transfer transf: transferDao.findTransferByFromAccount(account)){
+			pendingAmount += transf.getAmount();
 		}
 		
 		if(pendingAmount+transaction.getAmount() > transaction.getAccount().getBalance()){
@@ -222,9 +233,35 @@ public class TransactionServiceImpl implements TransactionService{
      * @return transaction
      * */
 	@Override
-	public Transaction approveTransfer(Transfer transfer) {
+	public Transfer approveTransfer(Transfer transfer) {
 		logger.info("Approving transfer request");
-		return null;
+		
+		Account toAccount = transfer.getToAccount();
+		Account fromAccount = transfer.getFromAccount();
+		
+		//initiate transaction for credit in toAccount and approve
+		//Transaction transaction = new Transaction();
+		Transaction transactionFrom = new Transaction();
+		Transaction transactionTo = new Transaction();
+		
+		transactionTo.setAccount(toAccount);
+		transactionTo.setAmount(transfer.getAmount());
+		transactionTo.setActive(true);
+		transactionTo.setApprovalStatus("Pending");
+		transactionTo.setType("CREDIT");
+		transactionTo = initiateCredit(transactionTo);
+		approveTransactionFromTransfer(transactionTo);
+		
+		//initiate transaction for debit in fromAccount and approve
+		transactionFrom.setAccount(fromAccount);
+		transactionFrom.setAmount(transfer.getAmount());
+		transactionFrom.setActive(true);
+		transactionFrom.setApprovalStatus("Pending");
+		transactionFrom.setType("DEBIT");
+		transactionFrom = initiateDebit(transactionFrom);
+		approveTransactionFromTransfer(transactionFrom);
+		
+		return transfer;
 	}
 
 	/**
@@ -247,6 +284,50 @@ public class TransactionServiceImpl implements TransactionService{
 		transaction.setModifiedBy(currentUser);
 		transaction.setActive(false);
 		transaction = transactionDao.update(transaction);
+		return transaction;
+	}
+	
+	/**
+     * Approves new transfer transaction
+     * 
+     * @param transaction
+     *            The transaction to be approved
+     * @return transaction
+     * */
+	@Override
+	public Transaction approveTransactionFromTransfer(Transaction transaction) {
+		logger.info("Inside approve transaction");
+		
+		//check if transaction is pending
+		if(transactionDao.findById(transaction.getTransactionId())==null){
+			logger.info("Not a pending transaction");
+			return null;
+		}
+		
+		User currentUser = userService.getCurrentUser();
+		if(currentUser==null){
+			logger.info("Current logged in user is null");
+			return null;
+		}
+	    
+		Account account = transaction.getAccount();
+		Double oldBalance = account.getBalance();
+		Double newBalance = 0.0;
+		if(transaction.getType().equalsIgnoreCase("DEBIT")){
+			newBalance = oldBalance - transaction.getAmount();
+		}
+		else {
+			newBalance = oldBalance + transaction.getAmount();
+		}
+		transaction.setApprovalStatus("Approved");
+		transaction.setOldBalance(oldBalance);
+		transaction.setNewBalance(newBalance);
+		account.setBalance(newBalance);
+		transaction.setModifiedOn(LocalDateTime.now());
+		transaction.setModifiedBy(currentUser);
+		transaction.setActive(true);
+		transaction = transactionDao.save(transaction);
+		account = accountDao.update(account);
 		return transaction;
 	}
 

@@ -8,7 +8,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import securbank.models.Transaction;
+import securbank.models.Transfer;
 import securbank.utils.ContraintUtils;
 
 /**
@@ -16,8 +16,8 @@ import securbank.utils.ContraintUtils;
  *
  */
 
-@Component("newTransactionFormValidator")
-public class NewTransactionFormValidator implements Validator{
+@Component("newTransferFormValidator")
+public class NewTransferFormValidator implements Validator{
 
 	/**
      * If supports class
@@ -29,11 +29,11 @@ public class NewTransactionFormValidator implements Validator{
      */	
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return Transaction.class.equals(clazz);
+		return Transfer.class.equals(clazz);
 	}
 
 	/**
-     * Validates initiate transaction form
+     * Validates initiate transfer form
      * 
      * @param target
      *            The target object
@@ -42,16 +42,16 @@ public class NewTransactionFormValidator implements Validator{
      */
 	@Override
 	public void validate(Object target, Errors errors) {
-		Transaction transaction = (Transaction) target;
+		Transfer transfer = (Transfer) target;
 		
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "type", "transaction.type.required", "Transaction type is required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "toAccount", "transfer.toAccount.required", "Transaction account is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "amount", "transaction.amount.required", "Transaction amount is required");
 		
-		if (!errors.hasFieldErrors("type") && !ContraintUtils.validateTransactionType(transaction.getType())) {
-				errors.rejectValue("type", "transaction.type.invalid", "Invalid Transaction Type");
+		if (!errors.hasFieldErrors("toAccount") && !ContraintUtils.validateTransferToAccount(Long.toString(transfer.getToAccount().getAccountNumber()))) {
+				errors.rejectValue("toAccount", "transaction.toAccount.invalid", "Invalid Account Number");
 		}
 		
-		if (!errors.hasFieldErrors("amount") && !ContraintUtils.validateTransactionAmount(Double.toString(transaction.getAmount()))) {
+		if (!errors.hasFieldErrors("amount") && !ContraintUtils.validateTransactionAmount(Double.toString(transfer.getAmount()))) {
 			errors.rejectValue("amount", "transaction.amount.invalid", "Invalid Amount");
 		}
 		

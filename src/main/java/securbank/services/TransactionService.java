@@ -15,7 +15,7 @@ public interface TransactionService {
 	public Transaction initiateCredit(Transaction transaction);
 	public Transaction initiateTransfer(Transfer transfer);
 	public Transaction approveTransaction(Transaction transaction);
-	public Transaction approveTransfer(Transfer transfer);
+	public Transfer approveTransfer(Transfer transfer);
 	public Transaction declineTransaction(Transaction transaction);
 	public Transaction declineTransaction(Transfer transfer);
 	public List<Transaction> getPendingTransactionsByAccountNumber(Long accountNumber);
@@ -23,4 +23,5 @@ public interface TransactionService {
 	public List<Transaction> getTransactionsByStatus(String approvalStatus);
 	public Transaction getTransactionById(UUID id);
 	public Transaction getPendingTransactionByAccountNumber(Long accountNumber);
+	public Transaction approveTransactionFromTransfer(Transaction transaction);
 }
