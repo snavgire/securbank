@@ -34,4 +34,5 @@ public interface UserService {
 	public boolean verifyModificationRequest(String status, UUID requestId);
 	public boolean verifyModificationRequestUserType(UUID requestId, String type);
 	public void deleteModificationRequest(ModificationRequest request);
+	public User getUserByUsernameOrEmail(String email);
 }

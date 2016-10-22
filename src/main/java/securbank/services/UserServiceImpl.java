@@ -599,4 +599,12 @@ public class UserServiceImpl implements UserService {
 		modificationRequestDao.remove(request);
 		return;
 	}
+
+	/* (non-Javadoc)
+	 * @see securbank.services.UserService#getUserByUsernameOrEmail(java.lang.String)
+	 */
+	@Override
+	public User getUserByUsernameOrEmail(String email) {
+		return userDao.findByUsernameOrEmail(email);
+	}
 }

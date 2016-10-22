@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import securbank.models.ModificationRequest;
 import securbank.models.User;
 import securbank.services.UserService;
+import securbank.services.ViewAuthorizationService;
 import securbank.validators.ApprovalUserFormValidator;
 import securbank.validators.InternalEditUserFormValidator;
 
@@ -35,6 +36,9 @@ public class EmployeeController {
 
 	@Autowired
 	private ApprovalUserFormValidator approvalUserFormValidator;
+	
+	@Autowired
+	private ViewAuthorizationService viewAuthorizationService;
 
 	final static Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 	
@@ -179,4 +183,37 @@ public class EmployeeController {
 		
         return "redirect:/employee/user/request";
     }	
+	
+	// View Authorization Start
+	@GetMapping("/employee/user/requestaccess")
+    public String addViewRequest(Model model) {
+		model.addAttribute("user", new User());
+		logger.info("GET request: Request for user");
+		
+        return "employee/requestaccess";
+    }
+	
+	@PostMapping("/employee/user/requestaccess")
+    public String addViewRequest(@ModelAttribute User user, BindingResult bindingResult) {
+		if (user.getEmail() == null || user.getEmail().equals("")) {
+			bindingResult.rejectValue("email", "email.invalid", "Email not valid");
+		}
+		user = userService.getUserByUsernameOrEmail(user.getEmail());
+		if (user == null || !user.getType().equalsIgnoreCase("external")) {
+			bindingResult.rejectValue("email", "email.invalid", "Email not valid");
+		}
+		
+		if (viewAuthorizationService.hasAccess(userService.getCurrentUser(), user)) {
+			bindingResult.rejectValue("email", "email.invalid", "Authorization exists");
+		}
+		
+		if (bindingResult.hasErrors()) {
+			return "employee/requestaccess";
+		}
+		viewAuthorizationService.createAuthorization(user);
+		logger.info("POST request: Employee request access");
+		
+        return "redirect:/employee/user/requestaccess";
+    }	
+	// View Authorization End
 }
