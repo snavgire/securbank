@@ -182,6 +182,11 @@ public class CommonController {
 			}
 			
 		if(forgotPasswordService.createUserPassword(user, request) != null){
+			return "redirect:/login";
+		}
+		return "redirect:/error?code=500";
+
+    }
 
 	@GetMapping("/request/verify/{id}")
     public String verifyEmailRequest(Model model, @PathVariable UUID id) {
@@ -224,8 +229,6 @@ public class CommonController {
 
 	}
 
-}
 
-    }
 }
 

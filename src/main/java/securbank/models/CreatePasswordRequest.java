@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Entity
-@Component("changePasswordRequest")
+@Component("createPasswordRequest")
 public class CreatePasswordRequest {
 	
 	@Id
