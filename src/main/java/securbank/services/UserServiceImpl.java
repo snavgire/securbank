@@ -250,4 +250,5 @@ public class UserServiceImpl implements UserService {
 		logger.info("Getting new user request by id");
 		return newUserRequest;
 	}
+	
 }

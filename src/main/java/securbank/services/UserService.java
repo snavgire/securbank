@@ -6,6 +6,7 @@ package securbank.services;
 import java.util.List;
 import java.util.UUID;
 
+import securbank.models.CreatePasswordRequest;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
 

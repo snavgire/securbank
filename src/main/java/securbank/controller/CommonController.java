@@ -2,6 +2,8 @@ package securbank.controller;
 
 import java.util.UUID;
 
+import javax.servlet.http.HttpSession;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,9 +23,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import securbank.models.CreatePasswordRequest;
+import securbank.models.ForgotPasswordRequest;
 import securbank.models.User;
+import securbank.dao.UserDao;
+import securbank.services.ForgotPasswordService;
 import securbank.services.UserService;
+import securbank.validators.CreatePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
+
 /**
  * @author Ayush Gupta
  *
@@ -35,6 +43,19 @@ public class CommonController {
 	
 	@Autowired 
 	NewUserFormValidator userFormValidator;
+	
+	@Autowired
+	UserDao userDAO;
+	
+	@Autowired
+	CreatePasswordFormValidator createPasswordFormValidator; 
+	
+	@Autowired
+    public HttpSession session;
+	
+	@Autowired
+	private ForgotPasswordService forgotPasswordService;
+	
 	
 	final static Logger logger = LoggerFactory.getLogger(CommonController.class);
 	
@@ -83,4 +104,91 @@ public class CommonController {
 		
 		return "redirect:/";
     }
+	
+	// for forgot password
+	@GetMapping("/forgotpassword")
+	public String forgotpasswordform(Model model){
+		model.addAttribute("forgotPasswordRequest", new ForgotPasswordRequest());
+		logger.info("GET request : email address for forgot password");
+		return "forgotpassword";
+	}
+	
+	@PostMapping("/forgotpassword")
+	public String forgotpasswordsubmit(@ModelAttribute ForgotPasswordRequest forgotPasswordRequest){
+		UUID token = (UUID) session.getAttribute("verification.token");
+		if (token == null) {
+			logger.info("POST request: Email for forgot password with invalid session token");
+			return "redirect:/error?code=400&path=bad-request";
+		}
+		else {
+			// clears session
+			session.removeAttribute("validation.token");
+		}
+		
+		User user = userService.getUserByIdAndActive(token);
+		if(user==null){
+			logger.info("POST request: Forgot password with invalid user id");
+			return "redirect:/error?code=400&path=bad-request";
+		}
+		
+		if(!forgotPasswordService.verifyUserAndInfo(user, forgotPasswordRequest)){
+			logger.info("GET request : user and entered deails did not match");
+			return "redirect:/error?code=400&path-bad-request";
+		}
+			
+		forgotPasswordService.sendEmailForgotPassword(user);			
+		logger.info("POST request : Sending link to reset password");
+		
+		return "redirect:/";		
+	}
+	
+	@GetMapping("/createpassword/{id}")
+	public String createpasswordform(Model model, @PathVariable UUID id){
+		User user = userService.getUserByIdAndActive(id);
+		if(user == null){
+			logger.info("GET request : verification failed for user's registered email ");
+			return "redirect:/error?code=user.notfound";
+		}
+		
+		model.addAttribute("createpasswordrequest", new CreatePasswordRequest());
+		logger.info("GET request : Create new password");
+		return "createpassword";
+	}
+	
+	
+	@PostMapping("/createpassword")
+    public String createPasswordSubmit(@ModelAttribute CreatePasswordRequest request, BindingResult binding) {
+		UUID token = (UUID) session.getAttribute("verification.token");
+		if (token == null) {
+			logger.info("POST request: Email for forgot password with invalid session token");
+			return "redirect:/error?code=400&path=bad-request";
+		}
+		else {
+			// clears session
+			session.removeAttribute("validation.token");
+		}
+		
+		User user = userService.getUserByIdAndActive(token);
+		if(user==null){
+			logger.info("POST request: Forgot password with invalid user id");
+			return "redirect:/error?code=400&path=bad-request";
+		}
+		
+		if(!user.getEmail().equals(request.getEmail()) || !user.getPhone().equals(request.getPhone()) ){
+			logger.info("GET request : Creating new password with invalid credentials ");
+		}
+		
+		createPasswordFormValidator.validate(request, binding);
+			if(binding.hasErrors()){
+				logger.info("POST request: createpassword form with validation errors");
+				return "createpassword";
+			}
+			
+		if(forgotPasswordService.createUserPassword(user, request) != null){
+			return "redirect:/login";
+		}
+		
+		return "redirect:/error?code=500";
+	}
+
 }
