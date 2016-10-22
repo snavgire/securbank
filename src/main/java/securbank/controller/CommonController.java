@@ -25,11 +25,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
+import securbank.models.ChangePasswordRequest;
 import securbank.models.User;
 import securbank.dao.UserDao;
 import securbank.services.ForgotPasswordService;
 import securbank.services.UserService;
+
 import securbank.validators.CreatePasswordFormValidator;
+import securbank.validators.ChangePasswordFormValidator;
+
 import securbank.validators.NewUserFormValidator;
 
 /**
@@ -56,10 +60,11 @@ public class CommonController {
 	@Autowired
 	private ForgotPasswordService forgotPasswordService;
 	
-	
+	@Autowired 
+	ChangePasswordFormValidator changePasswordFormValidator;
+
 	final static Logger logger = LoggerFactory.getLogger(CommonController.class);
-	
-	
+		
 	@RequestMapping(value="/logout", method = RequestMethod.GET)
 	public String logoutPage (HttpServletRequest request, HttpServletResponse response) {
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -177,10 +182,50 @@ public class CommonController {
 			}
 			
 		if(forgotPasswordService.createUserPassword(user, request) != null){
+
+	@GetMapping("/request/verify/{id}")
+    public String verifyEmailRequest(Model model, @PathVariable UUID id) {
+		if (userService.verifyModificationRequest("waiting", id) == false) {
+			logger.info("GET request: verification failed of request");
+			return "redirect:/error?code=400&path=request-invalid";
+		}
+		logger.info("GET request: verification of request");
+		
+		return "redirect:/";
+    }
+	
+	@GetMapping("/changepassword")
+	public String ChangePasswordform(Model model){
+		model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
+		logger.info("GET request: Change password");
+			
+        return "changepassword";
+	}
+	
+	@PostMapping("/changepassword")
+    public String changeUserPassword(@ModelAttribute ChangePasswordRequest request, BindingResult binding) {
+		changePasswordFormValidator.validate(request, binding);
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error?code=401";
+		}
+		if (!userService.verifyCurrentPassword(user, request.getExistingPassword())) {
+			binding.rejectValue("existingPassword", "invalid.password", "Password is not valid");
+		}
+		if(binding.hasErrors()){
+			logger.info("POST request: changepassword form with validation errors");
+			return "changepassword";
+		}			
+		if(userService.changeUserPassword(user, request) != null){
 			return "redirect:/login";
 		}
 		
 		return "redirect:/error?code=500";
+
 	}
 
 }
+
+    }
+}
+
