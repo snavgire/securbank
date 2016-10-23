@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+
+
+    <head>
+
+        <title>Transfer Funds</title>
+
+       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    </head>
+
+    <body>
+        <div class="row" style="margin-top:30px;">
+              <form>
+                    <h2 class="display-2 col-xs-offset-5" style="padding-left:10px;">Transfer Funds</h2>
+
+           <div class="input-group col-xs-4 col-xs-offset-4" style="margin-top:30px;">
+               <input required type="text" class="form-control" placeholder="Email Address" />
+           </div>
+
+             <div class="input-group col-xs-4 col-xs-offset-4" style="margin-top:30px;">
+                <span class="input-group-addon">$</span>
+                 <input required type="number" class="form-control" placeholder="Amount" />
+             </div>
+
+            <div class="col-xs-2 col-xs-offset-5" style="margin-top:40px;">
+              <input class="btn btn-primary btn-block" type="submit" value="Submit"/>
+            </div>
+
+          </form>
+
+        </div>
+
+    </body>
+
+</html>
