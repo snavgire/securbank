@@ -71,4 +71,19 @@ public class ExternalUserController {
 	
         return "redirect:/";
     }
+	
+	@GetMapping("/user/transaction")
+    public String transactionPage(Model model) {
+        return "external/transferfunds";
+    }
+	
+	@GetMapping("/user/debit")
+    public String debitPage(Model model) {
+        return "external/debit";
+    }
+	
+	@GetMapping("/user/credit")
+    public String creditPage(Model model) {
+        return "external/credit";
+    }
 }
