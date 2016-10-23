@@ -6,10 +6,8 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import securbank.dao.UserDao;
 import securbank.models.User;
 import securbank.models.ViewAuthorization;
-import securbank.services.UserService;
 import securbank.services.ViewAuthorizationService;
 /**
  * @author Ayush Gupta
@@ -18,12 +16,6 @@ import securbank.services.ViewAuthorizationService;
 @Component("authorizeUserFormValidator")
 public class AuthorizeUserFormValidator implements Validator{
 
-	@Autowired
-	private UserDao userDao;
-
-	@Autowired
-	private UserService userService;
-	
 	@Autowired
 	private ViewAuthorizationService viewAuthorizationService;
 	
