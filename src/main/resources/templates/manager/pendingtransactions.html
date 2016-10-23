@@ -48,9 +48,9 @@
 		<ul class="nav nav-tabs nav-justified">
 			<li><a th:href="@{/manager/user}">View External User Accounts</a></li>
 			<li><a th:href="@{/manager/details}">My Profile</a></li>
-			<li class="active"><a href="#">New External User Requests</a></li>
-			<li><a th:href="@{/manager/transfers}">Pending Transfers</a></li>
-			<li><a th:href="@{/manager/transactions}">Pending Transactions</a></li>
+			<li><a th:href="@{/manager/user/request}">New External User Requests</a></li>
+      <li><a th:href="@{/manager/transfers}">Pending Transfers</a></li>
+      <li class="active"><a href="#">Pending Transactions</a></li>
 		</ul>
 	</div>
 	<div class="container">
@@ -61,24 +61,31 @@
 	<div class="container">
 		<table class="table table-striped">
 			<thead>
-				<tr>
-					<th>Username</th>
-					<th>First Name</th>
-					<th>Last Name</th>
-					<th>Role</th>
-				</tr>
+        <tr>
+  				<th>Username</th>
+  				<th>Account Number</th>
+          <th>Amount</th>
+  				<th>Type</th>
+  			</tr>
 			</thead>
 			<tbody class="searchable">
-				<tr th:each="request : ${modificationrequests}">
-					<td th:text="${request.user.username}"></td>
-					<td th:text="${request.user.firstName}"></td>
-					<td th:text="${request.user.lastName}"></td>
-					<td th:text="${request.user.role}"></td>
-					<td><a class="btn btn-primary"
-						th:href="@{/manager/user/request/view/{id}(id=${request.modificationRequestId})}">View</a></td>
-					<td><a class="btn btn-danger"
-						th:href="@{/manager/user/request/delete/{id}(id=${request.modificationRequestId})}">Delete</a></td>
-				</tr>
+        <tr>
+          <td>nloney</td>
+          <td>123456</td>
+          <td>335.87</td>
+          <td>Debit</td>
+          <td><a th:href="@{/manager/transactions/single}">View</a></td>
+        <!-- Uncomment when logic in place -->
+				<!-- <tr th:each="request : ${modificationrequests}">
+        <tr th:each="transaction : ${transactions}">
+  				<td th:text="${transaction.account.user.username}"></td>
+  				<td th:text="${transaction.account.accountNumber}"></td>
+  				<td th:text="${transaction.amount}"></td>
+  				<td th:text="${transaction.type}"></td>
+  				<td><a th:href="@{/manager/transaction/{id}(id=${transaction.transactionId})}">View</a></td>
+  			</tr>
+       -->
+      </tr>
 			</tbody>
 		</table>
 	</div>

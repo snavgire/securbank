@@ -308,4 +308,24 @@ public class ManagerController {
 		
         return "redirect:/manager/user/request";
     }
+	
+	@GetMapping("/manager/transfers")
+    public String transferPage(Model model) {
+        return "manager/pendingtransfers";
+    }
+	
+	@GetMapping("/manager/transfers/single")
+    public String approveTransferPage(Model model) {
+        return "manager/approvetransfer";
+    }
+	
+	@GetMapping("/manager/transactions")
+    public String transactionPage(Model model) {
+        return "manager/pendingtransactions";
+    }
+	
+	@GetMapping("/manager/transactions/single")
+    public String approveTransactionPage(Model model) {
+        return "manager/approvetransaction";
+    }
 }
