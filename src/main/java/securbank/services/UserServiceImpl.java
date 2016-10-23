@@ -607,4 +607,14 @@ public class UserServiceImpl implements UserService {
 	public User getUserByUsernameOrEmail(String email) {
 		return userDao.findByUsernameOrEmail(email);
 	}
+
+	/* (non-Javadoc)
+	 * @see securbank.services.UserService#getModificationRequestsByUsers(java.lang.String, java.lang.String, securbank.models.User)
+	 */
+	@Override
+	public List<ModificationRequest> getModificationRequestsByUsers(String status, String type, List<User> users) {
+		logger.info("Getting all modification request by user type, status of request and users");
+		
+		return modificationRequestDao.findAllbyStatusAndUserTypeAndUsers(status, type, users);
+	}
 }

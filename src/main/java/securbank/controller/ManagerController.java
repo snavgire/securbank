@@ -26,6 +26,7 @@ import securbank.services.UserService;
 import securbank.services.ViewAuthorizationService;
 import securbank.validators.ApprovalUserFormValidator;
 import securbank.validators.AuthorizeUserFormValidator;
+import securbank.validators.EditUserFormValidator;
 import securbank.validators.InternalEditUserFormValidator;
 
 /**
@@ -39,6 +40,9 @@ public class ManagerController {
 	
 	@Autowired
 	private InternalEditUserFormValidator editUserFormValidator;
+
+	@Autowired
+	private EditUserFormValidator editExternalUserFormValidator;
 
 	@Autowired
 	private ApprovalUserFormValidator approvalUserFormValidator;
@@ -221,7 +225,7 @@ public class ManagerController {
 			return "redirect:/error?code=404";
 		}
 		
-		editUserFormValidator.validate(user, bindingResult);
+		editExternalUserFormValidator.validate(user, bindingResult);
 		if (bindingResult.hasErrors()) {
 			return "redirect:/error?code=400?path=form-validation";
         }
