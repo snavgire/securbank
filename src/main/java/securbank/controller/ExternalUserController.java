@@ -23,6 +23,9 @@ import securbank.services.TransferService;
 import securbank.services.UserService;
 import securbank.validators.NewTransactionFormValidator;
 import securbank.validators.NewTransferFormValidator;
+import securbank.validators.EditUserFormValidator;
+import securbank.validators.NewUserFormValidator;
+
 
 /**
  * @author Ayush Gupta
@@ -47,14 +50,20 @@ public class ExternalUserController {
 	
 	@Autowired
 	public HttpSession session;
+
+	@Autowired 
+	NewUserFormValidator userFormValidator;
+	
+	@Autowired 
+	EditUserFormValidator editUserFormValidator;
 	
 	final static Logger logger = LoggerFactory.getLogger(ExternalUserController.class);
-	
+
 	@GetMapping("/user/details")
     public String currentUserDetails(Model model) {
 		User user = userService.getCurrentUser();
 		if (user == null) {
-			return "redirect:/error?code=user-notfound";
+			return "redirect:/error?code=400&path=user-notfound";
 		}
 		
 		model.addAttribute("user", user);
@@ -117,5 +126,29 @@ public class ExternalUserController {
 		}
 		
 		return "external/createtransfer";
+	}
+
+	@GetMapping("/user/edit")
+    public String editUser(Model model) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error";
+		}
+		model.addAttribute("user", user);
+		
+        return "external/edit";
+    }
+	
+	@PostMapping("/user/edit")
+    public String editSubmit(@ModelAttribute User user, BindingResult bindingResult) {
+		editUserFormValidator.validate(user, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "external/edit";
+        }
+		
+		// create request
+    	userService.createExternalModificationRequest(user);
+	
+        return "redirect:/";
     }
 }
