@@ -15,4 +15,5 @@ import securbank.models.Verification;
 public interface VerificationService {
 	public User getUserByIdAndType(UUID id, String type);
 	public Verification createVerificationCodeByType(User user, String type);
+	public void removeVerification(UUID id);
 }

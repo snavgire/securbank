@@ -13,4 +13,5 @@ import securbank.models.Verification;
  */
 public interface VerificationDao extends BaseDao<Verification, UUID> {
 	public User findUserByIdAndType(UUID id, String type);
+	public List<Verification> findAllByUserAndType(User user, String type);
 }

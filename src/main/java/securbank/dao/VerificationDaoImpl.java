@@ -1,6 +1,7 @@
 package securbank.dao;
 
-import java.time.LocalDateTime;
+import org.joda.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
@@ -41,8 +42,8 @@ public class VerificationDaoImpl extends BaseDaoImpl<Verification, UUID> impleme
 		try {
 			return this.entityManager.createQuery("SELECT verification.user from Verification verification " +
 					"WHERE verification.verificationId = :id " +
-					"AND verification.type = :type" + 
-					"AND verification.expiredOn > :now", User.class)
+					"AND verification.type = :type " + 
+					"AND verification.expireOn > :now", User.class)
 					.setParameter("id", id)
 					.setParameter("type", type)
 					.setParameter("now", LocalDateTime.now())
@@ -51,5 +52,25 @@ public class VerificationDaoImpl extends BaseDaoImpl<Verification, UUID> impleme
 		catch(NoResultException e) {
 			return null;
 		}
+	}
+	
+	/**
+     * Returns instances for user and type
+     * 
+     * @param user
+     *            The user to query
+     * @param type
+     *            The type of code
+     * @return verification
+     */
+	public List<Verification> findAllByUserAndType(User user, String type) {
+		return this.entityManager.createQuery("SELECT verification from Verification verification " +
+				"WHERE verification.type = :type " + 
+				"AND verification.user = :user " + 
+				"AND verification.expireOn > :now", Verification.class)
+				.setParameter("user", user)
+				.setParameter("type", type)
+				.setParameter("now", LocalDateTime.now())
+				.getResultList();
 	}
 }

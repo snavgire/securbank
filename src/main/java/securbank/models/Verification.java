@@ -2,7 +2,6 @@ package securbank.models;
 
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,7 +21,7 @@ import org.joda.time.LocalDateTime;
  */
 
 @Entity 
-@Table(name = "Account")
+@Table(name = "Verification")
 public class Verification {
 
 	@Id
@@ -33,7 +32,7 @@ public class Verification {
 	private UUID verificationId;
 
 	/** multiple account can be associated with an user	 */
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "userId", nullable = false)
 	private User user;
 	
@@ -42,7 +41,7 @@ public class Verification {
 	private LocalDateTime createdOn;
 	
 	@NotNull
-	private LocalDateTime exprireOn;
+	private LocalDateTime expireOn;
 	
 	@NotNull
 	private String type;
@@ -58,15 +57,15 @@ public class Verification {
 	 * @param verificationId
 	 * @param user
 	 * @param createdOn
-	 * @param exprireOn
+	 * @param expireOn
 	 * @param type
 	 */
-	public Verification(UUID verificationId, User user, LocalDateTime createdOn, LocalDateTime exprireOn, String type) {
+	public Verification(UUID verificationId, User user, LocalDateTime createdOn, LocalDateTime expireOn, String type) {
 		super();
 		this.verificationId = verificationId;
 		this.user = user;
 		this.createdOn = createdOn;
-		this.exprireOn = exprireOn;
+		this.expireOn = expireOn;
 		this.type = type;
 	}
 
@@ -113,17 +112,17 @@ public class Verification {
 	}
 
 	/**
-	 * @return the exprireOn
+	 * @return the expireOn
 	 */
-	public LocalDateTime getExprireOn() {
-		return exprireOn;
+	public LocalDateTime getExpireOn() {
+		return expireOn;
 	}
 
 	/**
-	 * @param exprireOn the exprireOn to set
+	 * @param expireOn the expireOn to set
 	 */
-	public void setExprireOn(LocalDateTime exprireOn) {
-		this.exprireOn = exprireOn;
+	public void setExpireOn(LocalDateTime expireOn) {
+		this.expireOn = expireOn;
 	}
 
 	/**
@@ -146,6 +145,6 @@ public class Verification {
 	@Override
 	public String toString() {
 		return "Verification [verificationId=" + verificationId + ", user=" + user + ", createdOn=" + createdOn
-				+ ", exprireOn=" + exprireOn + ", type=" + type + "]";
+				+ ", expireOn=" + expireOn + ", type=" + type + "]";
 	}
 }

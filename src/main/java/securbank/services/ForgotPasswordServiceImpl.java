@@ -1,5 +1,7 @@
 package securbank.services;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import securbank.dao.UserDao;
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
 import securbank.models.User;
+import securbank.models.Verification;
 
 /**
  * 
@@ -20,6 +23,7 @@ import securbank.models.User;
  */
 
 @Service("forgotPasswordService")
+@Transactional
 public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 	@Autowired
 	private PasswordEncoder encoder;
@@ -38,12 +42,16 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 	final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 	
 	@Override
-	public boolean sendEmailForgotPassword(User user) {
+	public boolean sendEmailForgotPassword(Verification verification) {
+		User user = verification.getUser();
+		if (user == null)  {
+			return false;
+		}
 		
 		logger.info("Sending email for user to create new password");
 		//setup up email message
 		message = new SimpleMailMessage();
-		message.setText(env.getProperty("forgot.password.body").replace(":id:",user.getUserId().toString()));
+		message.setText(env.getProperty("forgot.password.body").replace(":id:",verification.getVerificationId().toString()));
 		message.setSubject(env.getProperty("external.user.verification.subject"));
 		message.setTo(user.getEmail());
 		

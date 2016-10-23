@@ -2,10 +2,9 @@ package securbank.controller;
 
 import java.util.UUID;
 
-import javax.servlet.http.HttpSession;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +22,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import securbank.dao.UserDao;
+import securbank.models.ChangePasswordRequest;
 import securbank.models.CreatePasswordRequest;
 import securbank.models.ForgotPasswordRequest;
-import securbank.models.ChangePasswordRequest;
 import securbank.models.User;
-import securbank.dao.UserDao;
-import securbank.services.ForgotPasswordService;
+import securbank.models.Verification;
 import securbank.services.AuthenticationService;
+import securbank.services.ForgotPasswordService;
 import securbank.services.SecurityContextService;
 import securbank.services.UserService;
-
-import securbank.validators.CreatePasswordFormValidator;
+import securbank.services.VerificationService;
 import securbank.validators.ChangePasswordFormValidator;
-
+import securbank.validators.CreatePasswordFormValidator;
 import securbank.validators.NewUserFormValidator;
 
 /**
@@ -62,6 +61,9 @@ public class CommonController {
 	
 	@Autowired
 	CreatePasswordFormValidator createPasswordFormValidator; 
+	
+	@Autowired
+	VerificationService verificationService;
 	
 	@Autowired
     public HttpSession session;
@@ -140,38 +142,40 @@ public class CommonController {
 	public String forgotpasswordform(Model model){
 		model.addAttribute("forgotPasswordRequest", new ForgotPasswordRequest());
 		logger.info("GET request : email address for forgot password");
+		
 		return "forgotpassword";
 	}
 	
 	@PostMapping("/forgotpassword")
 	public String forgotpasswordsubmit(@ModelAttribute ForgotPasswordRequest forgotPasswordRequest){
-		
 		User user = forgotPasswordService.getUserbyUsername(forgotPasswordRequest.getUserName());
-		if(user==null){
+		if(user == null) {
 			logger.info("POST request: Forgot password with invalid user id");
+			
 			return "redirect:/error?code=400&path=bad-request";
 		}
 		
-		if(!forgotPasswordService.verifyUserAndInfo(user, forgotPasswordRequest)){
+		if(!forgotPasswordService.verifyUserAndInfo(user, forgotPasswordRequest)) {
 			logger.info("GET request : user and entered deails did not match");
+			
 			return "redirect:/error?code=400&path-bad-request";
 		}
-			
-		forgotPasswordService.sendEmailForgotPassword(user);			
+		Verification verification = verificationService.createVerificationCodeByType(user, "forgot");	
+		forgotPasswordService.sendEmailForgotPassword(verification);			
 		logger.info("POST request : Sending link to reset password");
 		
-		return "redirect:/";
+		return "redirect:/login";
 	}
 	
 	@GetMapping("/createpassword/{id}")
 	public String createpasswordform(Model model, @PathVariable UUID id){
-		User user = userService.getUserByIdAndActive(id);
+		User user = verificationService.getUserByIdAndType(id, "forgot");
 		if(user == null){
 			logger.info("GET request : verification failed for user's registered email ");
 			return "redirect:/error?code=user.notfound";
 		}
-		
-		model.addAttribute("createpasswordrequest", new CreatePasswordRequest());
+		session.setAttribute("forgotpassword.verification", id);
+		model.addAttribute("createPasswordRequest", new CreatePasswordRequest());
 		logger.info("GET request : Create new password");
 		return "createpassword";
 	}
@@ -179,22 +183,23 @@ public class CommonController {
 	
 	@PostMapping("/createpassword")
     public String createPasswordSubmit(@ModelAttribute CreatePasswordRequest request, BindingResult binding) {
-		UUID token = (UUID) session.getAttribute("verification.token");
+		UUID token = (UUID) session.getAttribute("forgotpassword.verification");
 		if (token == null) {
 			logger.info("POST request: Email for forgot password with invalid session token");
 			return "redirect:/error?code=400&path=bad-request";
 		}
-		else {
-			// clears session
-			session.removeAttribute("validation.token");
-		}
+
+		// clears session
+		User user = verificationService.getUserByIdAndType(token, "forgot");
+		session.removeAttribute("validation.token");
 		
-		User user = userService.getUserByIdAndActive(token);
+		// User user = userService.getUserByIdAndActive(token);
 		if(user==null){
 			logger.info("POST request: Forgot password with invalid user id");
+			
 			return "redirect:/error?code=400&path=bad-request";
 		}
-		
+		verificationService.removeVerification(token);
 		if(!user.getEmail().equals(request.getEmail()) || !user.getPhone().equals(request.getPhone()) ){
 			logger.info("GET request : Creating new password with invalid credentials ");
 			return "redirect:/error?code=400&path=bad-request";			
