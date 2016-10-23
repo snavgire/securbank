@@ -17,11 +17,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import securbank.models.ModificationRequest;
 import securbank.models.User;
+import securbank.models.ViewAuthorization;
 import securbank.services.UserService;
+import securbank.services.ViewAuthorizationService;
 import securbank.validators.ApprovalUserFormValidator;
+import securbank.validators.AuthorizeUserFormValidator;
 import securbank.validators.InternalEditUserFormValidator;
 
 /**
@@ -38,6 +42,12 @@ public class ManagerController {
 
 	@Autowired
 	private ApprovalUserFormValidator approvalUserFormValidator;
+
+	@Autowired
+	private AuthorizeUserFormValidator authorizeUserFormValidator;
+
+	@Autowired
+	private ViewAuthorizationService viewAuthorizationService;
 
 	final static Logger logger = LoggerFactory.getLogger(ManagerController.class);
 	
@@ -307,5 +317,38 @@ public class ManagerController {
 		logger.info("POST request: Manager approves modification request");
 		
         return "redirect:/manager/user/request";
+    }
+	
+	@GetMapping("/manager/authorize")
+    public String authorizeUser(@RequestParam(value="success", required=false) Boolean success, Model model) {
+		ViewAuthorization authorization = new ViewAuthorization();
+		authorization.setEmployee(new User());
+		authorization.setExternal(new User());
+		if (success != null && success == true) {
+			model.addAttribute("success", true);
+		}
+		if (success != null && success == false) {
+			model.addAttribute("success", false);
+		}
+		model.addAttribute("viewrequest", authorization);
+		logger.info("GET request: Manager authorizes user");
+		
+        return "manager/requestaccess";
+    }
+	
+	@PostMapping("/manager/authorize")
+    public String authorizeUser(@ModelAttribute("viewrequest") ViewAuthorization request, BindingResult bindingResult) {
+		User external = userService.getUserByUsernameOrEmail(request.getExternal().getEmail());
+		User employee = userService.getUserByUsernameOrEmail(request.getEmployee().getEmail());
+		request.setEmployee(employee);
+		request.setExternal(external);
+		authorizeUserFormValidator.validate(request, bindingResult);
+		if (bindingResult.hasErrors()) {
+			return "manager/requestaccess";
+		}
+		viewAuthorizationService.createAuthorization(employee, external, true);
+		logger.info("POST request: Manager authorizes user");
+		
+        return "redirect:/manager/authorize?success=true";
     }
 }

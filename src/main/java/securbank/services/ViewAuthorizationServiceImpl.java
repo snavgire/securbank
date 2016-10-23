@@ -45,16 +45,11 @@ public class ViewAuthorizationServiceImpl implements ViewAuthorizationService {
 	 * @see securbank.services.ViewAuthorizationService#createAuthorization(securbank.models.ViewAuthorization)
 	 */
 	@Override
-	public ViewAuthorization createAuthorization(User external) {
-		User employee = userService.getCurrentUser();
-		if (employee == null) {
-			return null;
-		}
-		
+	public ViewAuthorization createAuthorization(User employee, User external, Boolean active) {
 		ViewAuthorization authorization = new ViewAuthorization();
 		authorization.setEmployee(employee);
 		authorization.setExternal(external);
-		authorization.setActive(false);
+		authorization.setActive(active);
 		authorization = viewAuthorizationDao.save(authorization);
 		
 		return authorization;

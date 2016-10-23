@@ -15,7 +15,7 @@ import securbank.models.ViewAuthorization;
  */
 public interface ViewAuthorizationService {
 	public boolean hasAccess(User employee, User external);
-	public ViewAuthorization createAuthorization(User external);
+	public ViewAuthorization createAuthorization(User employee, User external, Boolean active);
 	public List<User> getAllAuthorization(User user);
 	public ViewAuthorization approveAuthorization(ViewAuthorization authorization);
 	public ViewAuthorization getAuthorizationById(UUID id);

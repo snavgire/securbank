@@ -210,7 +210,7 @@ public class EmployeeController {
 		if (bindingResult.hasErrors()) {
 			return "employee/requestaccess";
 		}
-		viewAuthorizationService.createAuthorization(user);
+		viewAuthorizationService.createAuthorization(userService.getCurrentUser(), user, false);
 		logger.info("POST request: Employee request access");
 		
         return "redirect:/employee/user/requestaccess";
