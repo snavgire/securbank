@@ -40,9 +40,7 @@
 					<label class="col-md-4 control-label" for="textinput">Username</label>
 					<div class="col-md-4">
 						<input id="textinput" name="textinput" type="text" placeholder=""
-							class="form-control input-md" required="" th:field="*{username}" />
-						<div class="alert alert-danger"
-							th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+							class="form-control input-md" required="" th:field="*{username}" readonly="true"/>
 					</div>
 				</div>
 
