@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+
 import securbank.models.User;
 import securbank.services.UserService;
 import securbank.validators.NewUserFormValidator;
@@ -83,4 +84,5 @@ public class CommonController {
 		
 		return "redirect:/";
     }
+	
 }

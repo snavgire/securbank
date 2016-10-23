@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
 
+import securbank.models.LoginAttempt;
 import securbank.models.User;
 import securbank.services.AuthenticationService;
 
@@ -20,6 +21,7 @@ import securbank.services.AuthenticationService;
  * @author Ayush Gupta
  *
  */
+
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Autowired
@@ -32,10 +34,13 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		User user = auth.verifyUser(authentication.getPrincipal().toString(), authentication.getCredentials().toString());
+		
 		if (user == null) {
-			throw new BadCredentialsException("Invalid Username or Password");
+			throw new BadCredentialsException("Invalid Username or Password.");
 		}
+		
 		auth.updateLoginTime(user);
+		
 		
 		List<GrantedAuthority> roles = AuthorityUtils.commaSeparatedStringToAuthorityList(user.getRole());
 		

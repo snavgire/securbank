@@ -25,6 +25,7 @@ import securbank.dao.UserDao;
 import securbank.models.Account;
 import securbank.models.NewUserRequest;
 import securbank.models.User;
+import securbank.models.LoginAttempt;
 
 /**
  * @author Ayush Gupta
@@ -70,6 +71,9 @@ public class UserServiceImpl implements UserService {
 		user.setCreatedOn(LocalDateTime.now());
 		user.setActive(false);
 		user.setType("external");
+		
+		LoginAttempt attempt = new LoginAttempt(user, 0, LocalDateTime.now());		
+		user.setLoginAttempt(attempt);
 		user = userDao.save(user);
 		
 		//setup up email message
@@ -99,6 +103,12 @@ public class UserServiceImpl implements UserService {
 			logger.info("Invalid request for new internal user");
 			return null;
 		}
+		
+		LoginAttempt attempt = new LoginAttempt();
+		attempt.setLastUpdated(LocalDateTime.now());
+		attempt.setCounter(0);
+		user.setLoginAttempt(attempt);
+		user = userDao.save(user);
 		
 		// Deactivates request
 		newUserRequest.setActive(false);
@@ -250,4 +260,6 @@ public class UserServiceImpl implements UserService {
 		logger.info("Getting new user request by id");
 		return newUserRequest;
 	}
+	
+	
 }

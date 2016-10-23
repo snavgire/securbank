@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import securbank.authentication.CustomAuthenticationProvider;
 import securbank.controller.CommonController;
+import securbank.services.AuthenticationServiceImpl;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -23,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
 	@Autowired
 	private CustomAuthenticationProvider customAuthenticationProvider;
 	
@@ -51,15 +53,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	        .and()
         .formLogin()
             .loginPage("/login")
-            .failureForwardUrl("/login?error")
+            //.failureForwardUrl("/login?error")
             .permitAll()
+            
             .and()
         .logout()
             .permitAll();
 
     }
 
-    @Autowired
+	@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     	auth.authenticationProvider(this.customAuthenticationProvider);
     }

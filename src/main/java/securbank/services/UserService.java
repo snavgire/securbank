@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import securbank.models.NewUserRequest;
 import securbank.models.User;
+import securbank.models.LoginAttempt;
 
 /**
  * @author Ayush Gupta
