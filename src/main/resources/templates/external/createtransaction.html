@@ -5,7 +5,7 @@
         <title>Create New Transaction Request</title>
     </head>
     <body>
-        <form action="#" th:action="@{/transaction/create}" th:object="${transaction}" method="post">
+        <form action="#" th:action="@{/user/createtransaction}" th:object="${transaction}" method="post">
    		<p>
     		Type: <select name="type" th:field="*{type}">
   					<option th:value="DEBIT">DEBIT</option>

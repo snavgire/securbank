@@ -72,15 +72,15 @@ public class ExternalUserController {
         return "external/detail";
     }
 	
-	@GetMapping("/transaction/create")
+	@GetMapping("/user/createtransaction")
 	public String newTransactionForm(Model model){
 		model.addAttribute("transaction", new Transaction());
 		logger.info("GET request: Extrernal user transaction creation request");
 		
-		return "transaction/create";
+		return "external/createtransaction";
 	}
 	
-	@PostMapping("/transaction/create")
+	@PostMapping("/user/createtransation")
     public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
 		logger.info("POST request: Submit transaction");
 		
@@ -101,17 +101,17 @@ public class ExternalUserController {
 			}
 		}
 		
-		return "transaction/create";
+		return "external/createtransaction";
     }
 	
-	@GetMapping("/external/createtransfer")
+	@GetMapping("/user/createtransfer")
 	public String newTransferForm(Model model){
 		model.addAttribute("transfer", new Transfer());
 		logger.info("GET request: Extrernal user transfer creation request");
 		return "external/createtransfer";
 	}
 	
-	@PostMapping("external/createtransfer")
+	@PostMapping("user/createtransfer")
     public String submitNewTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) {
 		logger.info("POST request: Submit transaction");
 		

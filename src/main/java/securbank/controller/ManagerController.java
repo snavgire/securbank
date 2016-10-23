@@ -212,6 +212,26 @@ public class ManagerController {
         return "manager/pendingtransactions";
     }
 	
+	@GetMapping("/manager/transaction/{id}")
+    public String getTransactionRequest(Model model, @PathVariable() UUID id) {
+		Transaction transaction = transactionService.getTransactionById(id);
+		
+		if (transaction == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+
+		// checks if manager is authorized for the request to approve
+		if (!transaction.getAccount().getUser().getType().equals
+				("external")) {
+			logger.warn("GET request: Manager unauthrorised request access");
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		model.addAttribute("transaction", transaction);
+		logger.info("GET request: Manager external transaction request by ID");
+		
+        return "manager/approvetransaction";
+    }
+	
 	@PostMapping("/manager/transaction/request/{id}")
     public String approveRejectTransactions(@ModelAttribute Transaction trans, @PathVariable() UUID id, BindingResult bindingResult) {
 		
@@ -237,27 +257,7 @@ public class ManagerController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "manager/pendingtransactions";
-    }
-	
-	@GetMapping("/manager/transaction/{id}")
-    public String getTransactionRequest(Model model, @PathVariable() UUID id) {
-		Transaction transaction = transactionService.getTransactionById(id);
-		
-		if (transaction == null) {
-			return "redirect:/error?code=404&path=request-invalid";
-		}
-
-		// checks if manager is authorized for the request to approve
-		if (!transaction.getAccount().getUser().getType().equals
-				("external")) {
-			logger.warn("GET request: Manager unauthrorised request access");
-			return "redirect:/error?code=401&path=request-unauthorised";
-		}
-		model.addAttribute("transaction", transaction);
-		logger.info("GET request: Manager external transaction request by ID");
-		
-        return "manager/approvetransaction";
+        return "redirect:manager/pendingtransactions";
     }
 			
 	@GetMapping("/manager/user/edit/{id}")
@@ -369,7 +369,7 @@ public class ManagerController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "redirect:manager/pendingtransfers";
+        return "manager/pendingtransfers";
     }
 	
 	@GetMapping("/manager/transfer/{id}")

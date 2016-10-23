@@ -45,11 +45,11 @@ public class TransferDaoImpl extends BaseDaoImpl<Transfer, UUID> implements Tran
      * @return transfers
      */
 	@Override
-	public List<Transfer> findTransferByFromAccount(Account accountNumber) {
+	public List<Transfer> findTransferByFromAccount(Account account) {
 		try {
 			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
-					+ " where transfer.fromAccount = :accountNumber", Transfer.class)
-					.setParameter("accountNumber", accountNumber)
+					+ " where transfer.fromAccount = :account", Transfer.class)
+					.setParameter("account", account)
 					.getResultList();
 		}
 		catch(NoResultException e) {
@@ -83,6 +83,21 @@ public class TransferDaoImpl extends BaseDaoImpl<Transfer, UUID> implements Tran
 			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
 					+ " where transfer.status = :status", Transfer.class)
 					.setParameter("status", status)
+					.getResultList();
+		}
+		catch(NoResultException e) {
+			// returns null if no transfer is found
+			return null;
+		}
+	}
+
+	@Override
+	public List<Transfer> findPendingTransferByFromAccount(Account fromAccount) {
+		try {
+			return this.entityManager.createQuery("SELECT transfer from Transfer transfer"
+					+ " where transfer.fromAccount = :account AND transfer.status = :status", Transfer.class)
+					.setParameter("account", fromAccount)
+					.setParameter("status", "Pending")
 					.getResultList();
 		}
 		catch(NoResultException e) {

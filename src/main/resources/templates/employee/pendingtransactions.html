@@ -18,9 +18,7 @@
 				<td th:text="${transaction.account.accountNumber}"></td>
 				<td th:text="${transaction.amount}"></td>
 				<td th:text="${transaction.type}"></td>
-				<td><a th:href="@{/manager/transaction/{id}(id=${transaction.transactionId})}">View</a></td>
-				<!--<td><a th:href="@{/manager/transaction/edit/{id}(id=${transaction.transactionId})}">Approve</a></td>
-				<td><a th:href="@{/manager/transaction/delete/{id}(id=${transaction.transactionId})}">Reject</a></td> -->
+				<td><a th:href="@{/employee/transaction/{id}(id=${transaction.transactionId})}">View</a></td>
 			</tr>
 		</table>
 	</body>

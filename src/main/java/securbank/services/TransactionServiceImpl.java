@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService{
 		}	
 		
 		//check for pending transfer amounts
-		for(Transfer transf: transferDao.findTransferByFromAccount(account)){
+		for(Transfer transf: transferDao.findPendingTransferByFromAccount(account)){
 			pendingAmount += transf.getAmount();
 		}
 		

@@ -88,7 +88,7 @@ public class TransferServiceImpl implements TransferService{
 		Double pendingAmount = 0.0;
 		
 		//check for pending transfer amounts
-		for(Transfer transf: transferDao.findTransferByFromAccount(account)){
+		for(Transfer transf: transferDao.findPendingTransferByFromAccount(account)){
 			pendingAmount += transf.getAmount();
 		}	
 		
