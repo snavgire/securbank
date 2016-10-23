@@ -291,6 +291,7 @@ public class UserServiceImpl implements UserService {
 		return newUserRequest;
 	}
 	
+
 	/**
      * Creates external user modification request
      * 
