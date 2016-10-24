@@ -115,8 +115,13 @@ public class User {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<Account> accounts = new HashSet<Account>(0);
 
+	/**One to one relationship */
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private LoginAttempt loginAttempt;
+	
+	/** One to many relation ship  */
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private Set<ModificationRequest> modificationRequest = new HashSet<ModificationRequest>(0);
 
 	public User() {
 		
@@ -144,11 +149,13 @@ public class User {
 	 * @param lastLogin
 	 * @param active
 	 * @param accounts
+	 * @param modificationRequest
 	 */
 	public User(UUID userId, String role, String type, String username, String password, String confirmPassword,
 			String firstName, String middleName, String lastName, String email, String phone, String addressLine1,
 			String addressLine2, String city, String state, String zip, LocalDateTime createdOn,
-			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts, LoginAttempt attempt) {
+			LocalDateTime modifiedOn, LocalDateTime lastLogin, Boolean active, Set<Account> accounts,LoginAttempt attempt,
+			Set<ModificationRequest> modificationRequest) {
 		super();
 		this.userId = userId;
 		this.role = role;
@@ -172,6 +179,7 @@ public class User {
 		this.active = active;
 		this.accounts = accounts;
 		this.loginAttempt = attempt;
+		this.modificationRequest = modificationRequest;
 	}
 
 	/**
@@ -475,7 +483,24 @@ public class User {
 	public LoginAttempt getLoginAttempt(){
 		return loginAttempt;
 	}
-	
+
+	/**
+	 * @return the modificationRequest
+	 */
+	public Set<ModificationRequest> getModificationRequest() {
+		return modificationRequest;
+	}
+
+	/**
+	 * @param modificationRequest the modificationRequest to set
+	 */
+	public void setModificationRequest(Set<ModificationRequest> modificationRequest) {
+		this.modificationRequest = modificationRequest;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", role=" + role + ", type=" + type + ", username=" + username + ", password="
@@ -483,6 +508,7 @@ public class User {
 				+ middleName + ", lastName=" + lastName + ", email=" + email + ", phone=" + phone + ", addressLine1="
 				+ addressLine1 + ", addressLine2=" + addressLine2 + ", city=" + city + ", state=" + state + ", zip="
 				+ zip + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", lastLogin=" + lastLogin
-				+ ", active=" + active + ", accounts=" + accounts + ", loginAttempt=" + loginAttempt + "]";
+				+ ", active=" + active + ", accounts=" + accounts + ", loginAttempt=" + loginAttempt 
+				+ ", modificationRequest=" + modificationRequest+ "]";
 	}
 }

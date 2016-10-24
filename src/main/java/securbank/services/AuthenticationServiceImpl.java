@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import securbank.dao.UserDao;
 import securbank.models.LoginAttempt;
 import securbank.models.User;
+import securbank.models.Verification;
 
 /**
  * @author Ayush Gupta
@@ -25,6 +26,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	
 	@Autowired
 	private UserDao userDao;
+
 	
 	@Autowired 
 	private PasswordEncoder encoder;
@@ -37,8 +39,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Autowired
 	private Environment env;
 	
+	@Autowired
+	VerificationService verificationService;
 	
-	
+	@Autowired
+	private ForgotPasswordService forgotPasswordService;
+
+	private Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 	
 	/**
      * Verify the username and password for current user
@@ -56,6 +63,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			return null;
 		}
 		
+		logger.info("Verifying username and password");
+		
 		if (!BCrypt.checkpw(password, user.getPassword())) {
 			//User found-Incorrect password, counter incremented 
 			LoginAttempt attempt= user.getLoginAttempt();
@@ -63,11 +72,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			if(attempt.getCounter() == 3){
 				user.setActive(false);
 				//Send email message
-				message = new SimpleMailMessage();
-				message.setText(env.getProperty("account.reactivate.body").replace(":id:",user.getUserId().toString()));
-				message.setSubject(env.getProperty("account.reactivate.subject"));
-				message.setTo(user.getEmail());
-				emailService.sendEmail(message);
+				//message = new SimpleMailMessage();
+				//message.setText(env.getProperty("account.reactivate.body").replace(":id:",user.getUserId().toString()));
+				//message.setSubject(env.getProperty("account.reactivate.subject"));
+				//message.setTo(user.getEmail());
+				//emailService.sendEmail(message);
+				
+				Verification verification = verificationService.createVerificationCodeByType(user, "lock");	
+				forgotPasswordService.sendEmailForgotPassword(verification);			
+				logger.info("POST request : Sending link to reset password and reactivate account.");
 			}
 			user.setLoginAttempt(attempt);
 			userDao.update(user);
@@ -93,13 +106,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		attempt.setCounter(0);
 		attempt.setLastUpdated(LocalDateTime.now());
 		user.setLoginAttempt(attempt);
-		
+		logger.info("Resetting LoginAteempt counter to 0");
 		user = userDao.update(user);
 		if (user == null) {
 			return null;
 		}
+		logger.info("Updating login time for User");
 		
 		return user;
 	}
+
+
+	@Override
+	public String getRedirectUrlFromRole(String role) {
+		// TODO Auto-generated method stub
+		String targetUrl = "";
+        if(role.contains("ADMIN")) {
+            targetUrl = "/admin/details";
+        } else if(role.contains("MANAGER")) {
+            targetUrl = "/manager/details";
+        } else if(role.contains("EMPLOYEE")) {
+            targetUrl = "/manager/details";
+        } else if(role.contains("INDIVIDUAL")|role.contains("MERCHANT")) {
+            targetUrl = "/user/details";
+        }
+        return targetUrl;
+	}
+
 	
 }

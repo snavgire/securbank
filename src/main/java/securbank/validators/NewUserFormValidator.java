@@ -95,5 +95,9 @@ public class NewUserFormValidator implements Validator{
 		if (!errors.hasFieldErrors("zip") && !ContraintUtils.validateZip(user.getZip())) {
 			errors.rejectValue("zip", "user.zip.invalid", "Invalid Zip");
 		}
+		
+		if (!errors.hasFieldErrors("role") && !ContraintUtils.validateExternalRole(user.getRole())) {
+			errors.rejectValue("role", "user.role.invalid", "Invalid Role");
+		}
 	} 
 }
