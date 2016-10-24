@@ -83,7 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else if(role.contains("MANAGER")) {
             targetUrl = "/manager/details";
         } else if(role.contains("EMPLOYEE")) {
-            targetUrl = "/manager/details";
+            targetUrl = "/employee/details";
         } else if(role.contains("INDIVIDUAL")|role.contains("MERCHANT")) {
             targetUrl = "/user/details";
         }
