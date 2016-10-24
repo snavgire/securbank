@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
 			logger.info("Invalid request for new internal user");
 			return null;
 		}
-		
+
 		// Deactivates request
 		newUserRequest.setActive(false);
 		newUserRequestDao.update(newUserRequest);

@@ -1,12 +1,10 @@
 package securbank.services;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import securbank.models.Account;
-import securbank.models.Transaction;
 import javax.transaction.Transactional;
+
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +14,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import securbank.dao.AccountDao;
-import securbank.dao.AccountDaoImpl;
 import securbank.dao.TransactionDao;
 import securbank.dao.TransferDao;
+import securbank.models.Account;
+import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
 
