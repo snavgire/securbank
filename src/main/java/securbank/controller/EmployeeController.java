@@ -244,7 +244,7 @@ public class EmployeeController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getApprovalStatus())){
-			if(transactionService.isTransactionValid(transaction)==false){
+			if(transactionService.isTransactionValid(transaction)==false && transaction.getType().equals("DEBIT")){
 				return "redirect:/error?code=404&path=amount-invalid";
 			}
 			transactionService.approveTransaction(transaction);
@@ -305,7 +305,7 @@ public class EmployeeController {
 		}
 		
 		//give error if account does not exist
-		if (accountService.accountExists(transfer.getToAccount())) {
+		if (!accountService.accountExists(transfer.getToAccount())) {
 			logger.warn("TO account does not exist");	
 			return "redirect:/error?code=401&path=request-invalid";
 		}
