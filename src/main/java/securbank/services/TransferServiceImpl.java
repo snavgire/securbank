@@ -76,6 +76,12 @@ public class TransferServiceImpl implements TransferService{
 			return null;
 		}
 		
+		//accountTo and accountFrom should not have same email address
+		if(currentUser.getEmail().equalsIgnoreCase(transfer.getToAccount().getUser().getEmail())){
+			logger.info("Transfer to and from accounts are same");
+			return null;
+		}
+		
 		//get user's checking account
 		logger.info("Getting current user's checking account");
 		for (Account acc: currentUser.getAccounts()){
@@ -93,11 +99,30 @@ public class TransferServiceImpl implements TransferService{
 			return null;
 		}
 		
-		transfer.setToAccount(transfer.getToAccount());
+		//get user's checking account
+		logger.info("Getting ToAccount user's checking account");
+		User toUser = userService.getUserByEmail(transfer.getToAccount().getUser().getEmail());
+		for (Account acc: toUser.getAccounts()){
+			if (acc.getType().equalsIgnoreCase("checking")){
+				transfer.setToAccount(acc);
+			}
+		}
 		
+		//user types should be external
+		if(!"ROLE_INDIVIDUAL".equalsIgnoreCase(currentUser.getRole()) && !"ROLE_MERCHANT".equalsIgnoreCase(currentUser.getEmail())){
+			logger.info("Current user is not an external user");
+			return null;
+		}
+		
+		if(!"ROLE_INDIVIDUAL".equalsIgnoreCase(transfer.getToAccount().getUser().getRole()) && !"ROLE_MERCHANT".equalsIgnoreCase(transfer.getToAccount().getUser().getRole())){
+			logger.info("To account user is not an external user");
+			return null;
+		}
+
 		transfer.setStatus("Pending");
 		transfer.setActive(true);
 		transfer.setCreatedOn(LocalDateTime.now());
+		
 		transferDao.save(transfer);
 		logger.info("After transferDao save");
 		
@@ -271,14 +296,17 @@ public class TransferServiceImpl implements TransferService{
 		//check if transfer amount is valid
 		if(pendingAmount+transfer.getAmount() > transfer.getFromAccount().getBalance()){
 			logger.info("Invalid transfer: amount requested to be debitted is more than permitted");
-			return true;
+			return false;
 		}
 		
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isToAccountValid(Transfer transfer) {
+		if(userService.getUserByEmail(transfer.getToAccount().getUser().getEmail())!=null){
+			return true;
+		}
 		return false;
 	}
 
