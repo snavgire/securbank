@@ -278,7 +278,7 @@ public class CommonController {
 	
 	@PostMapping("/reactivate")
     public String reactivateSubmit(@ModelAttribute CreatePasswordRequest request, BindingResult binding) {
-		UUID token = (UUID) session.getAttribute("reactivation.verification");
+		UUID token = (UUID) session.getAttribute("reactivate.verification");
 		if (token == null) {
 			logger.info("POST request: Email for forgot password with invalid session token");
 			return "redirect:/error?code=400&path=bad-request";
@@ -286,7 +286,7 @@ public class CommonController {
 
 		// clears session
 		User user = verificationService.getUserByIdAndType(token, "lock");
-		session.removeAttribute("validation.token");
+		session.removeAttribute("reactivation.verification");
 		
 		// User user = userService.getUserByIdAndActive(token);
 		if(user==null){
@@ -303,14 +303,14 @@ public class CommonController {
 		createPasswordFormValidator.validate(request, binding);
 			if(binding.hasErrors()){
 				logger.info("POST request: createpassword form with validation errors");
-				return "reactive";
+				return "reactivate";
 			}
 		userService.verifyNewUser(user.getUserId());
 		if(forgotPasswordService.createUserPassword(user, request) != null){
 			return "redirect:/login";
 		}
+		
 		return "redirect:/error?code=500";
-
     }
 
 }

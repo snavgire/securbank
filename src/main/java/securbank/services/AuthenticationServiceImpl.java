@@ -72,16 +72,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			if(attempt.getCounter() == 3){
 				user.setActive(false);
 				
-				// Send email message
-				message = new SimpleMailMessage();
-				message.setText(env.getProperty("account.reactivate.body").replace(":id:",user.getUserId().toString()));
-				message.setSubject(env.getProperty("account.reactivate.subject"));
-				message.setTo(user.getEmail());
-				emailService.sendEmail(message);
 				
-				Verification verification = verificationService.createVerificationCodeByType(user, "lock");	
-				forgotPasswordService.sendEmailForgotPassword(verification);			
-				logger.info("POST request : Sending link to reset password and reactivate account.");
+				Verification verification = verificationService.createVerificationCodeByType(user, "lock");				
+				if (verification != null) {
+					// Send email message
+					message = new SimpleMailMessage();
+					message.setText(env.getProperty("account.reactivate.body").replace(":id:",verification.getVerificationId().toString()));
+					message.setSubject(env.getProperty("account.reactivate.subject"));
+					message.setTo(user.getEmail());
+					emailService.sendEmail(message);
+					logger.info("POST request : Sending link to reset password and reactivate account.");
+				}
 			}
 			user.setLoginAttempt(attempt);
 			userDao.update(user);

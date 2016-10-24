@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
 			logger.info("Invalid request for new internal user");
 			return null;
 		}
-		
+
 		LoginAttempt attempt = new LoginAttempt();
 		attempt.setLastUpdated(LocalDateTime.now());
 		attempt.setCounter(0);
