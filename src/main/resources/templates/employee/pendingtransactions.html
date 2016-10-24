@@ -69,14 +69,6 @@
   			</tr>
 			</thead>
 			<tbody class="searchable">
-        <tr>
-          <td>nloney</td>
-          <td>123456</td>
-          <td>335.87</td>
-          <td>Debit</td>
-          <td><a th:href="@{/employee/transactions/single}">View</a></td>
-        <!-- Uncomment when logic in place -->
-				<!-- <tr th:each="request : ${modificationrequests}">
         <tr th:each="transaction : ${transactions}">
   				<td th:text="${transaction.account.user.username}"></td>
   				<td th:text="${transaction.account.accountNumber}"></td>
@@ -84,8 +76,6 @@
   				<td th:text="${transaction.type}"></td>
   				<td><a th:href="@{/employee/transaction/{id}(id=${transaction.transactionId})}">View</a></td>
   			</tr>
-       -->
-      </tr>
 			</tbody>
 		</table>
 	</div>

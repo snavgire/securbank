@@ -70,15 +70,6 @@
   			</tr>
 			</thead>
 			<tbody class="searchable">
-        <tr>
-          <td>Nikhil</td>
-          <td>123456</td>
-          <td>Rahul</td>
-          <td>134567</td>
-          <td>335.87</td>
-          <td><a th:href="@{/employee/transfers/single}">View</a></td>
-        <!-- Uncomment when logic in place -->
-				<!-- <tr th:each="request : ${modificationrequests}">
         <tr th:each="transfer : ${transfers}">
           <td th:text="${transfer.fromAccount.user.username}"></td>
           <td th:text="${transfer.fromAccount.accountNumber}"></td>
@@ -86,8 +77,7 @@
           <td th:text="${transfer.toAccount.accountNumber}"></td>
           <td th:text="${transfer.amount}"></td>
           <td><a th:href="@{/employee/transfer/{id}(id=${transfer.transferId})}">View</a></td>
-				</tr> -->
-      </tr>
+				</tr>
 			</tbody>
 		</table>
 	</div>

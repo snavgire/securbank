@@ -25,30 +25,26 @@
 	</nav>
 
 	<div class="container">
-		<h3>Transfer 123456</h3>
+		<h3>Transfer Approval Page</h3>
 	</div>
 
-	<!-- <form action="#"
+	<form action="#"
 		th:action="@{/manager/transfer/request/{id}(id=${transfer.transferId})}"
-		th:object="${transfer}" method="post"> -->
-	<form class="form-horizontal" action="#">
+		th:object="${transfer}" method="post">
 	<div class="container">
 		<table class="table table-user-information">
 			<tbody>
 				<tr>
 					<td>From Account</td>
-					<td>13576</td>
-					<!-- <td th:text="${transfer.fromAccount.accountNumber}"></td> -->
+					<td th:text="${transfer.fromAccount.accountNumber}"></td>
 				</tr>
 				<tr>
 					<td>To Account</td>
-					<td>13576</td>
-					<!-- <td th:text="${transfer.toAccount.accountNumber}"></td> -->
+					<td th:text="${transfer.toAccount.accountNumber}"></td>
 				</tr>
 				<tr>
 					<td>Amount</td>
-					<td>$300</td>
-					<!-- <td th:text="${transfer.amount}"></td> -->
+					<td th:text="${transfer.amount}"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -56,19 +52,15 @@
 			<div class="col-md-4">
 				<div class="radio">
 					<label for="radios-0">
-						<input type="radio" name="radios" id="radios-0">
+						<input type="radio" name="radios" id="radios-0" th:field="*{status}" th:value="approved">
 						Approve</input>
-						<!-- <input type="radio" name="radios" id="radios-0" th:field="*{status}" th:value="approved">
-						Approve</input> -->
 					</label>
 				</div>
 				<div class="radio">
 					<label for="radios-1">
-						<input type="radio" name="radios" id="radios-1">
-						Reject</input>
-						<!-- <input type="radio" name="radios" id="radios-1" th:field="*{status}" th:value="rejected"
+						<input type="radio" name="radios" id="radios-1" th:field="*{status}" th:value="rejected"
 						th:checked="1">
-						Reject</input> -->
+						Reject</input>
 					</label>
 				</div>
 			</div>

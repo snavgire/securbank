@@ -25,35 +25,30 @@
 	</nav>
 
 	<div class="container">
-		<h3>Transaction 123456</h3>
+		<h3>Transaction Approval Page</h3>
 	</div>
 
-	<!-- <form action="#"
+	<form action="#"
 		th:action="@{/manager/transaction/request/{id}(id=${transaction.transactionId})}"
-		th:object="${transaction}" method="post"> -->
-	<form class="form-horizontal" action="#">
+		th:object="${transaction}" method="post">
 	<div class="container">
 		<table class="table table-user-information">
 			<tbody>
 				<tr>
 					<td>Username</td>
-					<td>13576</td>
-					<!-- <td th:text="${transaction.account.user.username}"></td> -->
+					<td th:text="${transaction.account.user.username}"></td>
 				</tr>
 				<tr>
 					<td>Account Number</td>
-					<td>13576</td>
-					<!-- <td th:text="${transaction.account.accountNumber}"></td> -->
+					<td th:text="${transaction.account.accountNumber}"></td>
 				</tr>
 				<tr>
 					<td>Amount</td>
-					<td>$300</td>
-					<!-- <td th:text="${transaction.amount}"></td> -->
+					<td th:text="${transaction.amount}"></td>
 				</tr>
 				<tr>
 					<td>Type</td>
-					<td>Debit</td>
-					<!-- <td th:text="${transaction.type}"></td> -->
+					<td th:text="${transaction.type}"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -61,19 +56,15 @@
 			<div class="col-md-4">
 				<div class="radio">
 					<label for="radios-0">
-						<input type="radio" name="radios" id="radios-0">
+						<input type="radio" name="radios" id="radios-0" th:field="*{approvalStatus}" th:value="approved">
 						Approve</input>
-						<!-- <input type="radio" name="radios" id="radios-0" th:field="*{approvalStatus}" th:value="approved">
-						Approve</input> -->
 					</label>
 				</div>
 				<div class="radio">
 					<label for="radios-1">
-						<input type="radio" name="radios" id="radios-1">
-						Reject</input>
-						<!-- <input type="radio" name="radios" id="radios-1" th:field="*{approvalStatus}" th:value="rejected"
+						<input type="radio" name="radios" id="radios-1" th:field="*{approvalStatus}" th:value="rejected"
 						th:checked="1">
-						Reject</input> -->
+						Reject</input>
 					</label>
 				</div>
 			</div>
