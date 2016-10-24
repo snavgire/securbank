@@ -9,6 +9,7 @@ import securbank.models.ModificationRequest;
 
 import securbank.models.NewUserRequest;
 import securbank.models.User;
+import securbank.models.LoginAttempt;
 
 /**
  * @author Ayush Gupta
@@ -38,5 +39,6 @@ public interface UserService {
 	public User getUserByUsernameOrEmail(String email);
 	public boolean verifyCurrentPassword(User user,String password);
 	public User changeUserPassword(User user, ChangePasswordRequest model);
+	public User getUserByEmail(String email);
 }
 
