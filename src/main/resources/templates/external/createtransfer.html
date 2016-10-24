@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+        <title>Create New Transfer Request</title>
+    </head>
+    <body>
+        <form action="#" th:action="@{/user/createtransfer}" th:object="${transfer}" method="post">
+   		 <p>
+        	To: <input type="text" th:field="*{toAccount.user.email}" /> </p>
+        	<p th:if="${#fields.hasErrors('toAccount.user.email')}" th:errors="*{toAccount.user.email}"></p> 
+        <p>
+        	Amount: <input type="text" th:field="*{amount}" /> </p>
+        	<p th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Amount Error</p>
+        	
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset"/></p>
+    </form>
+    </body>
+</html>

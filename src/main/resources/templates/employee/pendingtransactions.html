@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <title>Pending Transactions</title>
+    </head>
+	<body>
+		<table>
+			<tr>
+				<td>Username</td>
+				<td>Account Number</td>
+				<td>Amount</td>
+				<td>Type</td>
+				<td>View</td>
+			</tr>
+			<tr th:each="transaction : ${transactions}">
+				<td th:text="${transaction.account.user.username}"></td>
+				<td th:text="${transaction.account.accountNumber}"></td>
+				<td th:text="${transaction.amount}"></td>
+				<td th:text="${transaction.type}"></td>
+				<td><a th:href="@{/employee/transaction/{id}(id=${transaction.transactionId})}">View</a></td>
+			</tr>
+		</table>
+	</body>
+</html>
