@@ -53,6 +53,9 @@ public class TransferServiceImpl implements TransferService{
 	private EmailService emailService;
 	
 	@Autowired
+	OtpService otpService;
+	
+	@Autowired
 	private Environment env;
 	
 	private SimpleMailMessage message;
@@ -88,6 +91,12 @@ public class TransferServiceImpl implements TransferService{
 			if (acc.getType().equalsIgnoreCase("checking")){
 				transfer.setFromAccount(acc);
 			}
+		}
+		
+		//check otp
+		if(!transfer.getOtp().equals(otpService.getOtpByUser(transfer.getFromAccount().getUser()).getCode())){
+			logger.info("Otp mismatch");
+			return null;
 		}
 		
 		if(isTransferValid(transfer)==false){

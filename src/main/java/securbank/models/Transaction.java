@@ -1,6 +1,5 @@
 package securbank.models;
 
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -11,10 +10,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.joda.time.LocalDateTime;
@@ -84,32 +82,37 @@ public class Transaction {
 	@Column(name = "active", nullable = false, columnDefinition = "BIT")
 	private Boolean active;
 	
+	@Transient
+	@Column(name = "otp")
+	private String otp;
+	
 	public Transaction(){
 		
 	}
 	
+	
+	
 	/**
 	 * @param transactionId
-	 * @param accountNumber
+	 * @param account
 	 * @param amount
 	 * @param type
 	 * @param approvalStatus
 	 * @param oldBalance
 	 * @param newBalance
 	 * @param criticalStatus
-	 * @param transferId
+	 * @param transfer
 	 * @param createdOn
 	 * @param modifiedOn
 	 * @param modifiedBy
 	 * @param active
+	 * @param otp
 	 */
-	public Transaction(UUID transactionId, Account accountNumber, double amount, 
-			String type, String approvalStatus, double oldBalance, double newBalance, Boolean criticalStatus, 
-			Transfer transfer, LocalDateTime createdOn, LocalDateTime modifiedOn, 
-			User modifiedBy, Boolean active){
-		super();
+	public Transaction(UUID transactionId, Account account, double amount, String type, String approvalStatus,
+			double oldBalance, double newBalance, boolean criticalStatus, Transfer transfer, LocalDateTime createdOn,
+			LocalDateTime modifiedOn, User modifiedBy, Boolean active, String otp) {
 		this.transactionId = transactionId;
-		this.account = accountNumber;
+		this.account = account;
 		this.amount = amount;
 		this.type = type;
 		this.approvalStatus = approvalStatus;
@@ -121,10 +124,11 @@ public class Transaction {
 		this.modifiedOn = modifiedOn;
 		this.modifiedBy = modifiedBy;
 		this.active = active;
-		
+		this.otp = otp;
 	}
 
-	
+
+
 	/**
 	 * @return the transfer
 	 */
@@ -340,15 +344,30 @@ public class Transaction {
 	}
 
 
+	/**
+	 * @return the otp
+	 */
+	public String getOtp() {
+		return otp;
+	}
+
+	/**
+	 * @param otp the otp to set
+	 */
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "Transaction [transactionId=" + transactionId + ", account=" + account + ", amount=" + amount
-				+ ", type=" + type + ", oldBalance=" + oldBalance + ", newBalance=" + newBalance + ", criticalStatus="
-				+ criticalStatus + ", transfer=" + transfer + ", createdOn=" + createdOn + "]";
+		return "Transaction [transactionId=" + transactionId + ", account=" + account + ", amount=" + amount + ", type="
+				+ type + ", approvalStatus=" + approvalStatus + ", oldBalance=" + oldBalance + ", newBalance="
+				+ newBalance + ", criticalStatus=" + criticalStatus + ", transfer=" + transfer + ", createdOn="
+				+ createdOn + ", modifiedOn=" + modifiedOn + ", modifiedBy=" + modifiedBy + ", active=" + active
+				+ ", otp=" + otp + "]";
 	}
-
 
 }

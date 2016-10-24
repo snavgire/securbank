@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
+import securbank.services.OtpService;
 import securbank.services.TransactionService;
 import securbank.services.TransferService;
 import securbank.services.UserService;
@@ -57,6 +58,9 @@ public class ExternalUserController {
 	@Autowired 
 	EditUserFormValidator editUserFormValidator;
 	
+	@Autowired
+	OtpService otpService;
+	
 	final static Logger logger = LoggerFactory.getLogger(ExternalUserController.class);
 
 	@GetMapping("/user/details")
@@ -80,6 +84,16 @@ public class ExternalUserController {
 		return "external/createtransaction";
 	}
 	
+	@GetMapping("/user/transaction/otp")
+	public String createTransactionOtp(Model model){
+		model.addAttribute("transaction", new Transaction());
+		logger.info("GET request: Extrernal user transaction generate OTP");
+		User currentUser = userService.getCurrentUser();
+		otpService.createOtpForUser(currentUser);
+		
+		return "redirect:/user/createtransaction";
+	}
+	
 	@PostMapping("/user/createtransaction")
     public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
 		logger.info("POST request: Submit transaction");
@@ -88,19 +102,22 @@ public class ExternalUserController {
 		
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransaction form with validation errors");
-			return "external/createtransaction";
+			return "redirect:/error?code=400&path=transaction-error";
 		}
 		
 		if(transaction.getType().contentEquals("CREDIT")){
 			if (transactionService.initiateCredit(transaction) == null) {
-				return "redirect:/";
+				return "redirect:/error?code=400&path=transaction-error";
 			}
 		}
 		else {
 			if (transactionService.initiateDebit(transaction) == null) {
-				return "redirect:/";
+				return "redirect:/error?code=400&path=transaction-error";
 			}
 		}
+		
+		//deactivate current otp
+		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
 		return "redirect:/user/createtransaction";
     }
@@ -109,7 +126,18 @@ public class ExternalUserController {
 	public String newTransferForm(Model model){
 		model.addAttribute("transfer", new Transfer());
 		logger.info("GET request: Extrernal user transfer creation request");
+		
 		return "external/createtransfer";
+	}
+
+	@GetMapping("/user/transfer/otp")
+	public String createTransferOtp(Model model){
+		model.addAttribute("transfer", new Transfer());
+		logger.info("GET request: Extrernal user transfer generate OTP");
+		User currentUser = userService.getCurrentUser();
+		otpService.createOtpForUser(currentUser);
+		
+		return "redirect:/user/createtransfer";
 	}
 	
 	@PostMapping("user/createtransfer")
@@ -120,12 +148,15 @@ public class ExternalUserController {
 		
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransfer form with validation errors");
-			return "external/createtransfer";
+			return "redirect:/error?code=400&path=transfer-error";
 		}
 		
 		if(transferService.initiateTransfer(transfer)==null){
-			return "redirect:/";
+			return "redirect:/error?code=400&path=transfer-error";
 		}
+		
+		//deactivate current otp
+		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
 		return "redirect:/user/createtransfer";
 	}
