@@ -611,6 +611,25 @@ public class UserServiceImpl implements UserService {
 		modificationRequestDao.remove(request);
 		return;
 	}
+
+	/* (non-Javadoc)
+	 * @see securbank.services.UserService#getUserByUsernameOrEmail(java.lang.String)
+	 */
+	@Override
+	public User getUserByUsernameOrEmail(String email) {
+		return userDao.findByUsernameOrEmail(email);
+	}
+
+	/* (non-Javadoc)
+	 * @see securbank.services.UserService#getModificationRequestsByUsers(java.lang.String, java.lang.String, securbank.models.User)
+	 */
+	@Override
+	public List<ModificationRequest> getModificationRequestsByUsers(String status, String type, List<User> users) {
+		logger.info("Getting all modification request by user type, status of request and users");
+		
+		return modificationRequestDao.findAllbyStatusAndUserTypeAndUsers(status, type, users);
+
+	}
 	
 	@Override
 	public boolean verifyCurrentPassword(User user, String password) {
