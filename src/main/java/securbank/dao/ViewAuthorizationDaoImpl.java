@@ -57,5 +57,9 @@ public class ViewAuthorizationDaoImpl extends BaseDaoImpl<ViewAuthorization, UUI
 				.setParameter("user", user)
 				.getResultList();
 	}
-
+	
+	public List<ViewAuthorization> findAllByInactive() {
+		return this.entityManager.createQuery("SELECT auth from ViewAuthorization auth where auth.active = false", ViewAuthorization.class)
+				.getResultList();
+	}
 }

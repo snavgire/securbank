@@ -100,4 +100,8 @@ public class ViewAuthorizationServiceImpl implements ViewAuthorizationService {
 	public List<ViewAuthorization> getPendingAuthorization(User user) {
 		return viewAuthorizationDao.findInactiveByExternal(user);
 	}
+	
+	public List<ViewAuthorization> getPendingAuthorization() {
+		return viewAuthorizationDao.findAllByInactive();
+	}
 }

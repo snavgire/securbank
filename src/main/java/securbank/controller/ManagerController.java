@@ -323,7 +323,7 @@ public class ManagerController {
         return "redirect:/manager/user/request";
     }
 	
-	@GetMapping("/manager/authorize")
+	@GetMapping("/manager/employee/authorize")
     public String authorizeUser(@RequestParam(value="success", required=false) Boolean success, Model model) {
 		ViewAuthorization authorization = new ViewAuthorization();
 		authorization.setEmployee(new User());
@@ -340,7 +340,7 @@ public class ManagerController {
         return "manager/requestaccess";
     }
 	
-	@PostMapping("/manager/authorize")
+	@PostMapping("/manager/employee/authorize")
     public String authorizeUser(@ModelAttribute("viewrequest") ViewAuthorization request, BindingResult bindingResult) {
 		User external = userService.getUserByUsernameOrEmail(request.getExternal().getEmail());
 		User employee = userService.getUserByUsernameOrEmail(request.getEmployee().getEmail());
@@ -353,6 +353,55 @@ public class ManagerController {
 		viewAuthorizationService.createAuthorization(employee, external, true);
 		logger.info("POST request: Manager authorizes user");
 		
-        return "redirect:/manager/authorize?success=true";
+        return "redirect:/manager/employee/authorize?success=true";
+    }
+	
+	@GetMapping("/manager/employee/request")
+    public String getRequest(Model model) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error";
+		}
+		
+		model.addAttribute("viewrequests", viewAuthorizationService.getPendingAuthorization());
+		
+        return "manager/accessrequests";
+    }
+	
+	@GetMapping("/manager/employee/request/view/{id}")
+    public String getRequest(@PathVariable UUID id, Model model) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		
+		ViewAuthorization authorization = viewAuthorizationService.getAuthorizationById(id);
+		if (authorization == null) {
+			return "redirect:/error?code=404";
+		}
+		model.addAttribute("viewrequest", authorization);
+		
+        return "manager/accessrequest_detail";
+    }
+	
+	@PostMapping("/manager/employee/request/{id}")
+    public String getRequests(@PathVariable UUID id, @ModelAttribute ViewAuthorization request, BindingResult bindingResult) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		String status = request.getStatus();
+		if (status == null || !(status.equals("approved") || status.equals("rejected"))) {
+			return "redirect:/error?code=400";
+		}
+		
+		ViewAuthorization authorization = viewAuthorizationService.getAuthorizationById(id);
+		if (authorization == null) {
+			return "redirect:/error?code=404";
+		}
+		authorization.setStatus(status);
+		authorization = viewAuthorizationService.approveAuthorization(authorization);
+		
+        return "redirect:/manager/employee/request";
     }
 }

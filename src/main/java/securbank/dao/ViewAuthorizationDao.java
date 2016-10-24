@@ -10,4 +10,5 @@ public interface ViewAuthorizationDao extends BaseDao<ViewAuthorization, UUID> {
 	public List<User> findByEmployee(User user);
 	public ViewAuthorization findByEmployeeAndExternal(User employee, User external);
 	public List<ViewAuthorization> findInactiveByExternal(User user);
+	public List<ViewAuthorization> findAllByInactive();
 }

@@ -120,7 +120,7 @@ public class ExternalUserController {
 		}
 		String status = request.getStatus();
 		if (status == null || !(status.equals("approved") || status.equals("rejected"))) {
-			bindingResult.rejectValue("status", "status.invalid", "Invalid Action");
+			return "redirect:/error?code=400";
 		}
 		
 		ViewAuthorization authorization = viewAuthorizationService.getAuthorizationById(id);

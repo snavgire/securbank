@@ -20,4 +20,5 @@ public interface ViewAuthorizationService {
 	public ViewAuthorization approveAuthorization(ViewAuthorization authorization);
 	public ViewAuthorization getAuthorizationById(UUID id);
 	public List<ViewAuthorization> getPendingAuthorization(User user);
+	public List<ViewAuthorization> getPendingAuthorization();
 }
