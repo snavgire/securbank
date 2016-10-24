@@ -25,8 +25,8 @@ public class ContraintUtils {
 	private static final String AMOUNT_PATTERN = "^[0-9]+(\\.[0-9]+)?$";
 	private static final String ACCOUNT_PATTERN = "[0-9]+";
 
-	private static final String INTERNAL_ROLES = "[ROLE_MANAGER|ROLE_EMPLOYEE|ROLE_ADMIN]";
-	private static final String EXTERNAL_ROLES = "[ROLE_INDIVIDUAL|ROLE_MERCHANT]";
+	private static final String INTERNAL_ROLES = "ROLE_MANAGER|ROLE_EMPLOYEE|ROLE_ADMIN";
+	private static final String EXTERNAL_ROLES = "ROLE_INDIVIDUAL|ROLE_MERCHANT";
 
 	
 	/**
