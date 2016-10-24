@@ -119,11 +119,10 @@ public class ContraintUtils {
 	 * @return boolean
 	 */
 	public static boolean validateTransactionAmount(String transactionAmount){
-//		pattern = Pattern.compile(AMOUNT_PATTERN);
-//		matcher = pattern.matcher(transactionAmount);
-//		
-//		return matcher.matches();
-		return true;
+		pattern = Pattern.compile(AMOUNT_PATTERN);
+		matcher = pattern.matcher(transactionAmount);
+		
+		return matcher.matches();
 	}
 	
 	/**
@@ -133,9 +132,9 @@ public class ContraintUtils {
 	 * 		Validates the account for transfer
 	 * @return boolean
 	 */
-	public static boolean validateTransferToAccount(String transferAccountNumber){
-		pattern = Pattern.compile(ACCOUNT_PATTERN);
-		matcher = pattern.matcher(transferAccountNumber);
+	public static boolean validateTransferToAccount(String transferAccountEmail){
+		pattern = Pattern.compile(EMAIL_PATTERN);
+		matcher = pattern.matcher(transferAccountEmail);
 		
 		return matcher.matches();
 	}

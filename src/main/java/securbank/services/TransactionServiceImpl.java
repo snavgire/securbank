@@ -82,21 +82,7 @@ public class TransactionServiceImpl implements TransactionService{
 		}
 		
 		//check if debit transaction is valid
-		Account account = transaction.getAccount();
-		Double pendingAmount = 0.0;
-		
-		//in Transaction model
-		for(Transaction trans: transactionDao.findPendingByAccountAndType(account, "DEBIT")){
-			pendingAmount += trans.getAmount();
-		}	
-		
-		//check for pending transfer amounts
-		for(Transfer transf: transferDao.findPendingTransferByFromAccount(account)){
-			pendingAmount += transf.getAmount();
-		}
-		
-		if(pendingAmount+transaction.getAmount() > transaction.getAccount().getBalance()){
-			logger.info("Invalid Debit transaction: amount requested is more than permitted");
+		if(isTransactionValid(transaction) == false){
 			return null;
 		}
 		
@@ -240,7 +226,6 @@ public class TransactionServiceImpl implements TransactionService{
 		Account fromAccount = transfer.getFromAccount();
 		
 		//initiate transaction for credit in toAccount and approve
-		//Transaction transaction = new Transaction();
 		Transaction transactionFrom = new Transaction();
 		Transaction transactionTo = new Transaction();
 		
@@ -431,6 +416,29 @@ public class TransactionServiceImpl implements TransactionService{
 		logger.info("Getting transaction by id");
 		
 		return transaction;
+	}
+
+	@Override
+	public boolean isTransactionValid(Transaction transaction) {
+		Account account = transaction.getAccount();
+		Double pendingAmount = 0.0;
+		
+		//in Transaction model
+		for(Transaction trans: transactionDao.findPendingByAccountAndType(account, "DEBIT")){
+			pendingAmount += trans.getAmount();
+		}	
+		
+		//check for pending transfer amounts
+		for(Transfer transf: transferDao.findPendingTransferByFromAccount(account)){
+			pendingAmount += transf.getAmount();
+		}
+		
+		if(pendingAmount+transaction.getAmount() > transaction.getAccount().getBalance()){
+			logger.info("Invalid transaction: amount requested is more than permitted");
+			return true;
+		}
+		
+		return false;
 	}
 
 

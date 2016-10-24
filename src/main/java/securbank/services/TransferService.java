@@ -18,4 +18,6 @@ public interface TransferService {
 	public List<Transfer> getTransfersByStatus(String approvalStatus);
 	public Transfer getTransferById(UUID id);
 	public Transfer getPendingTransfernByAccountNumber(Long accountNumber);
+	public boolean isTransferValid(Transfer transfer);
+	public boolean isToAccountValid(Transfer transfer);
 }

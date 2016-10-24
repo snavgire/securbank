@@ -72,9 +72,9 @@ public class Transfer {
 	@Column(name = "modifiedOn", nullable = true, updatable = true)
 	private LocalDateTime modifiedOn;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@Column(name = "userId", nullable = true, updatable = true)
-	private Set<User> modifiedBy = new HashSet<User>(0);
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "userId", nullable = true)
+	private User modifiedBy;
 
 	@NotNull
 	@Column(name = "active", nullable = false, columnDefinition = "BIT")
@@ -100,7 +100,7 @@ public class Transfer {
 	 * @param transactions
 	 */
 	public Transfer(UUID transferId, Account fromAccount, Account toAccountNumber, double amount, String status,
-			LocalDateTime createdOn, LocalDateTime modifiedOn, Set<User> modifiedBy, Boolean active,
+			LocalDateTime createdOn, LocalDateTime modifiedOn, User modifiedBy, Boolean active,
 			Set<Transaction> transactions) {
 		this.transferId = transferId;
 		this.fromAccount = fromAccount;
@@ -168,7 +168,7 @@ public class Transfer {
 	/**
 	 * @return the modifiedBy
 	 */
-	public Set<User> getModifiedBy() {
+	public User getModifiedBy() {
 		return modifiedBy;
 	}
 
@@ -239,7 +239,7 @@ public class Transfer {
 	/**
 	 * @param modifiedBy the modifiedBy to set
 	 */
-	public void setModifiedBy(Set<User> modifiedBy) {
+	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
 

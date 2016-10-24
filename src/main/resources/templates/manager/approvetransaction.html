@@ -11,7 +11,7 @@
 		th:object="${transaction}" method="post">
 			<td th:text="${transaction.account.user.username}"></td>
 			<td th:text="${transaction.account.accountNumber}"></td>
-			<td th:text="${transaction.amount}"></td>
+			<td> <input type="text" th:field="*{transaction.amount}" /></td>
 			<td th:text="${transaction.type}"></td>
 			<td> <input type="radio" th:field="*{approvalStatus}" th:value="approved">Approve</input> </td>
 			<td> <input type="radio" th:field="*{approvalStatus}" th:value="rejected" th:checked="1">Reject</input> </td>

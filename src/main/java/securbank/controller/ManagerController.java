@@ -249,6 +249,9 @@ public class ManagerController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getApprovalStatus())){
+			if(transactionService.isTransactionValid(transaction)==false){
+				return "redirect:/error?code=404&path=amount-invalid";
+			}
 			transactionService.approveTransaction(transaction);
 		}
 		else if ("rejected".equalsIgnoreCase(trans.getApprovalStatus())) {
@@ -257,7 +260,7 @@ public class ManagerController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "redirect:manager/pendingtransactions";
+        return "redirect:/manager/transactions";
     }
 			
 	@GetMapping("/manager/user/edit/{id}")
@@ -343,7 +346,7 @@ public class ManagerController {
 		}
 		
 		//give error if account does not exist
-		if (accountService.accountExists(transfer.getToAccount().getAccountNumber())) {
+		if (accountService.accountExists(transfer.getToAccount())) {
 			logger.warn("TO account does not exist");	
 			return "redirect:/error?code=401&path=request-invalid";
 		}
@@ -359,8 +362,12 @@ public class ManagerController {
 					
 			return "redirect:/error?code=401&path=request-unauthorised";
 		}
-		
+
 		if("approved".equalsIgnoreCase(trans.getStatus())){
+			//check if transfer is valid in case modified
+			if(transferService.isTransferValid(transfer)==false){
+				return "redirect:/error?code=401&path=amount-invalid";
+			}
 			transferService.approveTransfer(transfer);
 		}
 		else if ("rejected".equalsIgnoreCase(trans.getStatus())) {
@@ -369,7 +376,7 @@ public class ManagerController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "manager/pendingtransfers";
+        return "redirect:/manager/transfers";
     }
 	
 	@GetMapping("/manager/transfer/{id}")

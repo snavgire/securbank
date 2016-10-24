@@ -37,8 +37,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public boolean accountExists(Long accountNumber) {
-		
-		return false;
+	public boolean accountExists(Account account) {
+		return accountDao.accountExists(account);
 	}
 }

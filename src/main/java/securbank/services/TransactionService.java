@@ -24,4 +24,5 @@ public interface TransactionService {
 	public Transaction getTransactionById(UUID id);
 	public Transaction getPendingTransactionByAccountNumber(Long accountNumber);
 	public Transaction approveTransactionFromTransfer(Transaction transaction);
+	public boolean isTransactionValid(Transaction transaction);
 }

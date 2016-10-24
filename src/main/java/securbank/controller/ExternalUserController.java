@@ -80,14 +80,15 @@ public class ExternalUserController {
 		return "external/createtransaction";
 	}
 	
-	@PostMapping("/user/createtransation")
+	@PostMapping("/user/createtransaction")
     public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
 		logger.info("POST request: Submit transaction");
 		
 		transactionFormValidator.validate(transaction, bindingResult);
 		
 		if(bindingResult.hasErrors()){
-			return "redirect:/";
+			logger.info("POST request: createtransaction form with validation errors");
+			return "external/createtransaction";
 		}
 		
 		if(transaction.getType().contentEquals("CREDIT")){
@@ -113,13 +114,14 @@ public class ExternalUserController {
 	
 	@PostMapping("user/createtransfer")
     public String submitNewTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) {
-		logger.info("POST request: Submit transaction");
+		logger.info("POST request: Submit transfer");
 		
 		transferFormValidator.validate(transfer, bindingResult);
 		
-		/*if(bindingResult.hasErrors()){
-			return "redirect:/";
-		}*/
+		if(bindingResult.hasErrors()){
+			logger.info("POST request: createtransfer form with validation errors");
+			return "external/createtransfer";
+		}
 		
 		if(transferService.initiateTransfer(transfer)==null){
 			return "redirect:/";

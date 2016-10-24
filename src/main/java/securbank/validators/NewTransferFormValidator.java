@@ -47,7 +47,7 @@ public class NewTransferFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "toAccount", "transfer.toAccount.required", "Transaction account is required");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "amount", "transaction.amount.required", "Transaction amount is required");
 		
-		if (!errors.hasFieldErrors("toAccount") && !ContraintUtils.validateTransferToAccount(Long.toString(transfer.getToAccount().getAccountNumber()))) {
+		if (!errors.hasFieldErrors("toAccount") && !ContraintUtils.validateTransferToAccount(transfer.getToAccount().getUser().getEmail())) {
 				errors.rejectValue("toAccount", "transaction.toAccount.invalid", "Invalid Account Number");
 		}
 		

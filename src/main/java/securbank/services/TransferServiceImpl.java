@@ -84,27 +84,17 @@ public class TransferServiceImpl implements TransferService{
 			}
 		}
 		
-		Account account = transfer.getFromAccount();
-		Double pendingAmount = 0.0;
-		
-		//check for pending transfer amounts
-		for(Transfer transf: transferDao.findPendingTransferByFromAccount(account)){
-			pendingAmount += transf.getAmount();
-		}	
-		
-		//check for pending transaction amounts
-		for(Transaction trans: transactionDao.findPendingByAccountAndType(account, "DEBIT")){
-			pendingAmount += trans.getAmount();
-		}
-		
-		//check if transfer amount is valid
-		if(pendingAmount+transfer.getAmount() > transfer.getFromAccount().getBalance()){
-			logger.info("Invalid Debit transaction: amount requested is more than permitted");
+		if(isTransferValid(transfer)==false){
 			return null;
 		}
 		
-		//remove this
-		transfer.setToAccount(account);
+		//check if account exists and is active
+		if(isToAccountValid(transfer)==false){
+			return null;
+		}
+		
+		transfer.setToAccount(transfer.getToAccount());
+		
 		transfer.setStatus("Pending");
 		transfer.setActive(true);
 		transfer.setCreatedOn(LocalDateTime.now());
@@ -154,6 +144,7 @@ public class TransferServiceImpl implements TransferService{
 		}
 		
 		transfer.setStatus("Approved");
+		transfer.setModifiedBy(currentUser);
 		
 		//call transaction Service to create new approved debit and credit transactions
 		transactionService.approveTransfer(transfer);
@@ -260,6 +251,35 @@ public class TransferServiceImpl implements TransferService{
 	public Transfer getPendingTransfernByAccountNumber(Long accountNumber) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean isTransferValid(Transfer transfer) {
+		Account account = transfer.getFromAccount();
+		Double pendingAmount = 0.0;
+		
+		//check for pending transfer amounts
+		for(Transfer transf: transferDao.findPendingTransferByFromAccount(account)){
+			pendingAmount += transf.getAmount();
+		}	
+				
+		//check for pending transaction amounts
+		for(Transaction trans: transactionDao.findPendingByAccountAndType(account, "DEBIT")){
+			pendingAmount += trans.getAmount();
+		}
+				
+		//check if transfer amount is valid
+		if(pendingAmount+transfer.getAmount() > transfer.getFromAccount().getBalance()){
+			logger.info("Invalid transfer: amount requested to be debitted is more than permitted");
+			return true;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean isToAccountValid(Transfer transfer) {
+		return false;
 	}
 
 }

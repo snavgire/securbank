@@ -50,10 +50,19 @@ public class AccountDaoImpl extends BaseDaoImpl<Account, UUID> implements Accoun
 				.getSingleResult() != 0;
 	}
 
+	
+	
 	@Override
 	public boolean updateBalance() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean accountExists(Account account) {
+		return this.entityManager.createQuery("SELECT COUNT(account) from Account account where (account.accountNumber = :accountNumber)", Long.class)
+				.setParameter("accountNumber", account.getAccountNumber())
+				.getSingleResult() != 0;
 	}
 	
 }

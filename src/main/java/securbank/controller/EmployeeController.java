@@ -244,6 +244,9 @@ public class EmployeeController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getApprovalStatus())){
+			if(transactionService.isTransactionValid(transaction)==false){
+				return "redirect:/error?code=404&path=amount-invalid";
+			}
 			transactionService.approveTransaction(transaction);
 		}
 		else if ("rejected".equalsIgnoreCase(trans.getApprovalStatus())) {
@@ -252,7 +255,7 @@ public class EmployeeController {
 		
 		logger.info("GET request: Employee approve/decline external transaction requests");
 		
-        return "employee/pendingtransactions";
+        return "redirect:/employee/transactions";
     }
 	
 	@GetMapping("/employee/transfers")
@@ -302,7 +305,7 @@ public class EmployeeController {
 		}
 		
 		//give error if account does not exist
-		if (accountService.accountExists(transfer.getToAccount().getAccountNumber())) {
+		if (accountService.accountExists(transfer.getToAccount())) {
 			logger.warn("TO account does not exist");	
 			return "redirect:/error?code=401&path=request-invalid";
 		}
@@ -320,6 +323,9 @@ public class EmployeeController {
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getStatus())){
+			if(transferService.isTransferValid(transfer)==false){
+				return "redirect:/error?code=404&path=amount-invalid";
+			}
 			transferService.approveTransfer(transfer);
 		}
 		else if ("rejected".equalsIgnoreCase(trans.getStatus())) {
@@ -328,6 +334,6 @@ public class EmployeeController {
 		
 		logger.info("GET request: Employee approve/decline external transaction requests");
 		
-        return "employee/pendingtransfers";
+        return "redirect:/employee/transfers";
     }
 }
