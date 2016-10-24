@@ -28,7 +28,7 @@
 		<h3>Transaction Approval Page</h3>
 	</div>
 
-	<form action="#"
+	<form class="form-horizontal" action="#"
 		th:action="@{/manager/transaction/request/{id}(id=${transaction.transactionId})}"
 		th:object="${transaction}" method="post">
 	<div class="container">

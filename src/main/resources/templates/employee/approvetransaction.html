@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+class=form-horizontal <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
@@ -28,7 +28,7 @@
 		<h3>Transaction Approval page</h3>
 	</div>
 
-	<form action="#"
+	<form class="form-horizontal" action="#"
 		th:action="@{/employee/transaction/request/{id}(id=${transaction.transactionId})}"
 		th:object="${transaction}" method="post">
 	<div class="container">

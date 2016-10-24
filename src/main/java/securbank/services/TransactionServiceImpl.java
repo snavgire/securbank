@@ -435,10 +435,10 @@ public class TransactionServiceImpl implements TransactionService{
 		
 		if(pendingAmount+transaction.getAmount() > transaction.getAccount().getBalance()){
 			logger.info("Invalid transaction: amount requested is more than permitted");
-			return true;
+			return false;
 		}
 		
-		return false;
+		return true;
 	}
 
 

@@ -58,7 +58,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
           <div class="input-group col-xs-2">
             <span class="input-group-addon">$</span>
             <input id="textinput" name="textinput" type="text" placeholder=""
-							class="form-control input-md" required="" />
+							class="form-control input-md" required="" th:field="*{amount}"/>
           </div>
           <div class="alert alert-danger"
           th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>

@@ -36,5 +36,6 @@ public interface UserService {
 	public void deleteModificationRequest(ModificationRequest request);
 	public boolean verifyCurrentPassword(User user,String password);
 	public User changeUserPassword(User user, ChangePasswordRequest model);
+	public User getUserByEmail(String email);
 }
 

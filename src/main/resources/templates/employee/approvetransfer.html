@@ -29,7 +29,7 @@
 		<h3>Transfer Approval page</h3>
 	</div>
 
-	<form action="#"
+	<form class="form-horizontal" action="#"
 		th:action="@{/employee/transfer/request/{id}(id=${transfer.transferId})}"
 		th:object="${transfer}" method="post">
 	<div class="container">
