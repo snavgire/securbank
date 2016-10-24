@@ -102,7 +102,7 @@ public class ExternalUserController {
 			}
 		}
 		
-		return "external/createtransaction";
+		return "redirect:/user/createtransaction";
     }
 	
 	@GetMapping("/user/createtransfer")
