@@ -4,9 +4,6 @@ import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationTrustResolver;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,7 +80,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else if(role.contains("MANAGER")) {
             targetUrl = "/manager/details";
         } else if(role.contains("EMPLOYEE")) {
-            targetUrl = "/manager/details";
+            targetUrl = "/employee/details";
         } else if(role.contains("INDIVIDUAL")|role.contains("MERCHANT")) {
             targetUrl = "/user/details";
         }

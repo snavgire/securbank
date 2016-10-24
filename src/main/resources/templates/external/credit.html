@@ -3,8 +3,6 @@
 xmlns:th="http://www.thymeleaf.org"
 xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-        <title>Create New Transaction Request</title>
-    </head>
   <title>Transactions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet"
@@ -36,15 +34,14 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
   <div class="container" style="margin-top:40px;">
     <ul class="nav nav-pills" style="text-align:center">
-      <li role="presentation" style="float:none;display:inline-block"><a th:href="@{/user/createtransfer}">Transfer Funds</a></li>
+      <li role="presentation" style="float:none;display:inline-block"><a th:href="@{/user/transaction}">Transfer Funds</a></li>
       <li role="presentation" class="active" style="float:none;display:inline-block"><a href="#">Credit/Debit</a></li>
     </ul>
   </div>
 
   <div class="container" style="margin-top:15px;">
-    <form class="form-horizontal" action="#" th:action="@{/user/createtransaction}" th:object="${transaction}" method="post">
+    <form action="#" th:action="@{/user/createtransaction}" th:object="${transaction}" method="post">
       <fieldset>
-   		<p> Please generate your OTP before you proceed with the transaction </p>
 
         <div class="form-group">
           <label class="col-xs-5 control-label" for="selectbasic">Type</label>
@@ -67,10 +64,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
           <div class="alert alert-danger"
           th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
         </div>
-	<p><a th:href="@{/user/transaction/otp}">Generate OTP</a></p>
-        <p>
-        	OTP: <input type="text" th:field="*{otp}" /> </p>
- 
+
       <!-- Button -->
       <div class="form-group">
         <label class="col-md-5 control-label" for="submitbutton"></label>
