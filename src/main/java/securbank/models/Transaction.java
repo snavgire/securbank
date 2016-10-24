@@ -1,6 +1,5 @@
 package securbank.models;
 
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -11,10 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.joda.time.LocalDateTime;
