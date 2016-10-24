@@ -85,12 +85,6 @@ public class TransactionServiceImpl implements TransactionService{
 			return null;
 		}
 		
-		//check otp
-		if(!transaction.getOtp().equals(otpService.getOtpByUser(transaction.getAccount().getUser()).getCode())){
-			logger.info("Otp mismatch");
-			return null;
-		}
-		
 		transaction.setApprovalStatus("Pending");
 		if (transaction.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
 			transaction.setCriticalStatus(true);
@@ -138,11 +132,6 @@ public class TransactionServiceImpl implements TransactionService{
 			}
 		}
 		
-		//check otp
-		if(!transaction.getOtp().equals(otpService.getOtpByUser(transaction.getAccount().getUser()).getCode())){
-			logger.info("Otp mismatch");
-			return null;
-		}
 		
 		transaction.setApprovalStatus("Pending");
 		if (transaction.getAmount() > Double.parseDouble(env.getProperty("critical.amount"))) {
@@ -246,6 +235,7 @@ public class TransactionServiceImpl implements TransactionService{
 		transactionTo.setActive(true);
 		transactionTo.setApprovalStatus("Pending");
 		transactionTo.setType("CREDIT");
+		transactionTo.setTransfer(transfer);
 		transactionTo = initiateCredit(transactionTo);
 		approveTransactionFromTransfer(transactionTo);
 		
@@ -255,6 +245,7 @@ public class TransactionServiceImpl implements TransactionService{
 		transactionFrom.setActive(true);
 		transactionFrom.setApprovalStatus("Pending");
 		transactionFrom.setType("DEBIT");
+		transactionFrom.setTransfer(transfer);
 		transactionFrom = initiateDebit(transactionFrom);
 		approveTransactionFromTransfer(transactionFrom);
 		

@@ -89,9 +89,7 @@ public class Transaction {
 	public Transaction(){
 		
 	}
-	
-	
-	
+
 	/**
 	 * @param transactionId
 	 * @param account
@@ -127,7 +125,61 @@ public class Transaction {
 		this.otp = otp;
 	}
 
+	/**
+	 * @return the transactionId
+	 */
+	public UUID getTransactionId() {
+		return transactionId;
+	}
 
+	/**
+	 * @return the account
+	 */
+	public Account getAccount() {
+		return account;
+	}
+
+	/**
+	 * @return the amount
+	 */
+	public double getAmount() {
+		return amount;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * @return the approvalStatus
+	 */
+	public String getApprovalStatus() {
+		return approvalStatus;
+	}
+
+	/**
+	 * @return the oldBalance
+	 */
+	public double getOldBalance() {
+		return oldBalance;
+	}
+
+	/**
+	 * @return the newBalance
+	 */
+	public double getNewBalance() {
+		return newBalance;
+	}
+
+	/**
+	 * @return the criticalStatus
+	 */
+	public boolean isCriticalStatus() {
+		return criticalStatus;
+	}
 
 	/**
 	 * @return the transfer
@@ -136,6 +188,12 @@ public class Transaction {
 		return transfer;
 	}
 
+	/**
+	 * @return the createdOn
+	 */
+	public LocalDateTime getCreatedOn() {
+		return createdOn;
+	}
 
 	/**
 	 * @return the modifiedOn
@@ -143,31 +201,6 @@ public class Transaction {
 	public LocalDateTime getModifiedOn() {
 		return modifiedOn;
 	}
-
-
-	/**
-	 * @return the active
-	 */
-	public Boolean getActive() {
-		return active;
-	}
-
-
-	/**
-	 * @param transfer the transfer to set
-	 */
-	public void setTransfer(Transfer transfer) {
-		this.transfer = transfer;
-	}
-
-
-	/**
-	 * @param modifiedOn the modifiedOn to set
-	 */
-	public void setModifiedOn(LocalDateTime modifiedOn) {
-		this.modifiedOn = modifiedOn;
-	}
-
 
 	/**
 	 * @return the modifiedBy
@@ -177,84 +210,18 @@ public class Transaction {
 	}
 
 	/**
-	 * @param modifiedBy the modifiedBy to set
+	 * @return the active
 	 */
-	public void setModifiedBy(User modifiedBy) {
-		this.modifiedBy = modifiedBy;
+	public Boolean getActive() {
+		return active;
 	}
-
 
 	/**
-	 * @param active the active to set
+	 * @return the otp
 	 */
-	public void setActive(Boolean active) {
-		this.active = active;
+	public String getOtp() {
+		return otp;
 	}
-
-
-	/**
-	 * @return the transactionId
-	 */
-	public UUID getTransactionId() {
-		return transactionId;
-	}
-
-
-	/**
-	 * @return the accountNumber
-	 */
-	public Account getAccount() {
-		return account;
-	}
-
-
-	/**
-	 * @return the amount
-	 */
-	public double getAmount() {
-		return amount;
-	}
-
-
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
-
-
-	/**
-	 * @return the oldBalance
-	 */
-	public double getOldBalance() {
-		return oldBalance;
-	}
-
-	
-	/**
-	 * @return the newBalance
-	 */
-	public double getNewBalance() {
-		return newBalance;
-	}
-
-
-	/**
-	 * @return the criticalStatus
-	 */
-	public boolean isCriticalStatus() {
-		return criticalStatus;
-	}
-
-
-	/**
-	 * @return the createdOn
-	 */
-	public LocalDateTime getCreatedOn() {
-		return createdOn;
-	}
-
 
 	/**
 	 * @param transactionId the transactionId to set
@@ -263,14 +230,12 @@ public class Transaction {
 		this.transactionId = transactionId;
 	}
 
-
 	/**
 	 * @param account the account to set
 	 */
 	public void setAccount(Account account) {
 		this.account = account;
 	}
-
 
 	/**
 	 * @param amount the amount to set
@@ -279,7 +244,6 @@ public class Transaction {
 		this.amount = amount;
 	}
 
-
 	/**
 	 * @param type the type to set
 	 */
@@ -287,6 +251,12 @@ public class Transaction {
 		this.type = type;
 	}
 
+	/**
+	 * @param approvalStatus the approvalStatus to set
+	 */
+	public void setApprovalStatus(String approvalStatus) {
+		this.approvalStatus = approvalStatus;
+	}
 
 	/**
 	 * @param oldBalance the oldBalance to set
@@ -295,14 +265,12 @@ public class Transaction {
 		this.oldBalance = oldBalance;
 	}
 
-
 	/**
 	 * @param newBalance the newBalance to set
 	 */
 	public void setNewBalance(double newBalance) {
 		this.newBalance = newBalance;
 	}
-
 
 	/**
 	 * @param criticalStatus the criticalStatus to set
@@ -311,14 +279,12 @@ public class Transaction {
 		this.criticalStatus = criticalStatus;
 	}
 
-
-//	/**
-//	 * @param transferId the transferId to set
-//	 */
-//	public void setTransferId(UUID transferId) {
-//		this.transferId = transferId;
-//	}
-
+	/**
+	 * @param transfer the transfer to set
+	 */
+	public void setTransfer(Transfer transfer) {
+		this.transfer = transfer;
+	}
 
 	/**
 	 * @param createdOn the createdOn to set
@@ -327,28 +293,25 @@ public class Transaction {
 		this.createdOn = createdOn;
 	}
 
-
 	/**
-	 * @return the status
+	 * @param modifiedOn the modifiedOn to set
 	 */
-	public String getApprovalStatus() {
-		return approvalStatus;
+	public void setModifiedOn(LocalDateTime modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 
-
 	/**
-	 * @param status the status to set
+	 * @param modifiedBy the modifiedBy to set
 	 */
-	public void setApprovalStatus(String status) {
-		this.approvalStatus = status;
+	public void setModifiedBy(User modifiedBy) {
+		this.modifiedBy = modifiedBy;
 	}
 
-
 	/**
-	 * @return the otp
+	 * @param active the active to set
 	 */
-	public String getOtp() {
-		return otp;
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	/**
@@ -370,4 +333,5 @@ public class Transaction {
 				+ ", otp=" + otp + "]";
 	}
 
+	
 }
