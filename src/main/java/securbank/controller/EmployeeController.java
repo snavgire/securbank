@@ -179,4 +179,24 @@ public class EmployeeController {
 		
         return "redirect:/employee/user/request";
     }	
+	
+	@GetMapping("/employee/transfers")
+    public String transferPage(Model model) {
+        return "employee/pendingtransfers";
+    }
+	
+	@GetMapping("/employee/transfers/single")
+    public String approveTransferPage(Model model) {
+        return "employee/approvetransfer";
+    }
+	
+	@GetMapping("/employee/transactions")
+    public String transactionPage(Model model) {
+        return "employee/pendingtransactions";
+    }
+	
+	@GetMapping("/employee/transactions/single")
+    public String approveTransactionPage(Model model) {
+        return "employee/approvetransaction";
+    }
 }
