@@ -41,7 +41,8 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
   <div class="container" style="margin-top:15px;">
     <form class="form-horizontal" action="#" th:action="@{/user/createtransfer}" th:object="${transfer}" method="post">
       <fieldset>
-
+ 		 <p> Please generate your OTP before you proceed with the transfer </p>
+		
         <!-- Text input-->
         <div class="form-group">
           <label class="col-xs-5 control-label" for="textinput">To:</label>
@@ -64,7 +65,10 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
           <div class="alert alert-danger"
           th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
         </div>
-
+   	<p><a th:href="@{/user/transfer/otp}">Generate OTP</a></p>
+        <p>
+        	OTP: <input type="text" th:field="*{otp}" /> </p>
+     
       <!-- Button -->
       <div class="form-group">
         <label class="col-md-5 control-label" for="submitbutton"></label>

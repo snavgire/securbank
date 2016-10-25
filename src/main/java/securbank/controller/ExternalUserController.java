@@ -3,6 +3,10 @@
  */
 package securbank.controller;
 
+
+import java.util.List;
+import java.util.UUID;
+
 import java.util.UUID;
 import javax.servlet.http.HttpSession;
 
@@ -20,6 +24,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
+
+import securbank.services.AccountService;
+import securbank.services.OtpService;
 import securbank.models.ViewAuthorization;
 import securbank.services.UserService;
 import securbank.services.ViewAuthorizationService;
@@ -28,6 +35,7 @@ import securbank.services.TransferService;
 import securbank.validators.NewTransactionFormValidator;
 import securbank.validators.NewTransferFormValidator;
 import securbank.validators.EditUserFormValidator;
+import securbank.validators.NewMerchantPaymentFormValidator;
 import securbank.validators.NewUserFormValidator;
 
 
@@ -50,6 +58,9 @@ public class ExternalUserController {
 	private TransferService transferService;
 	
 	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
 	NewTransferFormValidator transferFormValidator;
 	
 	@Autowired
@@ -63,6 +74,12 @@ public class ExternalUserController {
 	
 	@Autowired 
 	EditUserFormValidator editUserFormValidator;
+	
+	@Autowired
+	NewMerchantPaymentFormValidator merchantPaymentFormValidator;
+	
+	@Autowired
+	OtpService otpService;
 	
 	final static Logger logger = LoggerFactory.getLogger(ExternalUserController.class);
 
@@ -87,27 +104,40 @@ public class ExternalUserController {
 		return "external/createtransaction";
 	}
 	
+	@GetMapping("/user/transaction/otp")
+	public String createTransactionOtp(Model model){
+		model.addAttribute("transaction", new Transaction());
+		logger.info("GET request: Extrernal user transaction generate OTP");
+		User currentUser = userService.getCurrentUser();
+		otpService.createOtpForUser(currentUser);
+		
+		return "redirect:/user/createtransaction";
+	}
+	
 	@PostMapping("/user/createtransaction")
     public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
 		logger.info("POST request: Submit transaction");
 		
 		transactionFormValidator.validate(transaction, bindingResult);
-		
+
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransaction form with validation errors");
-			return "external/createtransaction";
+			return "redirect:/user/createtransaction";
 		}
 		
 		if(transaction.getType().contentEquals("CREDIT")){
 			if (transactionService.initiateCredit(transaction) == null) {
-				return "redirect:/";
+				return "redirect:/error?code=400&path=transaction-error";
 			}
 		}
 		else {
 			if (transactionService.initiateDebit(transaction) == null) {
-				return "redirect:/";
+				return "redirect:/error?code=400&path=transaction-error";
 			}
 		}
+		
+		//deactivate current otp
+		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
 		return "redirect:/user/createtransaction";
     }
@@ -116,7 +146,18 @@ public class ExternalUserController {
 	public String newTransferForm(Model model){
 		model.addAttribute("transfer", new Transfer());
 		logger.info("GET request: Extrernal user transfer creation request");
+		
 		return "external/createtransfer";
+	}
+
+	@GetMapping("/user/transfer/otp")
+	public String createTransferOtp(Model model){
+		model.addAttribute("transfer", new Transfer());
+		logger.info("GET request: Extrernal user transfer generate OTP");
+		User currentUser = userService.getCurrentUser();
+		otpService.createOtpForUser(currentUser);
+		
+		return "redirect:/user/createtransfer";
 	}
 	
 	@PostMapping("user/createtransfer")
@@ -127,16 +168,64 @@ public class ExternalUserController {
 		
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransfer form with validation errors");
-			return "external/createtransfer";
+			return "redirect:user/createtransfer";
 		}
 		
 		if(transferService.initiateTransfer(transfer)==null){
-			return "redirect:/";
+			return "redirect:/error?code=400&path=transfer-error";
 		}
+		
+		//deactivate current otp
+		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
 		return "redirect:/user/createtransfer";
 	}
 
+	@GetMapping("/user/merchant/payment")
+	public String newMerchantTransferForm(Model model){
+		model.addAttribute("transfer", new Transfer());
+		logger.info("GET request: Extrernal user transfer creation request");
+		
+		return "external/merchantpayment";
+	}
+
+	@GetMapping("/user/merchanttransfer/otp")
+	public String createMerchantTransferOtp(Model model){
+		model.addAttribute("transfer", new Transfer());
+		logger.info("GET request: Extrernal user transfer generate OTP");
+		User currentUser = userService.getCurrentUser();
+		otpService.createOtpForUser(currentUser);
+		
+		return "redirect:/user/merchant/payment";
+	}
+	
+	@PostMapping("/user/merchant/payment")
+    public String submitNewMerchantTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) {
+		logger.info("POST request: Submit transfer");
+		
+		merchantPaymentFormValidator.validate(transfer, bindingResult);
+		
+		String otp = otpService.getOtpByUser(userService.getCurrentUser()).getCode();
+		 if(!transfer.getOtp().equals(otp)){
+			logger.info("Otp mismatch");
+			return "redirect:/error?code=400&path=transfer-error";
+		 }
+		
+		if(bindingResult.hasErrors()){
+			logger.info("POST request: createtransfer form with validation errors");
+			return "redirect:/error?code=400&path=transfer-error";
+		}
+		
+		if(transferService.initiateMerchantPaymentRequest(transfer)==null){
+			return "redirect:/error?code=400&path=transfer-error";
+		}
+		
+		//deactivate current otp
+		otpService.deactivateOtpByUser(userService.getCurrentUser());
+		
+		return "redirect:/user/merchant/payment";
+	}
+	
 	@GetMapping("/user/edit")
     public String editUser(Model model) {
 		User user = userService.getCurrentUser();
@@ -161,6 +250,83 @@ public class ExternalUserController {
         return "redirect:/";
     }
 	
+
+	@GetMapping("/user/transfers")
+    public String getTransfers(Model model) {
+		logger.info("GET request:  All pending transfers");
+		
+		List<Transfer> transfers = transferService.getTransfersByStatusAndUser(userService.getCurrentUser(),"Waiting");
+		if (transfers == null) {
+			return "redirect:/error?code=404&path=transfers-not-found";
+		}
+		model.addAttribute("transfers", transfers);
+		
+        return "external/pendingtransfers";
+    }
+	
+	@PostMapping("/user/transfer/request/{id}")
+    public String approveRejectTransfer(@ModelAttribute Transfer trans, @PathVariable() UUID id, BindingResult bindingResult) {
+		
+		Transfer transfer = transferService.getTransferById(id);
+		if (transfer == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+		
+		// checks if user is authorized for the request to approve
+		if (!transfer.getFromAccount().getUser().getEmail().equalsIgnoreCase(userService.getCurrentUser().getEmail())) {
+			logger.warn("Transafer made TO non external account");
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		if (!transfer.getToAccount().getUser().getRole().equalsIgnoreCase("ROLE_MERCHANT")) {
+			logger.warn("Transafer made FROM non merchant account");
+					
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+		if("approved".equalsIgnoreCase(trans.getStatus())){
+			//check if transfer is valid in case modified
+			if(transferService.isTransferValid(transfer)==false){
+				return "redirect:/error?code=401&path=amount-invalid";
+			}
+			transferService.approveTransferToPending(transfer);
+		}
+		else if ("rejected".equalsIgnoreCase(trans.getStatus())) {
+			transferService.declineTransfer(transfer);
+		}
+		
+		logger.info("GET request: Manager approve/decline external transaction requests");
+		
+        return "redirect:/user/transfers";
+    }
+	
+	@GetMapping("/user/transfer/{id}")
+    public String getTransferRequest(Model model, @PathVariable() UUID id) {
+		Transfer transfer = transferService.getTransferById(id);
+		
+		if (transfer == null) {
+			return "redirect:/error?code=404&path=request-invalid";
+		}
+
+		// checks if user is authorized for the request to approve
+		if (!transfer.getFromAccount().getUser().getEmail().equalsIgnoreCase(userService.getCurrentUser().getEmail())) {
+			logger.warn("Transafer made TO non external account");
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+		
+				
+		if (!transfer.getToAccount().getUser().getRole().equalsIgnoreCase("ROLE_MERCHANT")) {
+			logger.warn("Transafer made FROM non merchant account");
+					
+			return "redirect:/error?code=401&path=request-unauthorised";
+		}
+				
+		model.addAttribute("transfer", transfer);
+		logger.info("GET request: User merchant transfer request by ID");
+		
+        return "external/approverequests";
+	}
+
 	@GetMapping("/user/request")
     public String getRequest(Model model) {
 		User user = userService.getCurrentUser();
@@ -217,4 +383,5 @@ public class ExternalUserController {
 		
         return "redirect:/user/request";
     }
+
 }

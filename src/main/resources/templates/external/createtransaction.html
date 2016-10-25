@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 xmlns:th="http://www.thymeleaf.org"
 xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
-  <title>Transactions</title>
+	<head>
+	<title>Transactions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet"
   th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
@@ -43,6 +43,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
   <div class="container" style="margin-top:15px;">
     <form class="form-horizontal" action="#" th:action="@{/user/createtransaction}" th:object="${transaction}" method="post">
       <fieldset>
+   		<p> Please generate your OTP before you proceed with the transaction </p>
 
         <div class="form-group">
           <label class="col-xs-5 control-label" for="selectbasic">Type</label>
@@ -65,7 +66,10 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
           <div class="alert alert-danger"
           th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
         </div>
-
+	<p><a th:href="@{/user/transaction/otp}">Generate OTP</a></p>
+        <p>
+        	OTP: <input type="text" th:field="*{otp}" /> </p>
+ 
       <!-- Button -->
       <div class="form-group">
         <label class="col-md-5 control-label" for="submitbutton"></label>
