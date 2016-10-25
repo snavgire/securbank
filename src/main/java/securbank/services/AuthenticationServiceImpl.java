@@ -105,6 +105,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		user.setLastLogin(LocalDateTime.now());
 		//Login Successful, LoginAttempt counter reset to 0
 		LoginAttempt attempt = user.getLoginAttempt();
+		if(attempt==null)
+			attempt=new LoginAttempt(user, 0, LocalDateTime.now());
 		attempt.setCounter(0);
 		attempt.setLastUpdated(LocalDateTime.now());
 		user.setLoginAttempt(attempt);

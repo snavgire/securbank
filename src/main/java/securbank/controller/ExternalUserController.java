@@ -4,7 +4,6 @@
 package securbank.controller;
 
 import java.util.UUID;
-
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -22,13 +21,13 @@ import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
 import securbank.models.ViewAuthorization;
-import securbank.services.TransactionService;
-import securbank.services.TransferService;
 import securbank.services.UserService;
 import securbank.services.ViewAuthorizationService;
-import securbank.validators.EditUserFormValidator;
+import securbank.services.TransactionService;
+import securbank.services.TransferService;
 import securbank.validators.NewTransactionFormValidator;
 import securbank.validators.NewTransferFormValidator;
+import securbank.validators.EditUserFormValidator;
 import securbank.validators.NewUserFormValidator;
 
 
