@@ -7,7 +7,6 @@ package securbank.controller;
 import java.util.List;
 import java.util.UUID;
 
-import java.util.UUID;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -247,7 +246,7 @@ public class MerchantController {
 		// create request
     	userService.createExternalModificationRequest(user);
 	
-        return "redirect:/";
+        return "redirect:/merchant/details";
     }
 	
 

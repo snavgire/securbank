@@ -105,7 +105,7 @@ public class ManagerController {
     	userService.createInternalModificationRequest(user);
     	logger.info("POST request: Manager New modification request");
     	
-        return "redirect:/";
+        return "redirect:/manager/details";
     }
 	
 	@GetMapping("/manager/user/request")

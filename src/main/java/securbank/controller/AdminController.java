@@ -98,7 +98,7 @@ public class AdminController {
     	userService.editUser(user);
     	logger.info("POST request: Admin edit");
     	
-        return "redirect:/";
+        return "redirect:/admin/details";
     }
 	
 	@GetMapping("/admin/user/add")

@@ -95,7 +95,7 @@ public class EmployeeController {
     	userService.createInternalModificationRequest(user);
     	logger.info("POST request: Employee New modification request");
     	
-        return "redirect:/";
+        return "redirect:/employee/details";
     }
 	
 	@GetMapping("/employee/user/request")
