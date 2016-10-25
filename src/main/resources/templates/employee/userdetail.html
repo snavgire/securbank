@@ -18,22 +18,17 @@
 			<p class="navbar-brand">Cardinals Banking</p>
 		</div>
 		<ul class="nav navbar-nav navbar-right">
-		      <li><a th:href="@{/user/details}">My Dashboard</a></li>
-		      <li><a th:href="@{/logout}">Logout</a></li>
-		    </ul>
+					<li><a th:href="@{/employee/details}">My Dashboard</a></li>
+					<li><a th:href="@{/logout}">Logout</a></li>
+				</ul>
 		</div>
-</nav>
+	</nav>
+
 	<div class="container">
-		<h3>User Dashboard</h3>
-		<ul class="nav nav-tabs nav-justified">
-			<li class="active"><a href="#">My Profile</a></li>
-			<li><a th:href="@{/user/createtransaction}">Transactions</a></li>
-			<li><a th:href="@{/user/request}">View Access Requests</a></li>
-		</ul>
+		<h3 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h3>
 	</div>
 
 	<div class="container">
-		<h4 th:text="${user.firstName+' '+user.lastName+'s Profile'}"></h4>
 		<table class="table table-user-information">
 			<tbody>
 				<tr>
@@ -72,14 +67,9 @@
 					<td>Role</td>
 					<td th:text="${user.role}"></td>
 				</tr>
-				<tr>
-					<td>
-						<a th:href="@{/user/edit}" id="editbutton" name="editbutton"
-							class="btn btn-primary">Edit</a>
-					</td>
-				</tr>
 			</tbody>
 		</table>
 	</div>
+
 </body>
 </html>

@@ -3,9 +3,11 @@
  */
 package securbank.controller;
 
+
 import java.util.List;
 import java.util.UUID;
 
+import java.util.UUID;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -22,11 +24,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
+
 import securbank.services.AccountService;
 import securbank.services.OtpService;
+import securbank.models.ViewAuthorization;
+import securbank.services.UserService;
+import securbank.services.ViewAuthorizationService;
 import securbank.services.TransactionService;
 import securbank.services.TransferService;
-import securbank.services.UserService;
 import securbank.validators.NewTransactionFormValidator;
 import securbank.validators.NewTransferFormValidator;
 import securbank.validators.EditUserFormValidator;
@@ -60,6 +65,9 @@ public class ExternalUserController {
 	
 	@Autowired
 	public HttpSession session;
+
+	@Autowired 
+	ViewAuthorizationService viewAuthorizationService;
 
 	@Autowired 
 	NewUserFormValidator userFormValidator;
@@ -111,16 +119,10 @@ public class ExternalUserController {
 		logger.info("POST request: Submit transaction");
 		
 		transactionFormValidator.validate(transaction, bindingResult);
-		
-		String otp = otpService.getOtpByUser(transaction.getAccount().getUser()).getCode();
-		 if(!transaction.getOtp().equals(otp)){
-			logger.info("Otp mismatch");
-			return "redirect:/error?code=400&path=transfer-error";
-		 }
-		
+
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransaction form with validation errors");
-			return "redirect:/error?code=400&path=transaction-error";
+			return "redirect:/user/createtransaction";
 		}
 		
 		if(transaction.getType().contentEquals("CREDIT")){
@@ -164,15 +166,9 @@ public class ExternalUserController {
 		
 		transferFormValidator.validate(transfer, bindingResult);
 		
-		String otp = otpService.getOtpByUser(userService.getCurrentUser()).getCode();
-		 if(!transfer.getOtp().equals(otp)){
-			logger.info("Otp mismatch");
-			return "redirect:/error?code=400&path=transfer-error";
-		 }
-		
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransfer form with validation errors");
-			return "redirect:/error?code=400&path=transfer-error";
+			return "redirect:user/createtransfer";
 		}
 		
 		if(transferService.initiateTransfer(transfer)==null){
@@ -254,6 +250,7 @@ public class ExternalUserController {
         return "redirect:/";
     }
 	
+
 	@GetMapping("/user/transfers")
     public String getTransfers(Model model) {
 		logger.info("GET request:  All pending transfers");
@@ -329,4 +326,62 @@ public class ExternalUserController {
 		
         return "external/approverequests";
 	}
+
+	@GetMapping("/user/request")
+    public String getRequest(Model model) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/error";
+		}
+		
+		model.addAttribute("viewrequests", viewAuthorizationService.getPendingAuthorization(user));
+		
+        return "external/accessrequests";
+    }
+	
+	@GetMapping("/user/request/view/{id}")
+    public String getRequest(@PathVariable UUID id, Model model) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		
+		ViewAuthorization authorization = viewAuthorizationService.getAuthorizationById(id);
+		if (authorization == null) {
+			return "redirect:/error?code=404";
+		}
+		if (authorization.getExternal() != user) {
+			return "redirect:/error?code=401";
+		}
+		
+		model.addAttribute("viewrequest", authorization);
+		
+        return "external/accessrequest_detail";
+    }
+	
+	@PostMapping("/user/request/{id}")
+    public String getRequests(@PathVariable UUID id, @ModelAttribute ViewAuthorization request, BindingResult bindingResult) {
+		User user = userService.getCurrentUser();
+		if (user == null) {
+			return "redirect:/login";
+		}
+		String status = request.getStatus();
+		if (status == null || !(status.equals("approved") || status.equals("rejected"))) {
+			return "redirect:/error?code=400";
+		}
+		
+		ViewAuthorization authorization = viewAuthorizationService.getAuthorizationById(id);
+		if (authorization == null) {
+			return "redirect:/error?code=404";
+		}
+		if (authorization.getExternal() != user) {
+			return "redirect:/error?code=401";
+		}
+		
+		authorization.setStatus(status);
+		authorization = viewAuthorizationService.approveAuthorization(authorization);
+		
+        return "redirect:/user/request";
+    }
+
 }

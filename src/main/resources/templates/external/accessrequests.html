@@ -3,7 +3,7 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-<title>Employee Dashboard</title>
+<title>User Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet"
 	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
@@ -38,20 +38,17 @@
 			<p class="navbar-brand">Cardinals Banking</p>
 		</div>
 		<ul class="nav navbar-nav navbar-right">
-		      <li><a th:href="@{/employee/details}">My Dashboard</a></li>
+		      <li><a th:href="@{/user/details}">My Dashboard</a></li>
 		      <li><a th:href="@{/logout}">Logout</a></li>
 		    </ul>
 		</div>
 </nav>
 	<div class="container">
-		<h3>Employee Dashboard</h3>
+		<h3>User Dashboard</h3>
 		<ul class="nav nav-tabs nav-justified">
-			<li><a th:href="@{/employee/user}">View External User Accounts</a></li>
-			<li><a th:href="@{/employee/details}">My Profile</a></li>
-			<li><a th:href="@{/employee/user/requestaccess}">Request Access</a></li>
-			<li><a th:href="@{/employee/user/request}">New External User Requests</a></li>
-      <li><a th:href="@{/employee/transfers}">Pending Transfers</a></li>
-      <li class="active"><a href="#">Pending Transactions</a></li>
+			<li><a th:href="@{/user/details}">My Profile</a></li>
+			<li><a th:href="@{/user/createtransaction}">Transactions</a></li>
+			<li class="active"><a href="#">View Access Requests</a></li>
 		</ul>
 	</div>
 	<div class="container">
@@ -62,21 +59,19 @@
 	<div class="container">
 		<table class="table table-striped">
 			<thead>
-        <tr>
-  				<th>Username</th>
-  				<th>Account Number</th>
-          <th>Amount</th>
-  				<th>Type</th>
-  			</tr>
+				<tr>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Role</th>
+				</tr>
 			</thead>
 			<tbody class="searchable">
-        <tr th:each="transaction : ${transactions}">
-  				<td th:text="${transaction.account.user.username}"></td>
-  				<td th:text="${transaction.account.accountNumber}"></td>
-  				<td th:text="${transaction.amount}"></td>
-  				<td th:text="${transaction.type}"></td>
-  				<td><a th:href="@{/employee/transaction/{id}(id=${transaction.transactionId})}">View</a></td>
-  			</tr>
+				<tr th:each="request : ${viewrequests}">
+					<td th:text="${request.employee.firstName}"></td>
+					<td th:text="${request.employee.lastName}"></td>
+					<td><a class="btn btn-primary"
+						th:href="@{/user/request/view/{id}(id=${request.id})}">View</a></td>
+				</tr>
 			</tbody>
 		</table>
 	</div>
