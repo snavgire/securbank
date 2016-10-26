@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User createInternalUser(User user) {
-NewUserRequest newUserRequest = new NewUserRequest();
+		NewUserRequest newUserRequest = new NewUserRequest();
 		
 		// verify if request exists
 		newUserRequest = newUserRequestDao.findByEmailAndRole(user.getEmail(), user.getRole()); 
