@@ -3,7 +3,7 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-<title>System Manager Dashboard</title>
+<title>User Profile</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet"
 	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
@@ -18,21 +18,18 @@
 			<p class="navbar-brand">Cardinals Banking</p>
 		</div>
 		<ul class="nav navbar-nav navbar-right">
-		      <li><a th:href="@{/manager/details}">My Dashboard</a></li>
+		      <li><a th:href="@{/merchant/details}">My Dashboard</a></li>
 		      <li><a th:href="@{/logout}">Logout</a></li>
 		    </ul>
 		</div>
 </nav>
 	<div class="container">
-		<h3>System Manager Dashboard</h3>
+		<h3>User Dashboard</h3>
 		<ul class="nav nav-tabs nav-justified">
-			<li><a th:href="@{/manager/user}">View External User Accounts</a></li>
 			<li class="active"><a href="#">My Profile</a></li>
-			<li><a th:href="@{/manager/user/request}">New External User Requests</a></li>
-			<li><a th:href="@{/manager/employee/authorize}">Authorize Access</a></li>
-			<li><a th:href="@{/manager/employee/request}">View Access Requests</a></li>
-			<li><a th:href="@{/manager/transfers}">Pending Transfers</a></li>
-			<li><a th:href="@{/manager/transactions}">Pending Transactions</a></li>
+			<li><a th:href="@{/merchant/createtransaction}">Transactions</a></li>
+			<li><a th:href="@{/merchant/transfers}">Pending Transfer Requests</a></li>
+			<li><a th:href="@{/merchant/request}">View Access Requests</a></li>
 		</ul>
 	</div>
 
@@ -78,7 +75,7 @@
 				</tr>
 				<tr>
 					<td>
-						<a th:href="@{/manager/edit}" id="editbutton" name="editbutton"
+						<a th:href="@{/merchant/edit}" id="editbutton" name="editbutton"
 							class="btn btn-primary">Edit</a>
 					</td>
 				</tr>

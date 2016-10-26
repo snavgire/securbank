@@ -19,7 +19,7 @@
 			<p class="navbar-brand">Cardinals Banking</p>
 		</div>
 		<ul class="nav navbar-nav navbar-right">
-		      <li><a th:href="@{/employee/details}">My Dashboard</a></li>
+		      <li><a th:href="@{/merchant/details}">My Dashboard</a></li>
 		      <li><a th:href="@{/logout}">Logout</a></li>
 		    </ul>
 		</div>
@@ -28,19 +28,21 @@
 	<div class="alert alert-danger" th:if="${param.error}"></div>
 
 	<div class="container">
-		<form class="form-horizontal" action="#" th:action="@{/employee/user/edit/{id}(id=${user.userId})}"
+		<form class="form-horizontal" action="#" th:action="@{/merchant/edit}"
 			th:object="${user}" method="post">
 			<fieldset>
 
 				<!-- Form Name -->
-				<legend>Edit Internal User Profile</legend>
+				<legend>Edit User Profile</legend>
 
 				<!-- Text input-->
 				<div class="form-group">
 					<label class="col-md-4 control-label" for="textinput">Username</label>
 					<div class="col-md-4">
 						<input id="textinput" name="textinput" type="text" placeholder=""
-							class="form-control input-md" required="" th:field="*{username}" readonly="true"/>
+							class="form-control input-md" required="" th:field="*{username}" />
+						<div class="alert alert-danger"
+							th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
 					</div>
 				</div>
 
@@ -135,19 +137,6 @@
 						<div class="alert alert-danger"
 							th:if="${#fields.hasErrors('zip')}" th:errors="*{zip}"></div>
 					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="col-md-4 control-label" for="selectbasic">Role</label>
-					<div class="col-md-4">
-						<select id="selectbasic" name="selectbasic" class="form-control"
-							th:field="*{role}">
-							<option th:value="ROLE_INDIVIDUAL" th:selected="(*{role}==ROLE_INDIVIDUAL)">Individual</option>
-							<option th:value="ROLE_MERCHANT" th:selected="(*{role}==ROLE_MERCHANT)">Merchant</option>
-						</select>
-					</div>
-					<div class="alert alert-danger"
-						th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
 				</div>
 
 

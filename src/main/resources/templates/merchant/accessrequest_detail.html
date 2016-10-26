@@ -18,7 +18,7 @@
 			<p class="navbar-brand">Cardinals Banking</p>
 		</div>
 		<ul class="nav navbar-nav navbar-right">
-					<li><a th:href="@{/user/details}">My Dashboard</a></li>
+					<li><a th:href="@{/merchant/details}">My Dashboard</a></li>
 					<li><a th:href="@{/logout}">Logout</a></li>
 				</ul>
 		</div>
@@ -29,7 +29,7 @@
 	</div>
 
 	<form action="#"
-		th:action="@{/user/request/{id}(id=${viewrequest.id})}"
+		th:action="@{/merchant/request/{id}(id=${viewrequest.id})}"
 		th:object="${viewrequest}" method="post">
 	<div class="container">
 		<table class="table table-user-information">

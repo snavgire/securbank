@@ -3,7 +3,7 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-<title>Approve Request</title>
+<title>Transfer Request Approval</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet"
 	th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
@@ -25,26 +25,26 @@
 	</nav>
 
 	<div class="container">
-		<h3>Request Approval page</h3>
+		<h3>Transfer Request Approval</h3>
 	</div>
 
-	<form action="#"
-		th:action="@{/user/request/{id}(id=${viewrequest.id})}"
-		th:object="${viewrequest}" method="post">
+	<form class="form-horizontal" action="#"
+		th:action="@{/user/transfer/request/{id}(id=${transfer.transferId})}"
+		th:object="${transfer}" method="post">
 	<div class="container">
 		<table class="table table-user-information">
 			<tbody>
 				<tr>
-					<td>First Name</td>
-					<td th:text="*{employee.firstName}"></td>
+					<td>From Account</td>
+					<td th:text="${transfer.fromAccount.accountNumber}"></td>
 				</tr>
 				<tr>
-					<td>Last Name</td>
-					<td th:text="*{employee.lastName}"></td>
+					<td>To Account</td>
+					<td th:text="${transfer.toAccount.accountNumber}"></td>
 				</tr>
 				<tr>
-					<td>Email:</td>
-					<td th:text="*{employee.email}"></td>
+					<td>Amount</td>
+					<td th:text="${transfer.amount}"></td>
 				</tr>
 			</tbody>
 		</table>
