@@ -2,6 +2,7 @@ package securbank.controller;
 
 import java.util.UUID;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -127,13 +128,17 @@ public class CommonController {
 	}
 
 	@GetMapping("/verify/{id}")
-	public String verifyNewUser(Model model, @PathVariable UUID id) {
+	public String verifyNewUser(HttpServletResponse response, Model model, @PathVariable UUID id) {
 		if (userService.verifyNewUser(id) == false) {
 			logger.info("GET request: verification failed of new external user");
 			return "redirect:/error?code=400";
 		}
+		
 		logger.info("GET request: verification of new external user");
-
+		Cookie cookie = new Cookie("flag", "true");
+		cookie.setMaxAge(30*24*60*60 );
+		response.addCookie(cookie);
+		
 		return "redirect:/";
     }
 	
