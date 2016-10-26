@@ -57,7 +57,7 @@ public class GlobalExceptionController {
 	public ModelAndView handleAllException(Exception ex) {
 
 		ModelAndView model = new ModelAndView("error/genericError");
-		model.addObject("errMsg", "this is Exception.class");
+		model.addObject("400", "Bad Request");
 
 		return model;
 	}

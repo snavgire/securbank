@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import securbank.exceptions.Exceptions;
 import securbank.models.Transaction;
 import securbank.models.Transfer;
 import securbank.models.User;
@@ -84,10 +85,11 @@ public class MerchantController {
 	final static Logger logger = LoggerFactory.getLogger(MerchantController.class);
 
 	@GetMapping("/merchant/details")
-    public String currentUserDetails(Model model) {
+    public String currentUserDetails(Model model) throws Exceptions {
 		User user = userService.getCurrentUser();
 		if (user == null) {
-			return "redirect:/error?code=400&path=user-notfound";
+			//return "redirect:/error?code=400&path=user-notfound";
+			throw new Exceptions("400","User Not Found !");
 		}
 		
 		model.addAttribute("user", user);
@@ -115,7 +117,7 @@ public class MerchantController {
 	}
 	
 	@PostMapping("/merchant/createtransaction")
-    public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) {
+    public String submitNewTransaction(@ModelAttribute Transaction transaction, BindingResult bindingResult) throws Exceptions {
 		logger.info("POST request: Submit transaction");
 		
 		transactionFormValidator.validate(transaction, bindingResult);
@@ -127,12 +129,14 @@ public class MerchantController {
 		
 		if(transaction.getType().contentEquals("CREDIT")){
 			if (transactionService.initiateCredit(transaction) == null) {
-				return "redirect:/error?code=400&path=transaction-error";
+				//return "redirect:/error?code=400&path=transaction-error";
+				throw new Exceptions("400","Transaction Error !");
 			}
 		}
 		else {
 			if (transactionService.initiateDebit(transaction) == null) {
-				return "redirect:/error?code=400&path=transaction-error";
+				//return "redirect:/error?code=400&path=transaction-error";
+				throw new Exceptions("400","Transaction Error !");
 			}
 		}
 		
@@ -161,7 +165,7 @@ public class MerchantController {
 	}
 	
 	@PostMapping("merchant/createtransfer")
-    public String submitNewTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) {
+    public String submitNewTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) throws Exceptions {
 		logger.info("POST request: Submit transfer");
 		
 		transferFormValidator.validate(transfer, bindingResult);
@@ -172,7 +176,8 @@ public class MerchantController {
 		}
 		
 		if(transferService.initiateTransfer(transfer)==null){
-			return "redirect:/error?code=400&path=transfer-error";
+			//return "redirect:/error?code=400&path=transfer-error";
+			throw new Exceptions("400","Transfer Error !");
 		}
 		
 		//deactivate current otp
@@ -200,7 +205,7 @@ public class MerchantController {
 	}
 	
 	@PostMapping("/merchant/payment")
-    public String submitNewMerchantTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) {
+    public String submitNewMerchantTransfer(@ModelAttribute Transfer transfer, BindingResult bindingResult) throws Exceptions {
 		logger.info("POST request: Submit transfer");
 		
 		merchantPaymentFormValidator.validate(transfer, bindingResult);
@@ -208,16 +213,19 @@ public class MerchantController {
 		String otp = otpService.getOtpByUser(userService.getCurrentUser()).getCode();
 		 if(!transfer.getOtp().equals(otp)){
 			logger.info("Otp mismatch");
-			return "redirect:/error?code=400&path=transfer-error";
+			//return "redirect:/error?code=400&path=transfer-error";
+			throw new Exceptions("400","Transfer Error !");
 		 }
 		
 		if(bindingResult.hasErrors()){
 			logger.info("POST request: createtransfer form with validation errors");
-			return "redirect:/error?code=400&path=transfer-error";
+			//return "redirect:/error?code=400&path=transfer-error";
+			throw new Exceptions("400","Transfer Error !");
 		}
 		
 		if(transferService.initiateMerchantPaymentRequest(transfer)==null){
-			return "redirect:/error?code=400&path=transfer-error";
+			//return "redirect:/error?code=400&path=transfer-error";
+			throw new Exceptions("400","Transfer Error !");
 		}
 		
 		//deactivate current otp
@@ -252,12 +260,13 @@ public class MerchantController {
 	
 
 	@GetMapping("/merchant/transfers")
-    public String getTransfers(Model model) {
+    public String getTransfers(Model model) throws Exceptions {
 		logger.info("GET request:  All pending transfers");
 		
 		List<Transfer> transfers = transferService.getTransfersByStatusAndUser(userService.getCurrentUser(),"Waiting");
 		if (transfers == null) {
-			return "redirect:/error?code=404&path=transfers-not-found";
+			//return "redirect:/error?code=404&path=transfers-not-found";
+			throw new Exceptions("404","Transfer Not Found !");
 		}
 		model.addAttribute("transfers", transfers);
 		
@@ -265,29 +274,33 @@ public class MerchantController {
     }
 	
 	@PostMapping("/merchant/transfer/request/{id}")
-    public String approveRejectTransfer(@ModelAttribute Transfer trans, @PathVariable() UUID id, BindingResult bindingResult) {
+    public String approveRejectTransfer(@ModelAttribute Transfer trans, @PathVariable() UUID id, BindingResult bindingResult) throws Exceptions {
 		
 		Transfer transfer = transferService.getTransferById(id);
 		if (transfer == null) {
-			return "redirect:/error?code=404&path=request-invalid";
+			//return "redirect:/error?code=404&path=request-invalid";
+			throw new Exceptions("404","Transfer Not Found !");
 		}
 		
 		// checks if user is authorized for the request to approve
 		if (!transfer.getFromAccount().getUser().getEmail().equalsIgnoreCase(userService.getCurrentUser().getEmail())) {
 			logger.warn("Transafer made TO non external account");
-			return "redirect:/error?code=401&path=request-unauthorised";
+			//return "redirect:/error?code=401&path=request-unauthorised";
+			throw new Exceptions("401"," ");
 		}
 		
 		if (!transfer.getToAccount().getUser().getRole().equalsIgnoreCase("ROLE_MERCHANT")) {
 			logger.warn("Transafer made FROM non merchant account");
 					
-			return "redirect:/error?code=401&path=request-unauthorised";
+			//return "redirect:/error?code=401&path=request-unauthorised";
+			throw new Exceptions("401"," ");
 		}
 		
 		if("approved".equalsIgnoreCase(trans.getStatus())){
 			//check if transfer is valid in case modified
 			if(transferService.isTransferValid(transfer)==false){
-				return "redirect:/error?code=401&path=amount-invalid";
+				//return "redirect:/error?code=401&path=amount-invalid";
+				throw new Exceptions("401","Amount Invalid !");
 			}
 			transferService.approveTransferToPending(transfer);
 		}
@@ -301,24 +314,27 @@ public class MerchantController {
     }
 	
 	@GetMapping("/merchant/transfer/{id}")
-    public String getTransferRequest(Model model, @PathVariable() UUID id) {
+    public String getTransferRequest(Model model, @PathVariable() UUID id) throws Exceptions {
 		Transfer transfer = transferService.getTransferById(id);
 		
 		if (transfer == null) {
-			return "redirect:/error?code=404&path=request-invalid";
+			//return "redirect:/error?code=404&path=request-invalid";
+			throw new Exceptions("404","Invalid Request !");
 		}
 
 		// checks if user is authorized for the request to approve
 		if (!transfer.getFromAccount().getUser().getEmail().equalsIgnoreCase(userService.getCurrentUser().getEmail())) {
 			logger.warn("Transafer made TO non external account");
-			return "redirect:/error?code=401&path=request-unauthorised";
+			//return "redirect:/error?code=401&path=request-unauthorised";
+			throw new Exceptions("401"," ");
 		}
 		
 				
 		if (!transfer.getToAccount().getUser().getRole().equalsIgnoreCase("ROLE_MERCHANT")) {
 			logger.warn("Transafer made FROM non merchant account");
 					
-			return "redirect:/error?code=401&path=request-unauthorised";
+			//return "redirect:/error?code=401&path=request-unauthorised";
+			throw new Exceptions("401"," ");
 		}
 				
 		model.addAttribute("transfer", transfer);
@@ -328,10 +344,11 @@ public class MerchantController {
 	}
 
 	@GetMapping("/merchant/request")
-    public String getRequest(Model model) {
+    public String getRequest(Model model) throws Exceptions {
 		User user = userService.getCurrentUser();
 		if (user == null) {
-			return "redirect:/error";
+			//return "redirect:/error";
+			throw new Exceptions("401"," ");
 		}
 		
 		model.addAttribute("viewrequests", viewAuthorizationService.getPendingAuthorization(user));
@@ -340,7 +357,7 @@ public class MerchantController {
     }
 	
 	@GetMapping("/merchant/request/view/{id}")
-    public String getRequest(@PathVariable UUID id, Model model) {
+    public String getRequest(@PathVariable UUID id, Model model) throws Exceptions {
 		User user = userService.getCurrentUser();
 		if (user == null) {
 			return "redirect:/login";
@@ -348,10 +365,12 @@ public class MerchantController {
 		
 		ViewAuthorization authorization = viewAuthorizationService.getAuthorizationById(id);
 		if (authorization == null) {
-			return "redirect:/error?code=404";
+			//return "redirect:/error?code=404";
+			throw new Exceptions("404"," ");
 		}
 		if (authorization.getExternal() != user) {
-			return "redirect:/error?code=401";
+			//return "redirect:/error?code=401";
+			throw new Exceptions("401"," ");
 		}
 		
 		model.addAttribute("viewrequest", authorization);
@@ -360,22 +379,25 @@ public class MerchantController {
     }
 	
 	@PostMapping("/merchant/request/{id}")
-    public String getRequests(@PathVariable UUID id, @ModelAttribute ViewAuthorization request, BindingResult bindingResult) {
+    public String getRequests(@PathVariable UUID id, @ModelAttribute ViewAuthorization request, BindingResult bindingResult) throws Exceptions {
 		User user = userService.getCurrentUser();
 		if (user == null) {
 			return "redirect:/login";
 		}
 		String status = request.getStatus();
 		if (status == null || !(status.equals("approved") || status.equals("rejected"))) {
-			return "redirect:/error?code=400";
+			//return "redirect:/error?code=400";
+			throw new Exceptions("400"," ");
 		}
 		
 		ViewAuthorization authorization = viewAuthorizationService.getAuthorizationById(id);
 		if (authorization == null) {
-			return "redirect:/error?code=404";
+			//return "redirect:/error?code=404";
+			throw new Exceptions("404"," ");
 		}
 		if (authorization.getExternal() != user) {
-			return "redirect:/error?code=401";
+			//return "redirect:/error?code=401";
+			throw new Exceptions("401"," ");
 		}
 		
 		authorization.setStatus(status);
