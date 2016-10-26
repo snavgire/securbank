@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
      */
 	@Override
 	public User createInternalUser(User user) {
-		NewUserRequest newUserRequest = new NewUserRequest();
+NewUserRequest newUserRequest = new NewUserRequest();
 		
 		// verify if request exists
 		newUserRequest = newUserRequestDao.findByEmailAndRole(user.getEmail(), user.getRole()); 
@@ -109,6 +109,7 @@ public class UserServiceImpl implements UserService {
 		LoginAttempt attempt = new LoginAttempt();
 		attempt.setLastUpdated(LocalDateTime.now());
 		attempt.setCounter(0);
+		attempt.setUser(user);
 		user.setLoginAttempt(attempt);
 		
 		// Deactivates request
