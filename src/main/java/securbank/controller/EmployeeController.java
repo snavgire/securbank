@@ -98,7 +98,7 @@ public class EmployeeController {
     	userService.createInternalModificationRequest(user);
     	logger.info("POST request: Employee New modification request");
     	
-        return "redirect:/";
+        return "redirect:/employee/details?successEdit=true";
     }
 	
 	@GetMapping("/employee/user/request")
@@ -193,7 +193,7 @@ public class EmployeeController {
 		}
 		logger.info("POST request: Employee approves external modification request");
 		
-        return "redirect:/employee/user/request";
+        return "redirect:/employee/user/request?successAction=true";
     }
 	
 	@GetMapping("/employee/user/request/delete/{id}")
@@ -247,7 +247,7 @@ public class EmployeeController {
 		userService.deleteModificationRequest(request);
 		logger.info("POST request: Employee approves modification request");
 		
-        return "redirect:/employee/user/request";
+        return "redirect:/employee/user/request?successDelete=true";
     }	
 	
 	@GetMapping("/employee/user")
@@ -354,7 +354,7 @@ public class EmployeeController {
 			throw new Exceptions("500"," ");
 		}
 		
-        return "redirect:/employee/user";
+        return "redirect:/employee/user?successEdit=true";
     }
 	
 	@GetMapping("/employee/user/delete/{id}")
@@ -409,7 +409,7 @@ public class EmployeeController {
 		userService.deleteUser(id);
 		logger.info("POST request: Employee New modification request");
     	
-        return "redirect:/employee/user";
+        return "redirect:/employee/user?successDelete=true";
     }
 	
 	// View Authorization Start
@@ -441,7 +441,7 @@ public class EmployeeController {
 		viewAuthorizationService.createAuthorization(userService.getCurrentUser(), user, false);
 		logger.info("POST request: Employee request access");
 		
-        return "redirect:/employee/user/requestaccess";
+        return "redirect:/employee/user/requestaccess?success=true";
     }	
 	
 	
@@ -512,7 +512,7 @@ public class EmployeeController {
 		
 		logger.info("GET request: Employee approve/decline external transaction requests");
 		
-        return "redirect:/employee/transactions";
+        return "redirect:/employee/transactions?successAction=true";
     }
 	
 	@GetMapping("/employee/transfers")
@@ -600,6 +600,6 @@ public class EmployeeController {
 		
 		logger.info("GET request: Employee approve/decline external transaction requests");
 		
-        return "redirect:/employee/transfers";
+        return "redirect:/employee/transfers?successAction=true";
     }
 }

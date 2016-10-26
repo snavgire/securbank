@@ -143,7 +143,7 @@ public class ExternalUserController {
 		//deactivate current otp
 		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
-		return "redirect:/user/createtransaction";
+		return "redirect:/user/createtransaction?successTransaction=true";
     }
 	
 	@GetMapping("/user/createtransfer")
@@ -183,7 +183,7 @@ public class ExternalUserController {
 		//deactivate current otp
 		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
-		return "redirect:/user/createtransfer";
+		return "redirect:/user/createtransfer?successTransaction=true";
 	}
 	
 	@GetMapping("/user/edit")
@@ -208,7 +208,7 @@ public class ExternalUserController {
 		// create request
     	userService.createExternalModificationRequest(user);
 	
-        return "redirect:/";
+        return "redirect:/user/details?successEdit=true";
     }
 	
 
@@ -263,7 +263,7 @@ public class ExternalUserController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "redirect:/user/transfers";
+        return "redirect:/user/transfers?successAction=true";
     }
 	
 	@GetMapping("/user/transfer/{id}")
@@ -356,7 +356,7 @@ public class ExternalUserController {
 		authorization.setStatus(status);
 		authorization = viewAuthorizationService.approveAuthorization(authorization);
 		
-        return "redirect:/user/request";
+        return "redirect:/user/request?successAction=true";
     }
 
 }

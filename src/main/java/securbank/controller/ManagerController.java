@@ -107,7 +107,7 @@ public class ManagerController {
     	userService.createInternalModificationRequest(user);
     	logger.info("POST request: Manager New modification request");
     	
-        return "redirect:/";
+        return "redirect:/manager/details?successEdit=true";
     }
 	
 	@GetMapping("/manager/user/request")
@@ -188,7 +188,7 @@ public class ManagerController {
 		}
 		logger.info("POST request: Employee approves external modification request");
 		
-        return "redirect:/manager/user/request";
+        return "redirect:/manager/user/request?successAction=true";
 	}
 
 	@GetMapping("/manager/user")
@@ -291,7 +291,7 @@ public class ManagerController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "redirect:/manager/transactions";
+        return "redirect:/manager/transactions?successAction=true";
     }
 			
 	@GetMapping("/manager/user/edit/{id}")
@@ -341,7 +341,7 @@ public class ManagerController {
 			throw new Exceptions("500"," ");
 		}
 		
-        return "redirect:/manager/user";
+        return "redirect:/manager/user?successEdit=true";
     }
 	
 	@GetMapping("/manager/user/delete/{id}")
@@ -421,7 +421,7 @@ public class ManagerController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "redirect:/manager/transfers";
+        return "redirect:/manager/transfers?successAction=true";
     }
 	
 	@GetMapping("/manager/transfer/{id}")
@@ -469,7 +469,7 @@ public class ManagerController {
 		userService.deleteUser(id);
 		logger.info("POST request: Employee New modification request");
     	
-        return "redirect:/manager/user";
+        return "redirect:/manager/user?successDelete=true";
     }
 	
 	@GetMapping("/manager/user/request/delete/{id}")
@@ -515,7 +515,7 @@ public class ManagerController {
 		userService.deleteModificationRequest(request);
 		logger.info("POST request: Manager approves modification request");
 		
-        return "redirect:/manager/user/request";
+        return "redirect:/manager/user/request?successDelete=true";
 
     }
 	
@@ -602,6 +602,6 @@ public class ManagerController {
 		authorization.setStatus(status);
 		authorization = viewAuthorizationService.approveAuthorization(authorization);
 		
-        return "redirect:/manager/employee/request";
+        return "redirect:/manager/employee/request?successAction=true";
     }
 }

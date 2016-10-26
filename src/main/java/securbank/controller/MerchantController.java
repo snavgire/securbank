@@ -7,7 +7,6 @@ package securbank.controller;
 import java.util.List;
 import java.util.UUID;
 
-import java.util.UUID;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -143,7 +142,7 @@ public class MerchantController {
 		//deactivate current otp
 		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
-		return "redirect:/merchant/createtransaction";
+		return "redirect:/merchant/createtransaction?successTransaction=true";
     }
 	
 	@GetMapping("/merchant/createtransfer")
@@ -183,7 +182,7 @@ public class MerchantController {
 		//deactivate current otp
 		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
-		return "redirect:/merchant/createtransfer";
+		return "redirect:/merchant/createtransfer?successTransaction=true";
 	}
 
 	@GetMapping("/merchant/payment")
@@ -231,7 +230,7 @@ public class MerchantController {
 		//deactivate current otp
 		otpService.deactivateOtpByUser(userService.getCurrentUser());
 		
-		return "redirect:/merchant/payment";
+		return "redirect:/merchant/payment?successPayment=true";
 	}
 	
 	@GetMapping("/merchant/edit")
@@ -255,7 +254,7 @@ public class MerchantController {
 		// create request
     	userService.createExternalModificationRequest(user);
 	
-        return "redirect:/";
+        return "redirect:/merchant/details?successEdit=true";
     }
 	
 
@@ -310,7 +309,7 @@ public class MerchantController {
 		
 		logger.info("GET request: Manager approve/decline external transaction requests");
 		
-        return "redirect:/merchant/transfers";
+        return "redirect:/merchant/transfers?successAction=true";
     }
 	
 	@GetMapping("/merchant/transfer/{id}")
@@ -403,7 +402,7 @@ public class MerchantController {
 		authorization.setStatus(status);
 		authorization = viewAuthorizationService.approveAuthorization(authorization);
 		
-        return "redirect:/merchant/request";
+        return "redirect:/merchant/request?successAction=true";
     }
 
 }

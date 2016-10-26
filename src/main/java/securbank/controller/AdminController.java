@@ -102,7 +102,7 @@ public class AdminController {
     	userService.editUser(user);
     	logger.info("POST request: Admin edit");
     	
-        return "redirect:/";
+        return "redirect:/admin/details?successEdit=true";
     }
 	
 	@GetMapping("/admin/user/add")
@@ -192,7 +192,7 @@ public class AdminController {
 			throw new Exceptions("500"," ");
 		}
 		
-        return "redirect:/admin/user";
+        return "redirect:/admin/user?successEdit=true";
     }
 	
 	@GetMapping("/admin/user/delete/{id}")
@@ -232,7 +232,7 @@ public class AdminController {
 		userService.deleteUser(id);
 		logger.info("POST request: Employee New modification request");
     	
-        return "redirect:/admin/user";
+        return "redirect:/admin/user?successDelete=true";
     }
 	
 	@GetMapping("/admin/user/{id}")
@@ -328,7 +328,7 @@ public class AdminController {
 		}
 		logger.info("POST request: Admin approves modification request");
 		
-        return "redirect:/admin/user/request";
+        return "redirect:/admin/user/request?successAction=true";
     }	
 
 	@GetMapping("/admin/user/request/delete/{id}")
@@ -371,7 +371,7 @@ public class AdminController {
 		userService.deleteModificationRequest(request);
 		logger.info("POST request: Admin approves modification request");
 		
-        return "redirect:/admin/user/request";
+        return "redirect:/admin/user/request?successDelete=true";
     }	
 	
 	@RequestMapping("/admin/syslogs")
